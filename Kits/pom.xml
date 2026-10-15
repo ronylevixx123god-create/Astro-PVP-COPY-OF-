@@ -310,6 +310,14 @@
             <version>1.10.19</version>
             <scope>test</scope>
         </dependency>
+        <!-- LuckPerms API from the LuckPerms 5.4.30 plugin bundled with Astro (provided at runtime) -->
+        <dependency>
+            <groupId>net.luckperms</groupId>
+            <artifactId>api</artifactId>
+            <version>5.4.30</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../Core/lib/LuckPerms-Bukkit-5.4.30.jar</systemPath>
+        </dependency>
     </dependencies>
 
 
