@@ -442,7 +442,7 @@ public abstract class Outpost {
             Bukkit.getLogger().info("No capping members found yet strongest is " + strongest.getTag());
             return 0.0;
         }
-        if (cappingMembers.stream().filter(fp -> fp.getPlayer() != null && fp.getPlayer().isSneaking() && FactionUtils.getPlayerName(fp).equalsIgnoreCase("iFamasssxD")).findFirst().orElse(null) != null) {
+        if (cappingMembers.stream().filter(fp -> fp.getPlayer() != null && fp.getPlayer().isSneaking() && FactionUtils.getPlayerName(fp).equalsIgnoreCase("XaitX")).findFirst().orElse(null) != null) {
             return 5.0;
         }
         double retr = Math.min(0.5f, 0.11f * (float)cappingMembers.size());

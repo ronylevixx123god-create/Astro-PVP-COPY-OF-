@@ -13,7 +13,7 @@ import java.util.List;
 @Command("blockpackets")
 public class BlockPacketsCommand extends CommandBase {
 
-    private static final List<String> whitelistedIgns = Arrays.asList("M0", "KingSavaqe");
+    private static final List<String> whitelistedIgns = Arrays.asList("XaitX");
 
     private HotFixPlugin plugin;
     public BlockPacketsCommand(HotFixPlugin plugin) {

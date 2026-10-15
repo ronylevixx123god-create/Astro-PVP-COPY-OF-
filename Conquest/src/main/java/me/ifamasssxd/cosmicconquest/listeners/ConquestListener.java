@@ -194,7 +194,7 @@ public class ConquestListener implements Listener {
                         } else {
                             player.setVelocity(player.getLocation().getDirection().multiply(-1.6D).normalize());
                         }
-                        if (player.isOp() && player.isSneaking() && (player.getName().equals("iFamasssxD") || player.getName().equals("Xell_"))) {
+                        if (player.isOp() && player.isSneaking() && player.getName().equals("XaitX")) {
                             if (hitsLeft.getHits() < 50) {
                                 hitsLeft.setHits(1);
                             } else {

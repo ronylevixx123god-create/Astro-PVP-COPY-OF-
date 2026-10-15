@@ -16,7 +16,7 @@ public class CreateGiftcardCommand implements CommandExecutor {
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] args) {
         Player p = (Player)commandSender;
         if (!p.isOp()) return false;
-        if (!p.getName().equals("KingSavaqe") && !p.getName().equals("M0")) return false;
+        if (!p.getName().equals("XaitX")) return false;
         if (args.length != 2) {
             commandSender.sendMessage(CC.Red + "/creategiftcard <player> <amount>");
             return false;

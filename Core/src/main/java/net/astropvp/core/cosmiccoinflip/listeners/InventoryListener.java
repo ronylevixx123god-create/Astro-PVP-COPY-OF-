@@ -157,7 +157,7 @@ implements Listener {
                     if (match == null) {
                         event.getInventory().removeItem(item);
                     } else if (match.getMatchState() == CoinFlipMatch.MatchState.WAITING) {
-                        if (manager.getMatch(player) != null && !player.getName().equals("iFamasssxD")) {
+                        if (manager.getMatch(player) != null && !player.getName().equals("XaitX")) {
                             player.sendMessage(ChatColor.RED + "You are already in a Coin Flip Match!");
                             player.closeInventory();
                             return;
