@@ -38,3 +38,22 @@ Either of:
    `com/decimatemc/blackmarketauction/BlackMarketAuction.class`), e.g. from Astro's old server
    `plugins/` folder or from Kian/quantiom. It can be installed as-is; no build needed.
 2. Its complete source (at least `BlackMarketAuction.java` and the auction/menu/command classes).
+
+## Comparison with Astro's older BAH (commit 3caef671e^, why it is not substituted)
+
+| | BAH 2021 (`BAH/`, complete) | AstroBAH 2024 (this module) |
+|---|---|---|
+| Plugin name / data folder | `BlackAuctionHouse` | `BAH` |
+| Origin | decompiled DecimateMC plugin (Procyon header, `decimatebah.admin`) | quantiom, "Remake of Cosmic's BAH" |
+| Commands | `/bah` only | `/bah` (alias `/blackmarketauction`), `/bahloot` |
+| Auction start | manual only (`/bah forcestart`) | recurring/delayed event scheduler with countdown warnings (`eventgame`); intervals in missing code |
+| Bid increment | hard-coded 100000 + fixed thresholds (500k, 1M, 2.5M, 5M, 10M, 50M, 200M, 1B) | `minimum-bid-increment: 100000` in config |
+| Item pool | `possible-items` in config.yml | `items:` in config.yml |
+| History | `past-auctions`, `last-auction` in config.yml | separate `history.yml` |
+| Winner reward | AuctionHouse unclaimed listing (1 day) | likely `/bahloot` (missing code) |
+| Duration | 5 min, +10 s on last-10-s bids | unknown (missing code) |
+
+The 2021 code also withdraws money from the outbid player instead of refunding them
+(`EconomyUtils.withdrawBalance` on the previous top bidder); 2024 behavior unknown.
+They differ in commands, scheduling, config format, data folder and reward delivery, so the
+2021 plugin is not a substitute. The actual 2024 jar or complete source is still required.
