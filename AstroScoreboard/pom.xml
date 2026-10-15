@@ -36,6 +36,15 @@
     </repositories>
 
     <dependencies>
+        <!-- Keep first: Arkkit brings an older CosmicKOTH.jar whose OutpostType has no SPACE.
+             This bundled KoTHs-0.1.jar matches the current KoTHs module API (incl. SPACE). -->
+        <dependency>
+            <groupId>com.conaxgames</groupId>
+            <artifactId>Koth</artifactId>
+            <version>0.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/KoTHs-0.1.jar</systemPath>
+        </dependency>
         <!-- ConaxGames repos -->
         <dependency>
             <groupId>com.conaxgames</groupId>
@@ -231,13 +240,6 @@
             <systemPath>${project.basedir}/lib/CosmicDuel.jar</systemPath>
         </dependency>
 
-        <dependency>
-            <groupId>com.conaxgames</groupId>
-            <artifactId>Koth</artifactId>
-            <version>0.1</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/KoTHs-0.1.jar</systemPath>
-        </dependency>
 
         <dependency>
             <groupId>com.conaxgames</groupId>
