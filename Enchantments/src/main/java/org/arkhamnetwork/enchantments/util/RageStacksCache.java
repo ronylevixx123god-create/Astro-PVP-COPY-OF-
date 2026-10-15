@@ -2,7 +2,7 @@ package org.arkhamnetwork.enchantments.util;
 
 import lombok.Getter;
 import lombok.Setter;
-import com.cosmicpvp.cosmicutils.cache.Cache;
+import net.astropvp.core.utils.cache.Cache;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;

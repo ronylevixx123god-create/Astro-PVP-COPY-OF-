@@ -24,10 +24,12 @@ import org.arkhamnetwork.enchantments.util.config.ConfigManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,7 +45,6 @@ public class Enchantments extends EnchantPlugin {
     private IceAspect iceAspectEnchant;
     @Getter
     private ConfigManager configManager;
-    private CustomEnchantment[] registeredEnchantments;
     private NatureWrath naturesWrathEnchant;
 
     public static Essentials getEssentials() {
@@ -60,10 +61,6 @@ public class Enchantments extends EnchantPlugin {
 
     public void onEnable() {
         instance = this;
-        saveDefaultConfig();
-        this.configManager = new ConfigManager(this);
-        this.configManager.setupFiles();
-        this.registeredEnchantments = null;
         ess3 = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
         playerLocations = new ConcurrentHashMap<>();
         WorldGuardUtils.hook();
@@ -71,33 +68,7 @@ public class Enchantments extends EnchantPlugin {
         registerListeners();
         registerCommands();
         registerTasks();
-
-        Bukkit.getScheduler().runTaskTimer(this, () -> {
-            for (Player p : Bukkit.getServer().getOnlinePlayers())
-                Enchantments.playerLocations.put(p, p.getLocation());
-        }, 0L, 40L);
-
-        CommandEnchDust.dustEnabled = (new File("plugins/Enchantments/dust_enabled")).exists();
-        CommandEnchDust.soulEnabled = (new File("plugins/Enchantments/soul_enabled")).exists();
-        this.dungeonsEnabled = Bukkit.getPluginManager().isPluginEnabled("CosmicDungeons");
-        this.armorsetEnabled = (new File("plugins/Enchantments.jar")).exists();
-        if (Bukkit.getPluginManager().isPluginEnabled("CosmicSkyCustomItems")) {
-            EMPPulseItem empPulseItem = new EMPPulseItem();
-            CosmicSkyCustomItems.get().getItemManager().registerCustomItem(new OmniBlackscroll());
-            CosmicSkyCustomItems.get().getItemManager().registerCustomItem(empPulseItem);
-            Bukkit.getPluginManager().registerEvents(empPulseItem, this);
-        }
-
-    }
-
-    @Override
-    public void registerEnchantments() {
-        // EnchantmentAPI calls this hook after clearing its registry during reload.
-        if (!isEnabled()) {
-            return;
-        }
-        if (registeredEnchantments == null) {
-            registeredEnchantments = new CustomEnchantment[] {
+        CustomEnchantment[] array = {
                 new Lifesteal(), new Glowing(), new Blind(), new Deathbringer(), new Implants(), new Springs(), new Gears(), new Obsidianshield(), new Block(), new DeepWounds(),
                 new Enlighted(), new Frozen(), new Hardened(), this.iceAspectEnchant = new IceAspect(), new Lightning(), new Molten(), new Poison(), new Poisoned(), new ThunderingBlow(), new Vampire(),
                 new Trap(), new Overload(), new Headless(), new Haste(), new ObsidianDestroyer(), new DoubleStrike(), new EnderShift(), new Healing(), new Piercing(), new Curse(),
@@ -123,9 +94,43 @@ public class Enchantments extends EnchantPlugin {
                 new Treasure(),
                 new SoulMaster(), new OpeningCombo(), new MasteryBlackout(), new MasteryNeutralize(),
         };
+        //new SoulMaster(), new OpeningCombo(), new MasteryBlackout(), new MasteryNeutralize(),
+        //new AvengingAngel()
+        EnchantmentAPI.registerCustomEnchantments(array);
+
+
+        Bukkit.getScheduler().runTaskTimer(this, () -> {
+            for (Player p : Bukkit.getServer().getOnlinePlayers())
+                Enchantments.playerLocations.put(p, p.getLocation());
+        }, 0L, 40L);
+
+        //THIS IS A TEST
+
+        (new File("plugins/Enchantments/config.yml")).delete();
+        saveDefaultConfig();
+
+
+        try {
+            getConfig().load("plugins/Enchantments/config.yml");
+        } catch (IOException | InvalidConfigurationException e) {
+            e.printStackTrace();
         }
-        // Reuse instances: their listeners and repeating tasks must not be registered twice.
-        EnchantmentAPI.registerCustomEnchantments(registeredEnchantments);
+        CommandEnchDust.dustEnabled = (new File("plugins/Enchantments/dust_enabled")).exists();
+        CommandEnchDust.soulEnabled = (new File("plugins/Enchantments/soul_enabled")).exists();
+        this.dungeonsEnabled = Bukkit.getPluginManager().isPluginEnabled("CosmicDungeons");
+        this.armorsetEnabled = (new File("plugins/Enchantments.jar")).exists();
+        if (Bukkit.getPluginManager().isPluginEnabled("CosmicSkyCustomItems")) {
+            EMPPulseItem empPulseItem = new EMPPulseItem();
+            CosmicSkyCustomItems.get().getItemManager().registerCustomItem(new OmniBlackscroll());
+            CosmicSkyCustomItems.get().getItemManager().registerCustomItem(empPulseItem);
+            Bukkit.getPluginManager().registerEvents(empPulseItem, this);
+        }
+
+        this.configManager = new ConfigManager(this);
+        this.configManager.setupFiles();
+    }
+
+    public void registerEnchantments() {
     }
 
     public void onDisable() {

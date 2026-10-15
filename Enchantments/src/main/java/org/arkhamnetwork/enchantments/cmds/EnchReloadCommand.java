@@ -16,9 +16,7 @@ public class EnchReloadCommand implements CommandExecutor {
             return false;
         }
 
-        Enchantments.getInstance().reloadConfig();
         Enchantments.getInstance().getConfigManager().reloadFiles();
-        org.arkhamnetwork.enchantments.util.EnchantmentDescriptions.reload();
         sender.sendMessage(CC.translate("&aReloaded config..."));
         return false;
 

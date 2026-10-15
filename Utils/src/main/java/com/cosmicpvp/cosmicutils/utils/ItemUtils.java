@@ -29,7 +29,6 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -65,46 +64,6 @@ public class ItemUtils {
             return builder.getInt("durability");
         }
         return item.getDurability();
-    }
-
-    // CraftItemStack.modifyDurability(ItemStack, int) only exists on BananaSpigot; WineSpigot and plain
-    // Spigot lack it. Without it the item is returned unchanged, matching Astro's WineSpigot builds where
-    // these durability calls were commented out.
-    private static final Method MODIFY_DURABILITY = findModifyDurability();
-
-    private static Method findModifyDurability() {
-        try {
-            return CraftItemStack.class.getMethod("modifyDurability", ItemStack.class, int.class);
-        } catch (NoSuchMethodException e) {
-            return null;
-        }
-    }
-
-    private static ItemStack modifyDurability(ItemStack item, int durability) {
-        if (MODIFY_DURABILITY == null) {
-            return item;
-        }
-        try {
-            return (ItemStack) MODIFY_DURABILITY.invoke(null, item, durability);
-        } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException("Unable to modify item durability", e);
-        }
-    }
-
-    public static ItemStack addDurability(ItemStack item, short durability) {
-        return modifyDurability(item, durability);
-    }
-
-    public static ItemStack subtractDurability(ItemStack item, short durability) {
-        return modifyDurability(item, -durability);
-    }
-
-    public static ItemStack addDurability(ItemStack item, int durability) {
-        return modifyDurability(item, durability);
-    }
-
-    public static ItemStack subtractDurability(ItemStack item, int durability) {
-        return modifyDurability(item, -durability);
     }
 
     public static boolean areItemsSimilarIgnoringIID(ItemStack item, ItemStack itemWithIID) {
