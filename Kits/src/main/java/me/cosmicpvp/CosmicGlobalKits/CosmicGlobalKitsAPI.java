@@ -77,6 +77,37 @@ import java.util.Random;
 
 public class CosmicGlobalKitsAPI {
 
+    // Restored from 17d100a42^: callers and SQL still use kit tiers.
+    public static int getKitTier(Player player, GlobalKits kit) {
+        GlobalKitData found;
+        GlobalKitUser user = CosmicGlobalKits.getPlugin().getGlobalKitUser(player.getUniqueId());
+        if (user != null && user.getGlobalKits() != null && (found = user.getGlobalKits().get((Object)kit)) != null) {
+            return found.getKitTier();
+        }
+        return 0;
+    }
+
+    public static boolean canLevelUpGkit(Player player, GlobalKits kit) {
+        GlobalKitUser user = CosmicGlobalKits.getPlugin().getGlobalKitUser(player.getUniqueId());
+        if (user == null || user.getGlobalKits() == null || user.isLoadingData()) {
+            return false;
+        }
+        GlobalKitData da = user.getGlobalKits().get((Object)kit);
+        return da == null || da.getKitTier() < 3;
+    }
+
+    public static int setKitTier(Player player, GlobalKits kit, int level) {
+        GlobalKitUser user = CosmicGlobalKits.getPlugin().getGlobalKitUser(player.getUniqueId());
+        if (user == null) {
+            Bukkit.getLogger().info("[CosmicGlobalKits] Attempted to set kit tier to " + level + " for kit " + kit.name() + " for player: " + player.getName());
+            return 0;
+        }
+        GlobalKitData found = user.getGlobalKits().computeIfAbsent(kit, d -> new GlobalKitData(0L, level));
+        found.setKitTier(level);
+        GlobalCooldowns.setGlobalKitTier(player, kit, level);
+        return level;
+    }
+
 
 
 

@@ -70,8 +70,9 @@
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
-            <version>4.5.0</version>
-            <scope>provided</scope>
+            <version>4.5.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../HotFix/lib/ProtocolLib.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
