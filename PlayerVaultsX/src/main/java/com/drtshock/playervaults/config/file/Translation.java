@@ -128,7 +128,7 @@ public class Translation {
                     }
                 } else {
                     if (this.arrContains(features, TL.PRE_FORMATTED)) {
-                        repl = MiniMessage.miniMessage().escapeTokens(repl).replace("\\", "\\\\");
+                        repl = MiniMessage.miniMessage().escapeTags(repl).replace("\\", "\\\\");
                     }
                     replMatcher.appendReplacement(builder, repl);
                 }
@@ -154,7 +154,7 @@ public class Translation {
                 tagMatcher.appendTail(builder);
                 line = builder.toString();
             }
-            return MiniMessage.miniMessage().parse(line);
+            return MiniMessage.miniMessage().deserialize(line);
         }
 
         public @NonNull String getLegacy() {
