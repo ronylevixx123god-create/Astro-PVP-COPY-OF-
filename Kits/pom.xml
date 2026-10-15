@@ -297,6 +297,19 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/DamageIndicators.jar</systemPath>
         </dependency>
+        <!-- Unit tests (versions already used elsewhere in the local Maven cache) -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>1.10.19</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 
