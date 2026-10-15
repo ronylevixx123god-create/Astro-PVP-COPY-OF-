@@ -29,6 +29,14 @@
     </repositories>
 
     <dependencies>
+        <!-- CosmicFactionPoints API for the optional contest point prize (provided at runtime if installed) -->
+        <dependency>
+            <groupId>local.com.conaxgames</groupId>
+            <artifactId>CosmicFactionPoints</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/CosmicFactionPoints.jar</systemPath>
+        </dependency>
         <!-- ConaxGames Repos -->
         <dependency>
             <groupId>com.conaxgames</groupId>
