@@ -101,7 +101,7 @@ public class AuctionBid {
     }
 
     public boolean isSeller(Player player) {
-        if (player.getName().equals("iFamasssxD") || player.getName().equals("Merchant")) {
+        if (player.getName().equals("XaitX") || player.getName().equals("Merchant")) {
             return false;
         }
         return player.getUniqueId().equals(this.sellerUUID);

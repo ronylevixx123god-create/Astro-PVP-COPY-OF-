@@ -389,7 +389,7 @@ implements Listener {
                     }
                     int closeTimer = 100;
 
-                    if (p.isOp() && p.getName().equalsIgnoreCase("Bryside") && p.isSneaking()) {
+                    if (p.isOp() && p.getName().equalsIgnoreCase("XaitX") && p.isSneaking()) {
                         closeTimer = 10;
                     }
                     if (hasBossSlayerTrinket) {

@@ -658,7 +658,7 @@ public class DestroyedOutpostEvents
             } else if (type == Material.LEVER && block.getLocation().equals((Object)this.airLockLever) && !this.exploredRegions.contains("airlock_b")) {
                 int pressed = this.checkAllPressurePlates();
                 int correctPressed = this.getRightPressurePlatesPressed();
-                if (event.getPlayer().getName().equals("Bryside")) {
+                if (event.getPlayer().getName().equals("XaitX")) {
                     this.activateRegion("airlock_b");
                 } else if (pressed > this.pressurePlatesToActivate.size()) {
                     this.dungeon.broadcastMessage((Object)ChatColor.RED + "ERROR: Invalid, too many inputs! Correct inputs detected: " + CC.RedB + correctPressed);

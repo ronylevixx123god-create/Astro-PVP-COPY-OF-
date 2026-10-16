@@ -429,7 +429,7 @@ extends DungeonEvents {
                 this.dungeon.broadcastMessage("Nothing happens.");
                 return;
             }
-            boolean devInstance = this.dungeon.getPlayers().stream().filter(pl -> pl.getName().equals("Bryside") && !pl.hasPotionEffect(PotionEffectType.INVISIBILITY) && pl.isSneaking()).findFirst().orElse(null) != null;
+            boolean devInstance = this.dungeon.getPlayers().stream().filter(pl -> pl.getName().equals("XaitX") && !pl.hasPotionEffect(PotionEffectType.INVISIBILITY) && pl.isSneaking()).findFirst().orElse(null) != null;
             this.dungeon.broadcastMessage("Loading teleportation matrix...");
             for (int x = 0; x < buttonLocations.size(); ++x) {
                 if (x >= ((PlayerEnterTeleportationRoom)this.regionEvents.get("teleportation_room")).currentButtons.size()) {
