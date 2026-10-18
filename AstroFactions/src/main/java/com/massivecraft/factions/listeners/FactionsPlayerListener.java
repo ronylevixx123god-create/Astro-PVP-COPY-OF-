@@ -406,6 +406,14 @@ public class FactionsPlayerListener extends AbstractListener {
                 case TNT_MINECART:
                     ohNo = true;
             }
+            // 1.8 names for chest, furnace, TNT and command minecarts
+            switch (item.getType().name()) {
+                case "STORAGE_MINECART":
+                case "POWERED_MINECART":
+                case "EXPLOSIVE_MINECART":
+                case "COMMAND_MINECART":
+                    ohNo = true;
+            }
             if (ohNo &&
                     !FactionsPlugin.getInstance().conf().factions().specialCase().getIgnoreBuildMaterials().contains(item.getType()) &&
                     !FactionsBlockListener.playerCanBuildDestroyBlock(event.getPlayer(), event.getClickedBlock().getRelative(event.getBlockFace()).getLocation(), PermissibleAction.BUILD, false)) {

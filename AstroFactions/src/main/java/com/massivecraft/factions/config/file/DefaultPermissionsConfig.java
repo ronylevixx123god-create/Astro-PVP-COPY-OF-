@@ -259,7 +259,6 @@ public class DefaultPermissionsConfig {
                 this.normal.value = true;
                 this.recruit.value = true;
                 this.alt.value = true;
-                this.ally.value = true;
             }
         };
         @Comment("Use buttons in faction territory (while not raidable)")
@@ -270,7 +269,6 @@ public class DefaultPermissionsConfig {
                 this.normal.value = true;
                 this.recruit.value = true;
                 this.alt.value = true;
-                this.ally.value = true;
             }
         };
         @Comment("Use levers in faction territory (while not raidable)")
@@ -281,7 +279,6 @@ public class DefaultPermissionsConfig {
                 this.normal.value = true;
                 this.recruit.value = true;
                 this.alt.value = true;
-                this.ally.value = true;
             }
         };
         @Comment("Use containers in faction territory (while not raidable)")
@@ -384,7 +381,6 @@ public class DefaultPermissionsConfig {
                 this.normal.value = true;
                 this.recruit.value = true;
                 this.alt.value = true;
-                this.ally.value = true;
             }
         };
         private FactionOnlyPermInfo disband = new FactionOnlyPermInfo();
@@ -419,7 +415,6 @@ public class DefaultPermissionsConfig {
                 this.moderator.value = true;
                 this.normal.value = true;
                 this.recruit.value = true;
-                this.ally.value = true;
                 this.alt.value = true;
             }
         };
