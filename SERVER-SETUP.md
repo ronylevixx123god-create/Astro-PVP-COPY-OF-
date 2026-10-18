@@ -1,0 +1,192 @@
+# AstroPvP server setup checklist
+
+What to install so the restored plugins load the way Astro ran them. Everything here is from the
+`integration` branch (clean build 2026-10-18: 80 of 82 modules build; AstroDiscordSync and Trials are
+skipped for now) and from the jars already in Astro's files. Load/gameplay checks were done on an
+isolated TacoSpigot 1.8.8 test server, not on WineSpigot.
+
+**Later (not covered yet):** database (MySQL) setup and the WineSpigot license.
+
+## 1. Server
+
+- [ ] Server jar: `.lib/WineSpigot-V1.9.15.jar` (Minecraft 1.8.8; needs your WineSpigot license).
+- [ ] Java 8.
+- [ ] `server.properties`: `online-mode=true` (HotFix gives XaitX owner access by UUID, which needs online mode).
+- [ ] Accept the EULA yourself (`eula.txt`).
+
+## 2. Plugins built from this repo
+
+Build with Maven from the repo root, then copy each jar below from `<module>/target/` into `plugins/`.
+
+**Do not install** these build outputs:
+
+| Jar | Why |
+|---|---|
+| `StorageUtil/target/StorageUtil.jar` | Use `StorageUtil-0.1-shaded.jar` instead (the plain one lacks its libraries). |
+| `AstroWildPvP/target/AstroWildPvP-0.1.jar`, `WildPvP/target/WildPvP-0.1.jar` | Unshaded leftovers; use the `AstroWildPvP.jar` from the module you choose (see below). |
+| `AstroKits/target/AstroKits.jar`, `Vouchers/target/Vouchers.jar`, `AstroSlotBot/target/AstroSlotBot.jar` | No `plugin.yml`: not deployed plugins. The slot bot Astro used is `Slotbot/target/Slotbot-0.1.jar` (plugin AstroSlotBot). |
+
+**Pick one of each** (two modules build a plugin with the same name; which one Astro ran is not confirmed):
+
+| Plugin name | Option A | Option B |
+|---|---|---|
+| AstroWildPvP | `AstroWildPvP/target/AstroWildPvP.jar` (com.astropvp.wildpvp, v1.0-DEV) | `WildPvP/target/AstroWildPvP.jar` (com.cosmicpvp.cosmicwildpvp, v1.0) |
+| FactionLogs | `FactionLogs/target/FactionLogs.jar` (needs AstroKillCounters) | `AstroFactionLogs/target/AstroFactionLogs.jar` (needs CosmicPvPUtils) |
+
+**Install:**
+
+| Plugin | Jar |
+|---|---|
+| StorageUtil | `StorageUtil/target/StorageUtil-0.1-shaded.jar` |
+| CosmicPvPUtils | `Utils/target/CosmicPvPUtils.jar` |
+| Factions | `AstroFactions/target/Factions.jar` |
+| HotFix | `HotFix/target/HotFix.jar` |
+| Arkkit | `Ark/target/Arkkit.jar` |
+| AstroCore | `Core/target/AstroCore.jar` |
+| EnchantmentAPI | `EnchantmentsAPI/target/EnchantmentsAPI.jar` |
+| Enchantments | `Enchantments/target/Enchantments.jar` |
+| CosmicSkyCustomItems | `CustomItems/target/CustomItems-0.1.jar` |
+| AstroAdminItems | `AdminItems/target/AdminItems.jar` |
+| AstroAntiRightClick | `AntiRightClick/target/AntiRightClick.jar` |
+| AstroArcade | `Arcade/target/Arcade.jar` |
+| AstroArmorSets | `AstroArmorSets/target/AstroArmorSets-0.1.jar` |
+| AstroAttributes | `Attributes/target/Attributes-0.1.jar` |
+| AstroCagePvP | `AstroCagePvP/target/AstroCagePvP-1.0.jar` |
+| AstroChristmas | `AstroChristmas/target/AstroChristmas.jar` |
+| AstroCollectors | `AstroCollectors/target/AstroCollectors-1.0-SNAPSHOT.jar` |
+| AstroCrateKeys | `AstroCrateKeys/target/AstroCrateKeys.jar` |
+| AstroCustomBlocks | `AstroCustomBlocks/target/AstroCustomBlocks.jar` |
+| AstroDamageHandler | `AstroDamageHandler/target/AstroDamageHandler-0.1.jar` |
+| AstroEnvoys | `AstroEnvoy/target/AstroEnvoy-1.0.jar` |
+| AstroEvents | `AstroEvents/target/AstroEvents-1.0.jar` |
+| AstroGambling | `AstroGamble/target/AstroGamble-0.1.jar` |
+| AstroGiftCardPlugin | `GiftcardShop/target/GiftcardShop-1.0.jar` |
+| AstroItemFilter | `AstroItemFilter/target/AstroItemFilter.jar` |
+| AstroItemFlip | `ItemFlip/target/AstroItemFlip.jar` |
+| AstroItemSkins | `ItemSkins/target/ItemSkins-0.1.jar` |
+| AstroLootFilter | `LootFilter/target/LootFilter-0.1.jar` |
+| AstroLootboxes | `MysteryChests/target/MysteryChests.jar` |
+| AstroLoottables | `LootTable/target/LootTable.jar` |
+| AstroMobCoins | `MobCoins/target/MobCoins.jar` |
+| AstroRevive | `AstroRevive/target/AstroRevive.jar` |
+| AstroRuins | `Ruins/target/Ruins.jar` |
+| AstroScoreboard | `AstroScoreboard/target/AstroScoreboard.jar` |
+| AstroShowcase | `ShowcaseGUI/target/ShowcaseGUI.jar` |
+| AstroSlotBot | `Slotbot/target/Slotbot-0.1.jar` |
+| AstroSpaceGrinding | `AstroSpaceGrinding/target/AstroSpaceGrinding-0.1.jar` |
+| AstroSpawners | `AstroSpawnersMobcoins/target/AstroSpawners.jar` |
+| AstroTournaments | `Tournaments/target/Tournaments-0.1.jar` |
+| AstroWarzoneChests | `WarzoneChests/target/WarzoneChests.jar` |
+| AstroWeaponBonuses | `WeaponRunes/target/WeaponRunes.jar` |
+| Auction | `AuctionHouse/target/AuctionHouse-0.1.jar` |
+| BAH | `AstroBAH/target/AstroBAH-0.1.jar` — **Codex's reconstruction, not Astro's original 2024 plugin** |
+| CCVerify | `CCVerify/target/CCVerify-1.0.jar` |
+| ChatGames | `ChatGames/target/ChatGames.jar` |
+| Collect | `AstroCollect/target/Collect.jar` |
+| CosmicBosses | `Bosses/target/CosmicBosses.jar` |
+| CosmicConquests | `Conquest/target/Conquest-0.1.jar` |
+| CosmicContests | `Contest/target/Contest-0.1.jar` |
+| CosmicCustomTNT | `Explosive/target/Explosive.jar` |
+| CosmicDisguises | `Disguises/target/Disguises-0.1.jar` |
+| CosmicDuel | `Duels/target/CosmicDuel.jar` |
+| CosmicDungeons | `Dungeon/target/CosmicDungeons.jar` |
+| CosmicFactionBanners | `FactionBanners/target/FactionBanners.jar` |
+| CosmicGUIShop | `CosmicShop/target/CosmicShop.jar` |
+| CosmicGlobalKits | `Kits/target/Kits.jar` |
+| CosmicKOTH | `KoTHs/target/KoTHs-0.1.jar` |
+| CosmicMasks | `Masks/target/CosmicMasks.jar` |
+| CosmicMysteryChest | `Lootboxes/target/Lootboxes-0.1.jar` |
+| CosmicSkyInventoryPets | `Pets/target/CosmicSkyInventoryPets.jar` |
+| CosmicSpaceChests | `SpaceChests/target/SpaceChests-0.1.jar` |
+| CustomSkullBlocks | `CustomBlocks/target/CustomBlocks.jar` |
+| LPXPatches | `LPXPatches/target/LPXPatches.jar` |
+| NebulaShop | `NebulaShop/target/NebulaShop.jar` |
+| OutpostPatches | `Outpost/target/Outpost-0.1.jar` |
+| PlayerVaults | `PlayerVaultsX/target/PlayerVaultsX.jar` |
+| SpaceRecode | `SpaceRecode/target/SpaceRecode.jar` |
+
+**Known not to load yet** (installing them only logs an error):
+
+| Plugin | Reason |
+|---|---|
+| AstroHypeBoxes, AstroPvPTop | Need `CrankedUtils`, which no jar in Astro's files provides. |
+| ProxyPatch | Missing the `me.mattstudios.mf` command library. |
+| AstroDiscordSync, Trials | Not built (skipped for now). |
+
+## 3. Third-party plugins from Astro's files
+
+Copy these jars from the repo into `plugins/` (paths are relative to the repo root).
+
+| Plugin | Jar in Astro's files | Needed by |
+|---|---|---|
+| WorldEdit 6.1.7.3 | `Enchantments/lib/worldedit-bukkit-6.1.7.3.jar` | WorldGuard, CosmicDungeons, CosmicKOTH, CosmicSpaceChests, CosmicGlobalKits |
+| WorldGuard (cosmicpvp-5.9) | `Arcade/lib/WorldGuard.jar` | **required:** Arkkit, AstroCore, CosmicPvPUtils |
+| ProtocolLib 4.5.1 | `HotFix/lib/ProtocolLib.jar` | **required:** AstroRuins, CCVerify, CosmicMasks, CustomSkullBlocks; HotFix's XaitX owner access |
+| Essentials | `AstroCollectors/lib/Essentials.jar` | **required:** AstroCollectors, AstroCore, Enchantments |
+| LuckPerms 5.4.30 | `Core/lib/LuckPerms-Bukkit-5.4.30.jar` | Factions, CosmicGlobalKits (kit unlocks are LuckPerms permissions) |
+| FactionsKore | `.lib/FactionsKore-1.3.62.1.jar` | **required by AstroCore** (chat, MOTD, outposts) although AstroCore doesn't declare it; also PvPTop, AstroSpawners |
+| Commons (2021-12-01) | `Ruins/lib/Commons.jar` | **required:** AstroRuins, NebulaShop. Use this copy (newer superset of `NebulaShop/lib/Commons.jar`). |
+| BuycraftX 12.0.7 | `CCVerify/libs/BuycraftX.jar` | **required:** CCVerify (and so AstroRuins) |
+| AstroKillCounters | `Ruins/lib/AstroKillCounters-1.0 (6).jar` | **required:** AstroTournaments, FactionLogs (option A) |
+| HolographicDisplays | `AstroCollect/lib/HolographicDisplays (2).jar` | **required:** AstroCollectors, AstroEvents |
+| NBTAPI 2.7.1 | `AstroCustomBlocks/lib/item-nbt-api-plugin-2.7.1.jar` | **required:** AstroArmorSets, AstroHypeBoxes |
+| TAB 2.8.10 | `AstroScoreboard/lib/TAB-2.8.10 (1) (1).jar` | **required:** AstroScoreboard |
+| Kotlin 1.3.72 | `Dungeon/lib/Kotlin-1.3.72.jar` | **required:** ChatGames |
+| LibsDisguises | `Ark/lib/LibsDisguises.jar` | **required:** CosmicDisguises |
+| Citizens | `Ark/lib/Citizens.jar` | optional: Arkkit |
+| mcMMO | `Ark/lib/mcMMO.jar` | optional: Arkkit, Enchantments |
+| CoreProtect | `Ark/lib/CoreProtect.jar` | optional: Factions |
+| FactionUpgrades | `Ark/lib/FactionUpgrades.jar` | optional: Enchantments |
+| CosmicArmorSets | `AstroCollect/lib/CosmicArmorSets.jar` | optional: Arkkit |
+| CompilexPermissions | `Ark/lib/CompilexPermissions_2_1_1_1.jar` | optional only (CosmicPvPUtils, Kits, Disguises, SpaceChests) |
+
+**Not in Astro's files — download the exact version:**
+
+- [ ] **Vault 1.7.3** — required by AstroCore, Auction, BAH, CosmicGUIShop, CustomSkullBlocks.
+- [ ] **Multiverse-Core 2.5.0** — required by AstroCustomBlocks and AstroSpawners.
+
+## 4. Worlds
+
+- [ ] `world_ruins` — AstroRuins' mob spawn and no-fly tasks use this world; without it they log NullPointerExceptions every few ticks.
+
+## 5. Permissions and access
+
+- [ ] Staff who give slot bot tickets or turn the slot bot on/off need `slotbot.admin` (default: OP). Console always works (AstroCore's Last Man Standing reward uses `slotbot give <player> 1` from console).
+- [ ] `/nebula shop` needs `astrocore.nebula`.
+- [ ] `/f show` needs CosmicKOTH **and** AstroSpawners installed (it reads KOTH wins and faction top from them); without them the command errors.
+
+## 6. Factions config migration (claim permissions)
+
+The Factions build now enforces these rules in claimed land:
+
+- Players outside the owning faction (allies, truces, neutrals/factionless, enemies) can open **chests, trapped
+  chests and enchanting tables** — including `/f owner` land. Everything else is blocked for them by default.
+- Enemies, neutrals and truces can't be given anything else; saved permissions and config values for them are ignored.
+- Allies get nothing extra by default, but a faction can grant them permissions with `/f perm` or the GUI.
+- Members' role permissions are unchanged.
+
+New defaults only apply when `plugins/Factions/config/default_permissions.conf` and
+`default_permissions_offline.conf` say so. **Before the first start with this Factions jar:**
+
+- [ ] **No Factions folder yet (fresh server):** nothing to do — the jar writes the new defaults.
+- [ ] **Existing `default_permissions.conf`:** in **both** files set the ally `default` to `false` in these 5 sections:
+      `button`, `door`, `fly`, `lever`, `plate`:
+
+      door {
+          ally {
+              default=false
+              locked=false
+          }
+          ...
+
+      (Or move both files out of the folder and let the jar regenerate them — this also resets any other default you changed.)
+- [ ] **Existing factions (`plugins/Factions/data/factions.json`):** on the first start, each faction's saved ally
+      permissions are reset **once** to the ally defaults from the config above. Do the config step first, or the
+      old ally values are copied back. Ally permissions a leader granted on purpose are reset too and must be granted again.
+
+## 7. Known open items
+
+- AstroCore uses FactionsKore without declaring it in `plugin.yml`; load order isn't guaranteed.
+- Factions' only unit test (JUnit 4) isn't picked up by Maven's runner (0 tests run).
+- Not yet tested on WineSpigot or with real game clients; the database-backed parts (AstroCore, slot bot rewards,
+  BAH/Auction, land titles) need the database first.
