@@ -58,7 +58,7 @@ public class LoadCustomBlocks {
 
                 int godKeys = ymlFile.getInt("grinder");
                 double xp =  ymlFile.getInt("xp");
-                mobGrinder.getCrateKeys().put(CrateType.GRINDER, godKeys);
+                mobGrinder.getCrateKeys().put(CrateType.SOLAR, godKeys);
                 mobGrinder.setXp(xp);
 
                 if (mobGrinder.isActive()) {

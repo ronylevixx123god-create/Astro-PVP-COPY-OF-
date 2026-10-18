@@ -122,18 +122,28 @@
             <systemPath>${project.basedir}/lib/Lootboxes-0.1.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>com.conaxgames</groupId>
-            <artifactId>lootfilterapi</artifactId>
+            <groupId>net.astropvp</groupId>
+            <artifactId>LootFilter</artifactId>
             <version>0.1</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/LootFilter-0.1.jar</systemPath>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.conaxgames</groupId>
-            <artifactId>kgeyss</artifactId>
+            <groupId>net.astropvp</groupId>
+            <artifactId>AstroCrateKeys</artifactId>
             <version>0.1</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/AstroCrateKeys.jar</systemPath>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.conaxgames</groupId>

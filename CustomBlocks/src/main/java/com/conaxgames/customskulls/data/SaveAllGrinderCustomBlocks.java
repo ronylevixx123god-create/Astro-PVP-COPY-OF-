@@ -39,11 +39,11 @@ public class SaveAllGrinderCustomBlocks {
 
                     mobGrinder.setLastActivated(mobGrinder.getLastActivated());
 
-                        ymlFile.set("grinder", mobGrinder.getCrateKeys().get(CrateType.GODLY));
+                        ymlFile.set("grinder", mobGrinder.getCrateKeys().get(CrateType.COSMIC));
                         ymlFile.set("xp", mobGrinder.getXp());
                         mobGrinder.setLevel(mobGrinder.getLevel());
                         mobGrinder.setLastActivated(mobGrinder.getLastActivated());
-                        mobGrinder.getCrateKeys().put(CrateType.GRINDER, mobGrinder.getCrateKeys().get(CrateType.GRINDER));
+                        mobGrinder.getCrateKeys().put(CrateType.SOLAR, mobGrinder.getCrateKeys().get(CrateType.SOLAR));
                         mobGrinder.setXp(mobGrinder.getXp());
 
 

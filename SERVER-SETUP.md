@@ -33,6 +33,8 @@ Build with Maven from the repo root, then copy each jar below from `<module>/tar
 | AstroWildPvP | `AstroWildPvP/target/AstroWildPvP.jar` (com.astropvp.wildpvp, v1.0-DEV) | `WildPvP/target/AstroWildPvP.jar` (com.cosmicpvp.cosmicwildpvp, v1.0) |
 | FactionLogs | `FactionLogs/target/FactionLogs.jar` (needs AstroKillCounters) | `AstroFactionLogs/target/AstroFactionLogs.jar` (needs CosmicPvPUtils) |
 
+One FactionLogs is required either way: AstroSpawners uses its classes without declaring it.
+
 **Install:**
 
 | Plugin | Jar |
@@ -130,6 +132,7 @@ Copy these jars from the repo into `plugins/` (paths are relative to the repo ro
 | AstroKillCounters | `Ruins/lib/AstroKillCounters-1.0 (6).jar` | **required:** AstroTournaments, FactionLogs (option A) |
 | HolographicDisplays | `AstroCollect/lib/HolographicDisplays (2).jar` | **required:** AstroCollectors, AstroEvents |
 | NBTAPI 2.7.1 | `AstroCustomBlocks/lib/item-nbt-api-plugin-2.7.1.jar` | **required:** AstroArmorSets, AstroHypeBoxes |
+| ParticleLIB 2.1.1 | `CustomBlocks/lib/ParticleAPI_v2.1.1.jar` | **required** (used, but not bundled or declared, by): CustomSkullBlocks, Arkkit, AstroArmorSets, AstroAttributes, AstroItemSkins, AstroRevive, AstroSpaceGrinding, AstroSpawners, CosmicBosses, CosmicDungeons, CosmicKOTH, CosmicMasks, CosmicSkyInventoryPets, Enchantments |
 | TAB 2.8.10 | `AstroScoreboard/lib/TAB-2.8.10 (1) (1).jar` | **required:** AstroScoreboard |
 | Kotlin 1.3.72 | `Dungeon/lib/Kotlin-1.3.72.jar` | **required:** ChatGames |
 | LibsDisguises | `Ark/lib/LibsDisguises.jar` | **required:** CosmicDisguises |
@@ -187,6 +190,11 @@ New defaults only apply when `plugins/Factions/config/default_permissions.conf` 
 ## 7. Known open items
 
 - AstroCore uses FactionsKore without declaring it in `plugin.yml`; load order isn't guaranteed.
+- AstroSpawners uses FactionLogs, and CosmicMysteryChest needs CosmicSkyCustomItems at load, without declaring them.
+- CustomSkullBlocks' mob grinder (Blaze Stone Totem) key drops were already broken in Astro's code (a half-finished
+  key rename from 2022-12-30 reads a key type that is never stored); left unchanged.
+- Crate keys can only be created on WineSpigot (`CraftItemStack.getHandle()`), so AstroCrateKeys items, AstroSpawners
+  and CustomSkullBlocks can't be gameplay-tested on TacoSpigot.
 - Factions' only unit test (JUnit 4) isn't picked up by Maven's runner (0 tests run).
 - Not yet tested on WineSpigot or with real game clients; the database-backed parts (AstroCore, slot bot rewards,
   BAH/Auction, land titles) need the database first.
