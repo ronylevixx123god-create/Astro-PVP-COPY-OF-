@@ -59,6 +59,7 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
     protected Role defaultRole;
     protected Map<Permissible, Map<PermissibleAction, Boolean>> permissions = new HashMap<>();
     protected Map<Permissible, Map<PermissibleAction, Boolean>> permissionsOffline = new HashMap<>();
+    protected boolean allyPermsReset;
     protected Set<BanInfo> bans = new HashSet<>();
     protected double dtr;
     protected long lastDTRUpdateTime;
@@ -385,6 +386,9 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
         if (permInfo == null) { // Not valid lookup, like a role-only lookup of a relation
             return false;
         }
+        if (isLockedRelation(permissible)) { // Only chests/enchanting tables (AbstractListener); saved settings and config are ignored
+            return false;
+        }
         if (permInfo.isLocked()) { // Locked, so ignore the faction's setting
             return permInfo.defaultAllowed();
         }
@@ -402,7 +406,12 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
         if (permInfo == null) { // Not valid lookup, like a role-only lookup of a relation
             return false;
         }
-        return permInfo.isLocked();
+        return permInfo.isLocked() || isLockedRelation(permissible);
+    }
+
+    // Factions can only grant extra permissions to allies; enemies, neutrals and truces get none.
+    private static boolean isLockedRelation(Permissible permissible) {
+        return permissible == Relation.ENEMY || permissible == Relation.NEUTRAL || permissible == Relation.TRUCE;
     }
 
     private DefaultPermissionsConfig.Permissions.PermissiblePermInfo getPermInfo(boolean online, Permissible permissible, PermissibleAction permissibleAction) {
@@ -463,7 +472,7 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
         DefaultPermissionsConfig.Permissions defaultPermissions = this.getDefaultPermissions(online);
 
         DefaultPermissionsConfig.Permissions.PermissiblePermInfo permInfo = this.getPermInfo(online, permissible, permissibleAction);
-        if (permInfo == null || permInfo.isLocked()) {
+        if (permInfo == null || permInfo.isLocked() || isLockedRelation(permissible)) {
             return false; // Locked, can't continue;
         }
 
@@ -483,6 +492,21 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
             this.updatePerms(this.permissions, FactionsPlugin.getInstance().getConfigManager().getPermissionsConfig().getPermissions(), true);
             this.updatePerms(this.permissionsOffline, FactionsPlugin.getInstance().getConfigManager().getOfflinePermissionsConfig().getPermissions(), false);
         }
+        if (!this.allyPermsReset) {
+            // One-time reset of ally permissions copied from the old defaults; allies now only get what is granted.
+            this.resetAllyPerms(this.permissions, FactionsPlugin.getInstance().getConfigManager().getPermissionsConfig().getPermissions());
+            this.resetAllyPerms(this.permissionsOffline, FactionsPlugin.getInstance().getConfigManager().getOfflinePermissionsConfig().getPermissions());
+            this.allyPermsReset = true;
+        }
+    }
+
+    private void resetAllyPerms(Map<Permissible, Map<PermissibleAction, Boolean>> permissions, DefaultPermissionsConfig.Permissions defaults) {
+        Map<PermissibleAction, Boolean> ally = permissions.computeIfAbsent(Relation.ALLY, p -> new HashMap<>());
+        for (PermissibleAction permissibleAction : PermissibleAction.values()) {
+            if (!permissibleAction.isFactionOnly()) {
+                ally.put(permissibleAction, permissibleAction.getFullPerm(defaults).get(Relation.ALLY).defaultAllowed());
+            }
+        }
     }
 
     public void resetPerms() {
@@ -490,6 +514,7 @@ public abstract class MemoryFaction implements Faction, EconomyParticipator {
 
         this.resetPerms(this.permissions, FactionsPlugin.getInstance().getConfigManager().getPermissionsConfig().getPermissions(), true);
         this.resetPerms(this.permissionsOffline, FactionsPlugin.getInstance().getConfigManager().getOfflinePermissionsConfig().getPermissions(), false);
+        this.allyPermsReset = true;
     }
 
     private void resetPerms(Map<Permissible, Map<PermissibleAction, Boolean>> permissions, DefaultPermissionsConfig.Permissions defaults, boolean online) {

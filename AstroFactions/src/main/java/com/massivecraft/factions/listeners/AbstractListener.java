@@ -219,7 +219,7 @@ public abstract class AbstractListener implements Listener {
 
         PermissibleAction action = null;
 
-        if(!material.toString().contains("DIODE")){
+        if(!material.toString().contains("DIODE") && !material.toString().contains("COMPARATOR")){
             switch (material) {
                 case LEVER:
                     action = PermissibleAction.LEVER;
@@ -298,6 +298,10 @@ public abstract class AbstractListener implements Listener {
                     if (material.name().contains("SIGN")) {
                         action = PermissibleAction.ITEM;
                     }
+                    // 1.8 names for a lit furnace and farmland
+                    if (material.name().equals("BURNING_FURNACE") || material.name().equals("SOIL")) {
+                        action = PermissibleAction.CONTAINER;
+                    }
                     break;
             }
         }else{
@@ -313,8 +317,11 @@ public abstract class AbstractListener implements Listener {
             return true;
         }
 
+        // Chests and enchanting tables are open to everyone outside the owning faction.
+        boolean openToOutsider = isOpenToOutsiders(material) && !me.getFaction().getId().equals(otherFaction.getId());
+
         // F PERM check runs through before other checks.
-        if (!otherFaction.hasAccess(me, action)) {
+        if (!openToOutsider && !otherFaction.hasAccess(me, action)) {
             if (action != PermissibleAction.PLATE) {
                 me.msg(TL.GENERIC_NOPERMISSION, action);
             }
@@ -335,7 +342,7 @@ public abstract class AbstractListener implements Listener {
         }
 
         // Also cancel if player doesn't have ownership rights for this claim
-        if (FactionsPlugin.getInstance().conf().factions().ownedArea().isEnabled() && FactionsPlugin.getInstance().conf().factions().ownedArea().isProtectMaterials() && !otherFaction.playerHasOwnershipRights(me, loc)) {
+        if (!openToOutsider && FactionsPlugin.getInstance().conf().factions().ownedArea().isEnabled() && FactionsPlugin.getInstance().conf().factions().ownedArea().isProtectMaterials() && !otherFaction.playerHasOwnershipRights(me, loc)) {
             if (!justCheck) {
                 me.msg(TL.PLAYER_USE_OWNED, TextUtil.getMaterialName(material), otherFaction.getOwnerListString(loc));
             }
@@ -344,6 +351,18 @@ public abstract class AbstractListener implements Listener {
         }
 
         return true;
+    }
+
+    private static boolean isOpenToOutsiders(Material material) {
+        switch (material.name()) {
+            case "CHEST":
+            case "TRAPPED_CHEST":
+            case "ENCHANTMENT_TABLE":
+            case "ENCHANTING_TABLE":
+                return true;
+            default:
+                return false;
+        }
     }
 
     private static boolean isDupeMaterial(Material material) {

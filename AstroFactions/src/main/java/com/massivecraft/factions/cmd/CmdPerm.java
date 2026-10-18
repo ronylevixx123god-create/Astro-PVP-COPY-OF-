@@ -101,10 +101,16 @@ public class CmdPerm extends FCommand {
                 return;
         }
 
+        boolean anySet = false;
         for (Permissible permissible : permissibles) {
             for (PermissibleAction permissibleAction : permissibleActions) {
-                context.fPlayer.getFaction().setPermission(online, permissible, permissibleAction, access);
+                anySet |= context.fPlayer.getFaction().setPermission(online, permissible, permissibleAction, access);
             }
+        }
+
+        if (!anySet) {
+            context.fPlayer.msg(TL.COMMAND_PERM_INVALID_SET);
+            return;
         }
 
         context.fPlayer.msg(TL.COMMAND_PERM_SET, context.argAsString(1), access, context.argAsString(0));
