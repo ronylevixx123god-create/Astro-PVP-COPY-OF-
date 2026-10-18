@@ -1,0 +1,5 @@
+name: HotFixProbe
+main: devtest.HotFixProbe
+version: dev
+softdepend: [HotFix]
+description: Isolated test probe for HotFix auto-op

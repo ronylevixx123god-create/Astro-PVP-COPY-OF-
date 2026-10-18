@@ -1,0 +1,4 @@
+name: FactionsRulesProbe
+main: devtest.FactionsRulesProbe
+version: dev
+depend: [Factions]
