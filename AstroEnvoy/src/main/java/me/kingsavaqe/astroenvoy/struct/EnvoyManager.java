@@ -129,6 +129,13 @@ public class EnvoyManager implements PlaceholderReplacer {
 
         this.updateLastEnvoyTime();
 
+        // handleCrateSpawning needs more saved locations than crates; a new server has none yet
+        int crates = Bukkit.getOnlinePlayers().size() > 15 ? Bukkit.getOnlinePlayers().size() / 6 : 7;
+        if (getLocations().size() <= crates) {
+            this.plugin.getLogger().warning("Envoy skipped: " + getLocations().size() + " envoy locations saved, need more than " + crates + ". Add them with /aenvoy setup.");
+            return;
+        }
+
         this.setActive(true);
         this.handleCrateSpawning();
         this.plugin.getServer().getOnlinePlayers()
