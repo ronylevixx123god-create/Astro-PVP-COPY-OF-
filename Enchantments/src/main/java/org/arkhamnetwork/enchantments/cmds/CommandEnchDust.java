@@ -30,6 +30,11 @@ public class CommandEnchDust implements CommandExecutor {
         if (sender instanceof Player && !sender.isOp()) {
             return true;
         }
+        if (args.length < 2) {
+            sender.sendMessage("/enchdust <player> <rarity> <success> [mystery]");
+            sender.sendMessage("/enchdust <player> toggle_souls | toggle_tinkerer");
+            return true;
+        }
         final String p_name = args[0];
         if (args[1].equals("toggle_souls")) {
             if (CommandEnchDust.soulEnabled) {
@@ -64,8 +69,20 @@ public class CommandEnchDust implements CommandExecutor {
             return true;
         }
         final Player pl = Bukkit.getPlayer(p_name);
-        final ItemRarity ir = ItemRarity.valueOf(args[1].toUpperCase());
-        final int successAdd = Integer.parseInt(args[2]);
+        final ItemRarity ir;
+        final int successAdd;
+        try {
+            ir = ItemRarity.valueOf(args[1].toUpperCase());
+            successAdd = Integer.parseInt(args[2]);
+        } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException err) {
+            sender.sendMessage("/enchdust <player> <rarity> <success> [mystery]");
+            sender.sendMessage("Rarities: " + java.util.Arrays.toString(ItemRarity.values()));
+            return true;
+        }
+        if (pl == null) {
+            sender.sendMessage("Player " + p_name + " is not online.");
+            return true;
+        }
         final boolean mystery = args.length == 4 && Boolean.valueOf(args[3]);
         final ItemStack i = mystery ? EnchantmentBook.getSecretDust(ir, successAdd) : ((args.length >= 3) ? EnchantmentBook.getMagicDust(ir, successAdd) : EnchantmentBook.getPlatinumMagicDust(ir, successAdd));
         if (pl.getInventory().firstEmpty() != -1) {
