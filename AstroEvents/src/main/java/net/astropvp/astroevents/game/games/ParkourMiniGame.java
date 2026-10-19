@@ -241,11 +241,12 @@ public class ParkourMiniGame extends MiniGame<ParkourPlayer> {
     }
 
     private void unLoadCheckpoints() {
+        // events_world may not be installed
         this.getCheckpoints().forEach(((location, number) -> {
-            location.getBlock().setType(Material.AIR);
+            if (location.getWorld() != null) location.getBlock().setType(Material.AIR);
         }));
 
-        this.endLocation.getBlock().setType(Material.AIR);
+        if (this.endLocation.getWorld() != null) this.endLocation.getBlock().setType(Material.AIR);
 
         for (Hologram hologram : HologramsAPI.getHolograms(plugin)) {
             if (!hologram.getWorld().equals(super.getGameWorld())) return;
