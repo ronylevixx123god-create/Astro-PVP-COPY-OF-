@@ -156,6 +156,14 @@ Copy these jars from the repo into `plugins/` (paths are relative to the repo ro
   (outposts), `event`, and the dungeon worlds named in CosmicDungeons' config (`dungeon_yijki_a`,
   `dungeon_planet_nul`, ...).
 
+## 4b. CosmicDuel arenas (do this before players join)
+
+- [ ] Replace the `Arenas:` section of `plugins/CosmicDuel/config.yml`. Astro's default has a placeholder arena
+  `test` in the main world (`world`). CosmicDuel treats the world of the first arena as the duel world, so with
+  that placeholder every non-OP player in the main world counts as a duel spectator: all their commands are
+  blocked ("You cannot use commands while spectating.") and they are teleported to spawn. Use `Arenas: {}`
+  until the real arenas (in a separate duel world, e.g. `world_duels`) are set up.
+
 ## 5. Permissions and access
 
 - [ ] Staff who give slot bot tickets or turn the slot bot on/off need `slotbot.admin` (default: OP). Console always works (AstroCore's Last Man Standing reward uses `slotbot give <player> 1` from console).
@@ -195,5 +203,10 @@ New defaults only apply when `plugins/Factions/config/default_permissions.conf` 
 
 - AstroCore uses FactionsKore without declaring it in `plugin.yml`; load order isn't guaranteed.
 - Factions' only unit test (JUnit 4) isn't picked up by Maven's runner (0 tests run).
+- Astro's own command bugs, left unchanged: `/akoth` without arguments and `/removeskin` (both OP-only) throw an
+  internal error; `/lootboxtoggle` and `/lootboxfilter` are rewritten by AstroCore to `/mctoggle`/`/mcfilter`
+  (unknown) - use `/lbtoggle` and `/lbfilter`. `/bombs` and `/roulette` are disabled in Astro's code.
+- HotFix removes OP from every player on join except the UUIDs in `auto-op-uuids`; give staff permissions
+  through LuckPerms instead of `/op`.
 - Not yet tested on WineSpigot or with real game clients; the database-backed parts (AstroCore, slot bot rewards,
   BAH/Auction, land titles) need the database first.
