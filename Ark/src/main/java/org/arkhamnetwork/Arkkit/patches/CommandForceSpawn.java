@@ -51,12 +51,16 @@ final class CommandForceSpawn
             List<String> failed = new ArrayList<>();
             for (Player p : Bukkit.getOnlinePlayers()) {
                 if (p.equals(sender)) continue;
-                p.leaveVehicle();
-                if (p.teleport(Bukkit.getWorlds().get(0).getSpawnLocation(), PlayerTeleportEvent.TeleportCause.UNKNOWN)) {
-                    ++sent;
-                } else {
-                    failed.add(p.getName());
+                try {
+                    p.leaveVehicle();
+                    if (p.teleport(Bukkit.getWorlds().get(0).getSpawnLocation(), PlayerTeleportEvent.TeleportCause.UNKNOWN)) {
+                        ++sent;
+                        continue;
+                    }
+                } catch (Exception err) {
+                    err.printStackTrace();
                 }
+                failed.add(p.getName());
             }
             sender.sendMessage(ChatColor.GREEN + "You have sent " + sent + " player(s) to " + Bukkit.getWorlds().get(0).getName() + "'s /spawn!");
             if (!failed.isEmpty()) {
