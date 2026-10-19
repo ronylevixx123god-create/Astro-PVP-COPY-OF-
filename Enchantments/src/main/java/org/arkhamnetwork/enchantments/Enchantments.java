@@ -89,7 +89,7 @@ public class Enchantments extends EnchantPlugin {
                 new HeroicDodge(), new HeroKiller(), new BossSlayer(), new HeroicLuck(), new HeroicCleave(), new HeroicExecute(), new HeroicBleed(), this.hex = new Hex(), new Corrupt(), new MasteryMarkOfTheBeast(), new MasteryHorrify(),
                 new MasteryPoltergeist(), new MasteryFeignDeath(), new HeroicRocketEscape(), new HeroicTeleportation(), new HeroicTrap(), new HeroicBlock(), new HeroicGhost(), new MasterySoulSiphon(), new MasteryMortalCoil(), new MasteryRotAndDecay(),
                 new MasteryDemonicGateway(), new Reflect(), new HeroicReflect(), new MasteryLifesteal(),  new MasteryDeathPact(), new MasteryTombstone(), new MasteryDiscombobulate(), new MasteryExplosivesExpert(),
-                this.permafrostEnchant = new MasteryPermafrost(), new HeroicMetaphysical(), new MasteryWebWalker(), new HeroicCactus(), new HeroicTank(), new Sabotage(), new MasteryLavaStrider(), new HeroicInsanity(),
+                this.permafrostEnchant = new MasteryPermafrost(), new HeroicMetaphysical(), new MasteryWebWalker(), new HeroicCactus(), new HeroicTank(), new Sabotage(), new SoulTrap(), new MasteryLavaStrider(), new HeroicInsanity(),
                 new HeroicOverwhelm(), new KeyGrind(), new Coins(), //new Shiva(),
                 new Treasure(),
                 new SoulMaster(), new OpeningCombo(), new MasteryBlackout(), new MasteryNeutralize(),
