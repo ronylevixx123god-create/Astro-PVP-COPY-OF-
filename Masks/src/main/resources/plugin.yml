@@ -8,3 +8,7 @@ commands:
   mask:
     description: Mask command.
     aliases: [cmask, masks]
+permissions:
+  cosmicmasks.admin:
+    description: Take masks out of the /mask menu.
+    default: op

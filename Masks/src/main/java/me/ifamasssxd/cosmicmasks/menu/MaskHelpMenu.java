@@ -19,6 +19,7 @@ import com.cosmicpvp.cosmicutils.gui.InventoryItem;
 import com.cosmicpvp.cosmicutils.utils.CC;
 import com.cosmicpvp.cosmicutils.utils.InventoryUtils;
 import com.cosmicpvp.cosmicutils.utils.ItemBuilder;
+import com.cosmicpvp.cosmicutils.utils.PlayerUtil;
 import java.util.Arrays;
 import me.ifamasssxd.cosmicmasks.MaskType;
 import org.bukkit.DyeColor;
@@ -28,6 +29,8 @@ import org.bukkit.inventory.ItemStack;
 
 public class MaskHelpMenu
 extends CosmicGUI {
+    public static final String ADMIN_PERMISSION = "cosmicmasks.admin";
+
     public MaskHelpMenu(Player player) {
         super(player, "Astro Masks", InventoryUtils.fitSize((int)((int)Arrays.stream(MaskType.values()).filter(MaskType::isActive).count())));
     }
@@ -36,7 +39,15 @@ extends CosmicGUI {
         int index = 0;
         for (MaskType type : MaskType.values()) {
             if (!type.getMaskData().isActive()) continue;
-            this.setItem(index++, type.createMask(false), () -> this.closeWithDelay(pl -> pl.sendMessage(CC.RedB + "(!)" + CC.Red + " Unlock Player Masks at " + CC.RedU + "buy.astropvp.net" + CC.Red + "!")));
+            this.setItem(index++, type.createMask(false), () -> {
+                if (this.player.hasPermission(ADMIN_PERMISSION)) {
+                    // same item and delivery as /mask give
+                    PlayerUtil.giveOrDropProtectedItem(this.player, type.createMask(true), -1, null, CC.RedB + "(!) " + CC.Red + "Your mask has been dropped on the floor!");
+                    this.player.sendMessage(CC.GreenB + "(!)" + CC.Green + " You took a " + type.getMaskData().getDisplayName() + CC.Green + ".");
+                    return;
+                }
+                this.closeWithDelay(pl -> pl.sendMessage(CC.RedB + "(!)" + CC.Red + " You can't take masks from this menu."));
+            });
         }
         ItemStack pane = new ItemBuilder(Material.STAINED_GLASS_PANE, CC.RedB + "???", new String[]{CC.Gray + "This mask has not", CC.Gray + "been discovered yet."}).data((short)DyeColor.RED.getWoolData()).build();
         for (int i = 0; i < this.size; ++i) {
