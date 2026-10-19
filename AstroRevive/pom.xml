@@ -84,6 +84,7 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.10</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.MilkBowl</groupId>
@@ -105,6 +106,7 @@
             <groupId>com.conaxgames</groupId>
             <artifactId>Arkkit</artifactId>
             <version>0.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.conaxgames</groupId>
@@ -117,46 +119,55 @@
             <groupId>com.conaxgames</groupId>
             <artifactId>Sets</artifactId>
             <version>0.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.conaxgames</groupId>
             <artifactId>CompilexPermissions</artifactId>
             <version>0.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.conaxgames</groupId>
             <artifactId>Enchantments</artifactId>
             <version>0.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.conaxgames</groupId>
             <artifactId>Lootboxes</artifactId>
             <version>0.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.conaxgames</groupId>
             <artifactId>SpaceChests</artifactId>
             <version>0.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.conaxgames</groupId>
             <artifactId>Duels</artifactId>
             <version>0.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.conaxgames</groupId>
             <artifactId>Conquest</artifactId>
             <version>0.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.conaxgames</groupId>
             <artifactId>AuctionHouse</artifactId>
             <version>0.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.conaxgames</groupId>
             <artifactId>Lootboxes</artifactId>
             <version>0.1</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- System repos -->
