@@ -21,3 +21,7 @@ commands:
     aliases: ['aarmorset', 'aset', 'asets' ]
 
   heroicfix:
+permissions:
+  astroarmorsets.admin:
+    description: Take armor out of the /armorsets menu.
+    default: false
