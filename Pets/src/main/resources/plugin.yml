@@ -7,3 +7,7 @@ commands:
   pet:
     description: Pet command.
     aliases: [pets]
+permissions:
+  cosmicpets.admin:
+    description: Take pets out of the /pets menu.
+    default: false
