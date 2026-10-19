@@ -110,7 +110,7 @@ Build with Maven from the repo root, then copy each jar below from `<module>/tar
 | Plugin | Reason |
 |---|---|
 | AstroHypeBoxes, AstroPvPTop | Need `CrankedUtils`, which no jar in Astro's files provides. |
-| ProxyPatch | Missing the `me.mattstudios.mf` command library. |
+| ProxyPatch | **Don't install.** Not a patch: it adds fake players (`spoof add <name>`) to inflate the player count and makes them create/join factions. CCVerify works without it. |
 | AstroDiscordSync, Trials | Not built (skipped for now). |
 
 ## 3. Third-party plugins from Astro's files
@@ -120,7 +120,7 @@ Copy these jars from the repo into `plugins/` (paths are relative to the repo ro
 | Plugin | Jar in Astro's files | Needed by |
 |---|---|---|
 | WorldEdit 6.1.7.3 | `Enchantments/lib/worldedit-bukkit-6.1.7.3.jar` | WorldGuard, CosmicDungeons, CosmicKOTH, CosmicSpaceChests, CosmicGlobalKits |
-| WorldGuard (cosmicpvp-5.9) | `Arcade/lib/WorldGuard.jar` | **required:** Arkkit, AstroCore, CosmicPvPUtils |
+| WorldGuard 6.1 | `AstroCagePvP/lib/WorldGuard.jar` | **required:** Arkkit, AstroCore, CosmicPvPUtils. Not the `cosmicpvp-5.9` copy in most `lib/` folders: CosmicPvPUtils, CosmicDuel, CosmicDungeons, AstroCagePvP and Factions are compiled against 6.x (`ApplicableRegionSet` is an interface there) and fail with `IncompatibleClassChangeError` on 5.9. |
 | ProtocolLib 4.5.1 | `HotFix/lib/ProtocolLib.jar` | **required:** AstroRuins, CCVerify, CosmicMasks, CustomSkullBlocks; HotFix's XaitX owner access |
 | Essentials | `AstroCollectors/lib/Essentials.jar` | **required:** AstroCollectors, AstroCore, Enchantments |
 | LuckPerms 5.4.30 | `Core/lib/LuckPerms-Bukkit-5.4.30.jar` | Factions, CosmicGlobalKits (kit unlocks are LuckPerms permissions) |
@@ -130,7 +130,7 @@ Copy these jars from the repo into `plugins/` (paths are relative to the repo ro
 | AstroKillCounters | `Ruins/lib/AstroKillCounters-1.0 (6).jar` | **required:** AstroTournaments, FactionLogs (option A) |
 | HolographicDisplays | `AstroCollect/lib/HolographicDisplays (2).jar` | **required:** AstroCollectors, AstroEvents |
 | NBTAPI 2.7.1 | `AstroCustomBlocks/lib/item-nbt-api-plugin-2.7.1.jar` | **required:** AstroArmorSets, AstroHypeBoxes |
-| TAB 2.8.10 | `AstroScoreboard/lib/TAB-2.8.10 (1) (1).jar` | **required:** AstroScoreboard |
+| TAB 3.1.2 | `AstroScoreboard/lib/TAB.v3.1.2.jar` | **required:** AstroScoreboard (built against TAB 3's `me.neznamy.tab.api.TabAPI`; the TAB 2.8.10 jar in the same folder doesn't have it) |
 | Kotlin 1.3.72 | `Dungeon/lib/Kotlin-1.3.72.jar` | **required:** ChatGames |
 | LibsDisguises | `Ark/lib/LibsDisguises.jar` | **required:** CosmicDisguises |
 | Citizens | `Ark/lib/Citizens.jar` | optional: Arkkit |
@@ -144,10 +144,17 @@ Copy these jars from the repo into `plugins/` (paths are relative to the repo ro
 
 - [ ] **Vault 1.7.3** — required by AstroCore, Auction, BAH, CosmicGUIShop, CustomSkullBlocks.
 - [ ] **Multiverse-Core 2.5.0** — required by AstroCustomBlocks and AstroSpawners.
+- [ ] **PlaceholderAPI 2.11.6** — required by FactionsKore (it registers its placeholders on enable and fails
+  with `NoClassDefFoundError: me/clip/placeholderapi/...` without it, although it doesn't declare it).
 
 ## 4. Worlds
 
 - [ ] `world_ruins` — AstroRuins' mob spawn and no-fly tasks use this world; without it they log NullPointerExceptions every few ticks.
+- [ ] Astro's other maps (not in the repo). Without them these plugins log errors or don't enable:
+  `world_arcade` with WorldGuard region `arcade_blocks` (AstroArcade), `space` and `mars` (SpaceRecode,
+  AstroSpaceGrinding), `tournament_world` (AstroTournaments), `world_outpost_mars`, `world_outpost_pluto`
+  (outposts), `event`, and the dungeon worlds named in CosmicDungeons' config (`dungeon_yijki_a`,
+  `dungeon_planet_nul`, ...).
 
 ## 5. Permissions and access
 
