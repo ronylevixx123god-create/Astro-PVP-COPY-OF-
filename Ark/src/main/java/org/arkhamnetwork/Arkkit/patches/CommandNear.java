@@ -158,7 +158,8 @@ final class CommandNear
                     continue;
                 }
             }
-            if (ProxyPatch.playerNames.contains(p.getName())) continue;
+            // ProxyPatch is optional; without this check /near failed with an internal error
+            if (org.bukkit.Bukkit.getPluginManager().getPlugin("ProxyPatch") != null && ProxyPatch.playerNames.contains(p.getName())) continue;
             if (output.length() > 0) {
                 output.append(", ");
                 counter++;
