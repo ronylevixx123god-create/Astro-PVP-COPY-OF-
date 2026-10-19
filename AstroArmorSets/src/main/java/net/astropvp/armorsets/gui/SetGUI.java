@@ -19,8 +19,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SetGUI {
+
+    /** Lets staff take armor out of the menu; everyone else can only look. */
+    public static final String ADMIN_PERMISSION = "astroarmorsets.admin";
+    /** The set each player is previewing (sub menu open). */
+    public static final Map<UUID, ArmorSetType> PREVIEWING = new ConcurrentHashMap<>();
 
     private final Player player;
     private final String title;
@@ -32,6 +40,7 @@ public class SetGUI {
 
     public void openBaseGUI() {
         player.closeInventory();
+        PREVIEWING.remove(player.getUniqueId());
         int size = (int) (Math.ceil(ArmorSetType.values().length / 9d) * 9);
         Inventory inventory = Bukkit.createInventory(player, size, title);
 
@@ -53,6 +62,7 @@ public class SetGUI {
 
     public void openSubGUI(ArmorSetType setType) {
         player.closeInventory();
+        PREVIEWING.put(player.getUniqueId(), setType);
         player.playSound(player.getLocation(), Sound.CHEST_OPEN, 1, 1);
         Inventory inventory = Bukkit.createInventory(player, 9, title);
 
