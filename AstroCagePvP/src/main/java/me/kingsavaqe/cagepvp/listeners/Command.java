@@ -9,9 +9,13 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 public class Command implements Listener {
+   /** Commands that always work during a match (cage fight and wild pvp, including "leave"). */
+   private static final List<String> MATCH_COMMANDS = Arrays.asList("/cagefight", "/1v1", "/wildpvp", "/pvp");
    private final AstroCagePvP instance;
 
    public Command(AstroCagePvP instance) {
@@ -20,7 +24,7 @@ public class Command implements Listener {
 
    @EventHandler
    public void onPlayerCommandPreprocess(PlayerCommandPreprocessEvent event) {
-      if (!event.getMessage().toLowerCase().startsWith("/wildpvp") && !event.getMessage().toLowerCase().startsWith("/1v1")) {
+      if (!MATCH_COMMANDS.contains(event.getMessage().split(" ")[0].toLowerCase())) {
          Player player = event.getPlayer();
          FileConfiguration configLoad = this.instance.getConfig();
          Iterator<String> var4 = configLoad.getStringList("Listeners.Command.AllowedCommands").iterator();

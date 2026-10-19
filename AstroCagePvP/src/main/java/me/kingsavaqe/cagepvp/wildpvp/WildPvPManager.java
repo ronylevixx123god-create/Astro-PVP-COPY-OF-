@@ -19,6 +19,7 @@ public class WildPvPManager {
    public void onDisable() {
 
       for(WildPvP wildPvP : this.wildPvPs) {
+         wildPvP.removeCage();
          wildPvP.hideBorder(wildPvP.getCreator());
          if(wildPvP.hasJoined()) {
             wildPvP.teleportToJoinLocation(wildPvP.getJoined());
@@ -34,11 +35,13 @@ public class WildPvPManager {
          wildPvP.teleport(player);
       }
 
+      wildPvP.buildCage();
       this.wildPvPs.add(wildPvP);
       return wildPvP;
    }
 
    public void removeWildPvP(WildPvP wildPvP) {
+      wildPvP.removeCage();
       this.wildPvPs.remove(wildPvP);
    }
 

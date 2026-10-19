@@ -11,13 +11,18 @@ import org.arkhamnetwork.Arkkit.patches.combatlog.CombatLog;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 
 public class WildPvP {
@@ -28,6 +33,12 @@ public class WildPvP {
    private Location joinLocation;
    private boolean grace = true;
    private boolean ended = false;
+   /** Natural non-solid blocks the cage may replace; solid terrain, player-built blocks and liquids are left alone. */
+   private static final Set<Material> CAGE_REPLACEABLE = EnumSet.of(Material.AIR, Material.LONG_GRASS, Material.DOUBLE_PLANT,
+         Material.YELLOW_FLOWER, Material.RED_ROSE, Material.DEAD_BUSH, Material.SNOW, Material.VINE,
+         Material.BROWN_MUSHROOM, Material.RED_MUSHROOM);
+   /** Every block the cage turned into iron bars, so exactly those go back to air. */
+   private final List<Location> cageBlocks = new ArrayList<>();
 
    public WildPvP(AstroCagePvP instance, Player creator, Location location) {
       this.instance = instance;
@@ -234,6 +245,34 @@ public class WildPvP {
    }
 
     */
+
+   /** Iron bars on the four edges of the match chunk (the chunk the world border shows), bottom to top of the world. */
+   public void buildCage() {
+      Chunk chunk = this.getChunk();
+      int maxY = chunk.getWorld().getMaxHeight() - 1;
+      for (int x = 0; x < 16; ++x) {
+         for (int z = 0; z < 16; ++z) {
+            if (x != 0 && x != 15 && z != 0 && z != 15) continue;
+            for (int y = 1; y <= maxY; ++y) {
+               org.bukkit.block.Block block = chunk.getBlock(x, y, z);
+               if (!CAGE_REPLACEABLE.contains(block.getType())) continue;
+               block.setType(Material.IRON_FENCE);
+               this.cageBlocks.add(block.getLocation());
+            }
+         }
+      }
+   }
+
+   /** Turns exactly the blocks the cage placed back into air. */
+   public void removeCage() {
+      for (Location location : this.cageBlocks) {
+         org.bukkit.block.Block block = location.getBlock();
+         if (block.getType() == Material.IRON_FENCE) {
+            block.setType(Material.AIR);
+         }
+      }
+      this.cageBlocks.clear();
+   }
 
    public void teleport(Player player) {
       Random random = new Random();
