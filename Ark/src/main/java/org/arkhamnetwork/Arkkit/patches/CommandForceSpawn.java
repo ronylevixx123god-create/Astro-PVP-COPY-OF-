@@ -22,6 +22,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 final class CommandForceSpawn
@@ -41,7 +42,26 @@ final class CommandForceSpawn
             return true;
         }
         if (args.length != 1) {
-            sender.sendMessage(ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + "Usage " + ChatColor.WHITE + "/forcespawn <radius>");
+            sender.sendMessage(ChatColor.YELLOW.toString() + ChatColor.BOLD.toString() + "Usage " + ChatColor.WHITE + "/forcespawn <radius|all>");
+            return true;
+        }
+        if (args[0].equalsIgnoreCase("all")) {
+            // every online player except the sender, wherever they are (ops and staff included)
+            int sent = 0;
+            List<String> failed = new ArrayList<>();
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                if (p.equals(sender)) continue;
+                p.leaveVehicle();
+                if (p.teleport(Bukkit.getWorlds().get(0).getSpawnLocation(), PlayerTeleportEvent.TeleportCause.UNKNOWN)) {
+                    ++sent;
+                } else {
+                    failed.add(p.getName());
+                }
+            }
+            sender.sendMessage(ChatColor.GREEN + "You have sent " + sent + " player(s) to " + Bukkit.getWorlds().get(0).getName() + "'s /spawn!");
+            if (!failed.isEmpty()) {
+                sender.sendMessage(ChatColor.RED + "Could not teleport " + failed.size() + " player(s): " + String.join(", ", failed));
+            }
             return true;
         }
         int radius = Integer.parseInt(args[0]);
