@@ -135,7 +135,7 @@ Copy these jars from the repo into `plugins/` (paths are relative to the repo ro
 | LibsDisguises | `Ark/lib/LibsDisguises.jar` | **required:** CosmicDisguises |
 | Citizens | `Ark/lib/Citizens.jar` | optional: Arkkit |
 | mcMMO | `Ark/lib/mcMMO.jar` | optional: Arkkit, Enchantments |
-| CoreProtect | `Ark/lib/CoreProtect.jar` | optional: Factions |
+| CoreProtect 2.12.0 | `Ark/lib/CoreProtect.jar` | **required by FactionsKore** (its chest-logs feature fails with `NoClassDefFoundError: net/coreprotect/CoreProtectAPI` without it, and then AstroCore can't enable either); optional for Factions |
 | FactionUpgrades | `Ark/lib/FactionUpgrades.jar` | optional: Enchantments |
 | CosmicArmorSets | `AstroCollect/lib/CosmicArmorSets.jar` | optional: Arkkit |
 | CompilexPermissions | `Ark/lib/CompilexPermissions_2_1_1_1.jar` | optional only (CosmicPvPUtils, Kits, Disguises, SpaceChests) |
@@ -163,6 +163,14 @@ Copy these jars from the repo into `plugins/` (paths are relative to the repo ro
   that placeholder every non-OP player in the main world counts as a duel spectator: all their commands are
   blocked ("You cannot use commands while spectating.") and they are teleported to spawn. Use `Arenas: {}`
   until the real arenas (in a separate duel world, e.g. `world_duels`) are set up.
+
+## 4c. FactionsKore features that take over Astro commands
+
+- [ ] In `plugins/FactionsKore/`, set `enabled: false` in `customenchants.yml`, `mobcoins.yml`, `spectate.yml` and
+  `withdraw.yml` (a file with only `enabled: false` is enough; FactionsKore adds the rest). With FactionsKore's
+  defaults these features register `/ce`, `/coins`, `/mobcoins`, `/spectate` and `/withdraw` over AstroCore,
+  AstroMobCoins, CosmicDuel and CosmicGUIShop. Astro's code only uses FactionsKore's shield, outpost, grace and
+  KOTH features.
 
 ## 5. Permissions and access
 
@@ -208,5 +216,8 @@ New defaults only apply when `plugins/Factions/config/default_permissions.conf` 
   (unknown) - use `/lbtoggle` and `/lbfilter`. `/bombs` and `/roulette` are disabled in Astro's code.
 - HotFix removes OP from every player on join except the UUIDs in `auto-op-uuids`; give staff permissions
   through LuckPerms instead of `/op`.
+- Enchantments, as in Astro's code: Enchanter books and scrolls are free (prices 0 since 2021-01-01; only Mastery
+  costs XP); Tinkerer trading has been commented out since 2021-04-12 (the window opens, trades do nothing);
+  AstroCore blocks `/alchemist` and `/ce` for players without `commandfix.bypass` - players use `/enchants`.
 - Not yet tested on WineSpigot or with real game clients; the database-backed parts (AstroCore, slot bot rewards,
   BAH/Auction, land titles) need the database first.
