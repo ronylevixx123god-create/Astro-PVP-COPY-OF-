@@ -58,6 +58,9 @@ public class ChatFilter
     public void enable() throws IOException {
         bad_words = this.getBukkitPlugin().getConfig().getStringList("settings.chat_filter.bad_words");
         permanent_bad_words = this.getBukkitPlugin().getConfig().getStringList("settings.chat_filter.permanent_bad_words");
+        // an empty word matches everything and would censor all chat
+        bad_words.removeIf(w -> w.trim().isEmpty());
+        permanent_bad_words.removeIf(w -> w.trim().isEmpty());
         block_chat_until_move = this.getBukkitPlugin().getConfig().getBoolean("settings.chat_filter.block_chat_until_move");
         block_duplicate_messages = this.getBukkitPlugin().getConfig().getBoolean("settings.chat_filter.no_duplicates");
         remove_chat_colors = this.getBukkitPlugin().getConfig().getBoolean("settings.chat_filter.remove_chat_colors");

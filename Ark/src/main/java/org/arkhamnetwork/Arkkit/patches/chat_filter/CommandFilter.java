@@ -46,6 +46,10 @@ final class CommandFilter
             if (word.endsWith(" ")) {
                 word = word.substring(0, word.length() - 1);
             }
+            if (word.trim().isEmpty()) {
+                sender.sendMessage(ChatColor.RED + "Usage: /filter " + (addPerm ? "addp" : "add") + " <word>");
+                return true;
+            }
             if (addPerm && ChatFilter.permanent_bad_words.contains(word)) {
                 sender.sendMessage(ChatColor.RED + "The word, '" + word + "' is already permantently blocked.");
                 return true;
