@@ -29,7 +29,7 @@ class AdminSpaceCommand : CommandBase() {
     fun killAllCommand(player: Player) {
         MobManager.activeEntities.forEach { it.value.second.remove() }
         MobManager.activeEntities.clear()
-        SpaceAPI.WORLDS.forEach { Bukkit.getWorld(it)?.entities?.filter { entity -> entity !is Player }.forEach { entity -> entity.remove() }}
+        SpaceAPI.WORLDS.forEach { Bukkit.getWorld(it)?.entities?.filter { entity -> entity !is Player }?.forEach { entity -> entity.remove() }}
         SpaceAPI.WORLDS.forEach { Bukkit.getWorld(it)?.players?.forEach { player -> player.msg("&d&l(!) &dAll space mobs have been cleared, new ones will spawn soon")}}
     }
 
