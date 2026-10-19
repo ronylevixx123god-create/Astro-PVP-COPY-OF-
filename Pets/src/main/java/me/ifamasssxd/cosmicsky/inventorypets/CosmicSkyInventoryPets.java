@@ -75,6 +75,7 @@ public final class CosmicSkyInventoryPets extends JavaPlugin implements Listener
       return witcherCooldown;
    }
    private void registerListeners() {
+      Bukkit.getPluginManager().registerEvents(new PetMenuProtectionListener(), this);
       Bukkit.getPluginManager().registerEvents(new AbominalSnowmanListener(), this);
       Bukkit.getPluginManager().registerEvents(new BansheeListener(), this);
       Bukkit.getPluginManager().registerEvents(new TitanListener(), this);
