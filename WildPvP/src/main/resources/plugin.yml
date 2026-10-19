@@ -2,6 +2,7 @@ name: AstroWildPvP
 main: com.cosmicpvp.cosmicwildpvp.WildPvPPlugin
 author: Bryside
 version: 1.0
+depend: [Factions, CosmicPvPUtils, Arkkit]
 commands:
   wildpvp:
     usage: /<command>

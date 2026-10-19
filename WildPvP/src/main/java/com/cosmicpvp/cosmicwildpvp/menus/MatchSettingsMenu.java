@@ -28,6 +28,7 @@ public class MatchSettingsMenu implements Menu
         this.cagesEnabled = false;
         this.doublesEnabled = false;
         this.plugin = plugin;
+        this.inventory.setItem(2, this.getCagesClickable());
         this.inventory.setItem(4, this.getConfirmQueue());
     }
 
@@ -41,8 +42,13 @@ public class MatchSettingsMenu implements Menu
 
     @Override
     public void onClick(final Player player, final int slot, final ClickType type, final InventoryClickEvent event) {
-        if (slot == 4) {
-            event.setCancelled(true);
+        event.setCancelled(true);
+        if (event.getRawSlot() == 2) {
+            this.cagesEnabled = !this.cagesEnabled;
+            this.inventory.setItem(2, this.getCagesClickable());
+            return;
+        }
+        if (event.getRawSlot() == 4) {
             this.plugin.getQueueManager().createNewQueue(player, this.cagesEnabled);
             player.closeInventory();
         }

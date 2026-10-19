@@ -33,6 +33,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.EventPriority;
 import com.massivecraft.factions.FPlayer;
+import com.massivecraft.factions.FLocation;
 import com.massivecraft.factions.event.LandClaimEvent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
@@ -75,12 +76,8 @@ public class QueueListener implements Listener
     public void onPlayerJoin(final PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         final Chunk chunk = player.getLocation().getChunk();
-        if (Cages.noClaimUntil.containsKey(chunk)) {
-            final long expire = Cages.noClaimUntil.get(chunk);
-            final long now = System.currentTimeMillis();
-            if (expire > now) {
-                WildPvPPlugin.tpNow(player, WildPvPPlugin.getInstance().getSpawnLocation());
-            }
+        if (Cages.isChunkProtected(chunk)) {
+            WildPvPPlugin.tpNow(player, WildPvPPlugin.getInstance().getSpawnLocation());
         }
     }
 
@@ -111,13 +108,9 @@ public class QueueListener implements Listener
             event.setCancelled(true);
             return;
         }
-        if (Cages.noClaimUntil.containsKey(chunk)) {
-            final long expire = Cages.noClaimUntil.get(chunk);
-            final long now = System.currentTimeMillis();
-            if (expire > now) {
-                event.setCancelled(true);
-                BryUtil.sendMessage((CommandSender)fPlayer.getPlayer(), "&c&l(!)&c You cannot claim this land during a &lPvP Queue.");
-            }
+        if (Cages.isChunkProtected(chunk)) {
+            event.setCancelled(true);
+            BryUtil.sendMessage((CommandSender)fPlayer.getPlayer(), "&c&l(!)&c You cannot claim this land during a &lPvP Queue.");
         }
     }
 
@@ -125,12 +118,8 @@ public class QueueListener implements Listener
     public void onPlayerInteract(final PlayerInteractEvent event) {
         final Player player = event.getPlayer();
         final Chunk chunk = event.getPlayer().getLocation().getChunk();
-        if (event.hasItem() && (event.getItem().getType().name().contains("BANNER") || event.getItem().getType().name().contains("PICKAXE")) && (Cages.noClaimUntil.containsKey(chunk) || this.plugin.getQueueManager().getQueueByChunk(chunk) != null)) {
-            final long expire = Cages.noClaimUntil.get(chunk);
-            final long now = System.currentTimeMillis();
-            if (expire > now) {
-                event.setCancelled(true);
-            }
+        if (event.hasItem() && (event.getItem().getType().name().contains("BANNER") || event.getItem().getType().name().contains("PICKAXE")) && (Cages.isChunkProtected(chunk) || this.plugin.getQueueManager().getQueueByChunk(chunk) != null)) {
+            event.setCancelled(true);
         }
     }
 
@@ -139,16 +128,11 @@ public class QueueListener implements Listener
         boolean shouldClear = false;
         for (final Block block : event.blockList()) {
             final Chunk chunk = block.getLocation().getChunk();
-            if (Cages.noClaimUntil.containsKey(chunk)) {
-                final long expire = Cages.noClaimUntil.get(chunk);
-                final long now = System.currentTimeMillis();
-                if (expire > now) {
-                    event.setYield(0.0f);
-                    event.setCancelled(true);
-                    shouldClear = true;
-                    break;
-                }
-                continue;
+            if (Cages.isChunkProtected(chunk)) {
+                event.setYield(0.0f);
+                event.setCancelled(true);
+                shouldClear = true;
+                break;
             }
         }
         if (shouldClear) {
@@ -160,13 +144,9 @@ public class QueueListener implements Listener
     public void onBlockPlace(final BlockPlaceEvent event) {
         final Player player = event.getPlayer();
         final Chunk chunk = event.getBlock().getChunk();
-        if (Cages.noClaimUntil.containsKey(chunk)) {
-            final long expire = Cages.noClaimUntil.get(chunk);
-            final long now = System.currentTimeMillis();
-            if (expire > now) {
-                BryUtil.sendMessage((CommandSender)player, "&c&l(!)&c You cannot build in this land during a &lPvP Match.");
-                event.setCancelled(true);
-            }
+        if (Cages.isChunkProtected(chunk)) {
+            BryUtil.sendMessage((CommandSender)player, "&c&l(!)&c You cannot build in this land during a &lPvP Match.");
+            event.setCancelled(true);
         }
     }
 
@@ -174,13 +154,9 @@ public class QueueListener implements Listener
     public void onBlockBreak(final BlockBreakEvent event) {
         final Player player = event.getPlayer();
         final Chunk chunk = event.getBlock().getChunk();
-        if (Cages.noClaimUntil.containsKey(chunk)) {
-            final long expire = Cages.noClaimUntil.get(chunk);
-            final long now = System.currentTimeMillis();
-            if (expire > now) {
-                BryUtil.sendMessage((CommandSender)player, "&c&l(!)&c You cannot build in this land during a &lPvP Match.");
-                event.setCancelled(true);
-            }
+        if (Cages.isChunkProtected(chunk)) {
+            BryUtil.sendMessage((CommandSender)player, "&c&l(!)&c You cannot build in this land during a &lPvP Match.");
+            event.setCancelled(true);
         }
     }
 
@@ -204,19 +180,18 @@ public class QueueListener implements Listener
         if (queue.getState() == QueueState.INVINCIBILITY) {
             queue.removeInvincibility();
         }
-        if (!queue.isCageMatch() || queue.getState() == QueueState.CANCELLED) {}
+        // cancelled, host left the queue, or no fight yet: the cage goes now; after a fight it goes 120s after the start
+        if (queue.isCageMatch() && queue.getState() != QueueState.END) {
+            this.plugin.getCages().despawnCage(queue.getCreationLocation().getChunk());
+        }
     }
 
     @EventHandler(priority = EventPriority.LOW)
     public void onFactionBanner(final PlayerInteractEvent event) {
         final Player player = event.getPlayer();
         final Chunk chunk = player.getLocation().getChunk();
-        if (Cages.noClaimUntil.containsKey(chunk) && event.hasItem() && (event.getItem().getType().name().contains("BANNER") || event.getItem().getType() == Material.DIAMOND_PICKAXE)) {
-            final long expire = Cages.noClaimUntil.get(chunk);
-            final long now = System.currentTimeMillis();
-            if (expire > now) {
-                event.setCancelled(true);
-            }
+        if (Cages.isChunkProtected(chunk) && event.hasItem() && (event.getItem().getType().name().contains("BANNER") || event.getItem().getType() == Material.DIAMOND_PICKAXE)) {
+            event.setCancelled(true);
         }
     }
 
@@ -228,14 +203,10 @@ public class QueueListener implements Listener
         if (player.isOp() || player.hasPermission("factions.teleport.bypass")) {
             return;
         }
-        if (Cages.noClaimUntil.containsKey(chunk) && (queue == null || queue.getState() == QueueState.END)) {
-            final long expire = Cages.noClaimUntil.get(chunk);
-            final long now = System.currentTimeMillis();
-            if (expire > now) {
-                final String state = (event.getCause() == PlayerTeleportEvent.TeleportCause.ENDER_PEARL) ? "enderpearl" : "teleport";
-                BryUtil.sendMessage((CommandSender)player, "&c&l(!)&c You cannot " + state + " in this chunk while there is a cage match active.");
-                event.setCancelled(true);
-            }
+        if (Cages.isChunkProtected(chunk) && (queue == null || queue.getState() == QueueState.END)) {
+            final String state = (event.getCause() == PlayerTeleportEvent.TeleportCause.ENDER_PEARL) ? "enderpearl" : "teleport";
+            BryUtil.sendMessage((CommandSender)player, "&c&l(!)&c You cannot " + state + " in this chunk while there is a cage match active.");
+            event.setCancelled(true);
         }
     }
 
@@ -259,7 +230,7 @@ public class QueueListener implements Listener
             event.setCancelled(true);
             return;
         }
-        if (!Board.getInstance().getFactionAt(fPlayer.getLastStoodAt()).isNone()) {
+        if (!Board.getInstance().getFactionAt(new FLocation(player.getLocation())).isNone()) {
             BryUtil.sendMessage((CommandSender)player, "&c&l(!)&c You must be in &2Wilderness&c to create a queue.");
             event.setCancelled(true);
             return;

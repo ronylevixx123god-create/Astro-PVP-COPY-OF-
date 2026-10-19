@@ -72,6 +72,9 @@ public class SingleWildQueue
         this.opponent = opponent;
         this.state = QueueState.INVINCIBILITY;
         this.invincibilityTimer = new InvincibilityTimer(this, 7);
+        if (this.cageMatch) {
+            WildPvPPlugin.getInstance().getCages().scheduleDespawn(this.creationLocation.getChunk(), 120);
+        }
         this.previousLocationMap.put(opponent.getUniqueId(), opponent.getLocation());
         WildPvPPlugin.tpNow(opponent, this.creationLocation);
         opponent.sendMessage("");
@@ -92,6 +95,10 @@ public class SingleWildQueue
         BryUtil.sendMessage((CommandSender)this.host, "    &7&o(( You've been added back to the queue ))");
         this.opponent = null;
         this.state = QueueState.IDLE;
+        if (this.cageMatch) {
+            // back to waiting: the cage stays until the next opponent's match (or a cancel)
+            WildPvPPlugin.getInstance().getCages().cancelScheduledDespawn(this.creationLocation.getChunk());
+        }
     }
 
     public boolean containsPlayer(final Player player) {
@@ -143,7 +150,7 @@ public class SingleWildQueue
 
     public void endSuccesfully() {
         this.state = QueueState.END;
-        Cages.noClaimUntil.put(this.creationLocation.getChunk(), System.currentTimeMillis() + 90000L);
+        Cages.protectUntil(this.creationLocation.getChunk(), System.currentTimeMillis() + Cages.NO_CLAIM_AFTER_MILLIS);
         WildPvPPlugin.getInstance().getQueueManager().removeExisitingQueue(this);
     }
 

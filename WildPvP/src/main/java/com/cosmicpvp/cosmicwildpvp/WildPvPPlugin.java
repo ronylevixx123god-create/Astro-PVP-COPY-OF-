@@ -42,6 +42,8 @@ public class WildPvPPlugin extends JavaPlugin
     }
 
     public void onDisable() {
+        // never leave cage blocks behind
+        this.cages.despawnAll();
     }
 
     public Location getSpawnLocation() {
