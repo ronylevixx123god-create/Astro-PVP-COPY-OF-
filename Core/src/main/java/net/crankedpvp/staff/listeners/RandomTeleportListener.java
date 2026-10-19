@@ -51,7 +51,10 @@ public class RandomTeleportListener implements Listener {
                 //.filter(possiblePlayer -> !PLAYERS.contains(possiblePlayer.getName()))
                 //.filter(loopPlayer -> WorldGuardUtils.canPvPInRegion(player))
                 .collect(Collectors.toList());
-        possibleSelectedPlayers.removeIf(checkPlayer -> ProxyPatch.playerNames.contains(checkPlayer.getName()));
+        // ProxyPatch is optional; without this check /randomtp failed with an internal error
+        if (Bukkit.getPluginManager().getPlugin("ProxyPatch") != null) {
+            possibleSelectedPlayers.removeIf(checkPlayer -> ProxyPatch.playerNames.contains(checkPlayer.getName()));
+        }
         Player selectedPlayer = possibleSelectedPlayers.get(ThreadLocalRandom.current().nextInt(possibleSelectedPlayers.size()));
         player.teleport(selectedPlayer, PlayerTeleportEvent.TeleportCause.UNKNOWN);
         player.sendMessage(CC.translate(AstroCore.prefix + "&eYou have been teleported to &6" + selectedPlayer.getName()));
