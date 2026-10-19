@@ -10,6 +10,7 @@ public class NoFlyTask extends BukkitRunnable {
 	@Override
 	public void run() {
 		for (World world : AstroSpaceGrindingAPI.getWorlds()) {
+			if (world == null) continue; // map not installed
 			for(Player player : world.getPlayers()) {
 				if(player.isOp()) {
 					continue;

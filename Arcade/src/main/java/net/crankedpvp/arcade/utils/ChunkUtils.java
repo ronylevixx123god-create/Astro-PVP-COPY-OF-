@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.bukkit.BukkitWorld;
 import com.sk89q.worldedit.regions.Polygonal2DRegion;
+import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import net.crankedpvp.arcade.ArcadeAPI;
 import org.bukkit.*;
@@ -49,8 +50,11 @@ public class ChunkUtils {
     public static List<Location> getRegionBlocks(String region) {
         List<Location> blocks = new ArrayList<>();
         World bukkitWorld = Bukkit.getWorld(ArcadeAPI.WORLD_NAME);
+        if (bukkitWorld == null) return blocks; // map not installed
         com.sk89q.worldedit.world.World weWorld = new BukkitWorld(bukkitWorld);
-        ProtectedRegion wgRegion = WorldGuardUtils.getWorldGuard().getGlobalRegionManager().get(bukkitWorld).getRegion(region);
+        RegionManager regionManager = WorldGuardUtils.getWorldGuard().getGlobalRegionManager().get(bukkitWorld);
+        ProtectedRegion wgRegion = regionManager == null ? null : regionManager.getRegion(region);
+        if (wgRegion == null) return blocks;
         Polygonal2DRegion weRegion = new Polygonal2DRegion(weWorld, wgRegion.getPoints(), wgRegion.getMinimumPoint().getBlockY(), wgRegion.getMaximumPoint().getBlockY());
         for (BlockVector block : weRegion) {
             blocks.add(new Location(bukkitWorld, block.getBlockX(), block.getBlockY(), block.getBlockZ()));

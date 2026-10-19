@@ -7,6 +7,7 @@ import me.astropvp.astrospacegrinding.listeners.StrongholdBuffsListener;
 import me.astropvp.astrospacegrinding.listeners.ViewItemsGUIListener;
 import me.astropvp.astrospacegrinding.utils.config.ConfigManager;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
@@ -40,9 +41,12 @@ public class AstroSpaceGrindingPlugin extends JavaPlugin {
 		startTasks();
 		this.configManager = new ConfigManager(this);
 		this.configManager.setupFiles();
-		for (Entity entity : Bukkit.getWorld("space").getEntities()) {
-			if (entity instanceof Player) continue;
-			entity.remove();
+		World space = Bukkit.getWorld("space");
+		if (space != null) { // map not installed
+			for (Entity entity : space.getEntities()) {
+				if (entity instanceof Player) continue;
+				entity.remove();
+			}
 		}
 		activeMonsters = new HashMap<>();
 	}

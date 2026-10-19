@@ -16,8 +16,8 @@ class ClearMobsTask : BukkitRunnable() {
         }
         MobManager.activeEntities.clear()
 
-        SpaceAPI.WORLDS.forEach { Bukkit.getWorld(it).entities.filter { type -> type !is Player } .forEach { entity -> entity.remove() }}
-        SpaceAPI.WORLDS.forEach { Bukkit.getWorld(it).players.forEach { player -> player.msg("&d&l(!) &dAll space mobs have been cleared, new ones will spawn soon")}}
+        SpaceAPI.WORLDS.forEach { Bukkit.getWorld(it)?.entities?.filter { type -> type !is Player }?.forEach { entity -> entity.remove() }}
+        SpaceAPI.WORLDS.forEach { Bukkit.getWorld(it)?.players?.forEach { player -> player.msg("&d&l(!) &dAll space mobs have been cleared, new ones will spawn soon")}}
     }
 
 }

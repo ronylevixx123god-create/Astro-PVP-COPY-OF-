@@ -72,7 +72,7 @@ public class ArcadeManager {
         String msgVictim = Language.MATCH_STARTED_VICTIM.getMessage().replace("{killer}", player1.getName());
         player1.sendMessage(CC.translate(msgKiller));
         player2.sendMessage(CC.translate(msgVictim));
-        for (Player player : Bukkit.getWorld(ArcadeAPI.WORLD_NAME).getPlayers()) {
+        for (Player player : ArcadeAPI.getArcadeWorldPlayers()) {
             player.sendMessage(CC.translate(Language.MATCH_STARTED_BROADCAST.getMessage().replace("{player1}", player1.getName()).replace("{player2}", player2.getName())));
         }
         ArcadeBorderPlayers.borderPlayers.add(uuid1);
@@ -154,7 +154,7 @@ public class ArcadeManager {
 
     public void closeArcade() {
         final List<ArcadeMatch> cloneMatches = new ArrayList<>(matches);
-        final List<Player> arcadePlayers = new ArrayList<>(Bukkit.getWorld(ArcadeAPI.WORLD_NAME).getPlayers());
+        final List<Player> arcadePlayers = new ArrayList<>(ArcadeAPI.getArcadeWorldPlayers());
         for (ArcadeMatch arcadeMatch : cloneMatches) {
             endMatch(arcadeMatch.getPlayers().getLeft());
         }

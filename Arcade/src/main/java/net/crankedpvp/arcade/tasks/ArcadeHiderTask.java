@@ -14,7 +14,7 @@ public class ArcadeHiderTask extends BukkitRunnable {
         for (ArcadeMatch arcadeMatch : ArcadePlugin.getInstance().getArcadeManager().getMatches()) {
             Player player1 = Bukkit.getPlayer(arcadeMatch.getPlayers().getLeft());
             Player player2 = Bukkit.getPlayer(arcadeMatch.getPlayers().getRight());
-            for (Player player : Bukkit.getWorld(ArcadeAPI.WORLD_NAME).getPlayers()) {
+            for (Player player : ArcadeAPI.getArcadeWorldPlayers()) {
                 if (player.getUniqueId() == player1.getUniqueId() || player.getUniqueId() == player2.getUniqueId())
                     continue;
                 if(player.hasPermission("arcade.see")) continue;

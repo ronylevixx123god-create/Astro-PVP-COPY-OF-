@@ -84,10 +84,11 @@ class SpacePlugin : JavaPlugin() {
 
     override fun onDisable() {
         for (world in SpaceAPI.WORLDS) {
-            for (player in Bukkit.getWorld(world).players) {
+            val spaceWorld = Bukkit.getWorld(world) ?: continue
+            for (player in spaceWorld.players) {
                 player.teleport(Bukkit.getWorld("world").spawnLocation)
             }
-            for (entity in Bukkit.getWorld(world).entities) {
+            for (entity in spaceWorld.entities) {
                 if(entity !is Player) {
                     entity.remove()
                 }
