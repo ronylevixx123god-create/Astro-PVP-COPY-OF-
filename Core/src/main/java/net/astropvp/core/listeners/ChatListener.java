@@ -21,6 +21,7 @@ import net.astropvp.core.titles.utils.Clickable;
 import net.crankedpvp.staff.managers.StaffChatManager;
 import net.luckperms.api.LuckPermsProvider;
 import org.arkhamnetwork.Arkkit.patches.chat_filter.ChatFilter;
+import org.arkhamnetwork.Arkkit.patches.chat_filter.ChatUtils;
 import org.arkhamnetwork.Arkkit.utils.EssentialsUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -213,6 +214,9 @@ public class ChatListener implements Listener {
                 clickable.add(String.format("&d&o%s's Inventory", playerName), String.format("&7View %s's Inventory", playerName), "/invsee " + playerName);
                 message = message.replace("[brag]", "").replace("[BRAG]", "");
             }
+
+            // Arkkit /filterchat words show as **** unless this recipient turned the filter off with /togglefilter
+            message = ChatUtils.getFilteredMessage(message, recipient, false);
 
             ChatColor chatcolor = AstroCore.getInstance().getAstroPlayerManager().getAstroPlayer(player.getUniqueId()).getChatColor();
             if (player.isOp()) {
