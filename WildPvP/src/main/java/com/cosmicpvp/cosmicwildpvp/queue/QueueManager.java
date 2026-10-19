@@ -84,7 +84,8 @@ public class QueueManager
                 return;
             }
         }
-        if (this.plugin.getCages().hasCage(host.getLocation().getChunk())) {
+        // (a host already in the queue gets the "already in the queue" message from QueueCreateEvent instead)
+        if (this.getQueueByHost(host) == null && this.plugin.getCages().hasCage(host.getLocation().getChunk())) {
             host.sendMessage(CC.translate("&c&l(!)&c There is already a cage in this chunk."));
             return;
         }
