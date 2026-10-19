@@ -58,6 +58,7 @@ import com.massivecraft.factions.FPlayers;
 import me.ifamasssxd.cosmicskycustoms.CosmicSkyCustomItems;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -351,9 +352,16 @@ public class CosmicDungeonsPlugin extends JavaPlugin {
     }
 
     private void loadDungeons() {
-        CosmicDungeonsPlugin.get_().getApi().addDungeon(new Dungeon(Bukkit.getWorld("dungeon_yijki_a"), DungeonType.ABANDONED_SHIP, this.getConfig().getString("dungeons.dungeon_yijki_a.name"), new LinkedList<String>(this.getConfig().getStringList("dungeons.dungeon_yijki_a.description"))));
-        CosmicDungeonsPlugin.get_().getApi().addDungeon(new DestroyedOutpostDungeon(Bukkit.getWorld(DungeonType.DESTROYED_OUTPOST.getInternalName()), "&4&l&nDestroyed Outpost", new LinkedList<String>(Lists.newArrayList("", "&4&lLORE", CC.Gray + "After investigating the source of the", CC.Gray + "distress signal sent from the Abandoned Spaceship", CC.Gray + "and parsing over the recovered Cosmonaut Ship", CC.Gray + "master log files, a chilling series of events", CC.Gray + "has been uncovered.", "", CC.Gray + "With the teleportation matrix solved, the", CC.Gray + "Mother of Yijki\u2019s source location has been traced.", CC.Gray + "There is a rift into its dimension at the", CC.Gray + "core of this destroyed mining outpost.", "", CC.Gray + "You have been chosen to lead the assault", CC.Gray + "onto the hostile planet to rid the Cosmoverse", CC.Gray + "of this demonic entity of destruction."))));
-        CosmicDungeonsPlugin.get_().getApi().addDungeon(new PlanetNulDungeon(Bukkit.getWorld(DungeonType.PLANET_NUL.getInternalName()), "&8&l&nPlanet Nul", new LinkedList<String>(Lists.newArrayList("", "&8&lLORE", CC.Gray + "Located on the edge of the Cosmoverse,", CC.Gray + "Planet Nul is a mysterious and dark planet", CC.Gray + "that, until recently, held no significance.", CC.Gray, CC.Gray + "However, new intel suggests one of the", CC.Gray + "Most infamous criminals in the universe,", CC.Gray + "known only as - " + CC.DarkGray + "The Corrupt Cosmonaut,", CC.Gray + "is hiding deep in an abandoned military bunker", CC.Gray + "that can be accessed from the planet's surface.", CC.Gray, CC.Gray + "An elite team has been assembled, and you have", CC.Gray + "been chosen, to launch a tactical assault on", CC.Gray + "the military bunker on Planet Nul with one", CC.Gray + "simple objective: " + CC.DarkGray + "Eliminate the Corrupt Cosmonaut."))));
+        // A dungeon is only registered when its map world exists
+        World abandonedShip = Bukkit.getWorld("dungeon_yijki_a");
+        World destroyedOutpost = Bukkit.getWorld(DungeonType.DESTROYED_OUTPOST.getInternalName());
+        World planetNul = Bukkit.getWorld(DungeonType.PLANET_NUL.getInternalName());
+        if (abandonedShip != null) CosmicDungeonsPlugin.get_().getApi().addDungeon(new Dungeon(abandonedShip, DungeonType.ABANDONED_SHIP, this.getConfig().getString("dungeons.dungeon_yijki_a.name"), new LinkedList<String>(this.getConfig().getStringList("dungeons.dungeon_yijki_a.description"))));
+        else getLogger().warning("World dungeon_yijki_a not found, Abandoned Ship dungeon not loaded");
+        if (destroyedOutpost != null) CosmicDungeonsPlugin.get_().getApi().addDungeon(new DestroyedOutpostDungeon(destroyedOutpost, "&4&l&nDestroyed Outpost", new LinkedList<String>(Lists.newArrayList("", "&4&lLORE", CC.Gray + "After investigating the source of the", CC.Gray + "distress signal sent from the Abandoned Spaceship", CC.Gray + "and parsing over the recovered Cosmonaut Ship", CC.Gray + "master log files, a chilling series of events", CC.Gray + "has been uncovered.", "", CC.Gray + "With the teleportation matrix solved, the", CC.Gray + "Mother of Yijki\u2019s source location has been traced.", CC.Gray + "There is a rift into its dimension at the", CC.Gray + "core of this destroyed mining outpost.", "", CC.Gray + "You have been chosen to lead the assault", CC.Gray + "onto the hostile planet to rid the Cosmoverse", CC.Gray + "of this demonic entity of destruction."))));
+        else getLogger().warning("World " + DungeonType.DESTROYED_OUTPOST.getInternalName() + " not found, Destroyed Outpost dungeon not loaded");
+        if (planetNul != null) CosmicDungeonsPlugin.get_().getApi().addDungeon(new PlanetNulDungeon(planetNul, "&8&l&nPlanet Nul", new LinkedList<String>(Lists.newArrayList("", "&8&lLORE", CC.Gray + "Located on the edge of the Cosmoverse,", CC.Gray + "Planet Nul is a mysterious and dark planet", CC.Gray + "that, until recently, held no significance.", CC.Gray, CC.Gray + "However, new intel suggests one of the", CC.Gray + "Most infamous criminals in the universe,", CC.Gray + "known only as - " + CC.DarkGray + "The Corrupt Cosmonaut,", CC.Gray + "is hiding deep in an abandoned military bunker", CC.Gray + "that can be accessed from the planet's surface.", CC.Gray, CC.Gray + "An elite team has been assembled, and you have", CC.Gray + "been chosen, to launch a tactical assault on", CC.Gray + "the military bunker on Planet Nul with one", CC.Gray + "simple objective: " + CC.DarkGray + "Eliminate the Corrupt Cosmonaut."))));
+        else getLogger().warning("World " + DungeonType.PLANET_NUL.getInternalName() + " not found, Planet Nul dungeon not loaded");
     }
 
     private void mkdirs() {

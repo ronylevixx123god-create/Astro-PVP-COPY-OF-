@@ -146,7 +146,7 @@ class SpaceInventory(val player: Player) {
     }
 
     private val activePlayersAtMars: Int
-        get() = Bukkit.getWorld("mars").players.size
+        get() = Bukkit.getWorld("mars")?.players?.size ?: 0
 
     fun open() {
         this.spaceGUI.open(this.player)

@@ -11,7 +11,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class ArcadeRegionChecker extends BukkitRunnable {
     @Override
     public void run() {
-        for (Player player : Bukkit.getWorld(ArcadeAPI.WORLD_NAME).getPlayers()) {
+        for (Player player : ArcadeAPI.getArcadeWorldPlayers()) {
 
             if (WorldGuardUtils.getRegionName(player.getLocation()).equals(ArcadeAPI.SAFEZONE_REGION_NAME) && ArcadeAPI.inArcadeMatch(player.getUniqueId())) {
                 ArcadePlugin.getInstance().getArcadeManager().endMatch(player.getUniqueId());

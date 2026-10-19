@@ -14,6 +14,7 @@ import me.ifamasssxd.cosmichcf.api.HCFOutpostAPI;
 import me.ifamasssxd.cosmichcf.struct.OutpostType;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -154,7 +155,8 @@ public class SpaceGUI {
     }
 
     private int getActivePlayersAtMars() {
-        return Bukkit.getWorld("mars").getPlayers().size();
+        World mars = Bukkit.getWorld("mars");
+        return mars == null ? 0 : mars.getPlayers().size();
     }
 
 

@@ -55,7 +55,7 @@ public class ArcadeGUI {
                 .addLoreLine(CC.translate("&7set equipped to join this warp."))
                 .addLoreLine("")
                 .addLoreLine(CC.translate("&dCurrent Info:"))
-                .addLoreLine(CC.translate("&fPlayers: &7" + Bukkit.getWorld(ArcadeAPI.WORLD_NAME).getPlayers().size()))
+                .addLoreLine(CC.translate("&fPlayers: &7" + ArcadeAPI.getArcadeWorldPlayers().size()))
                 .addLoreLine("")
                 .addLoreLine(CC.translate("&dStatus"))
                 .addLoreLine(CC.translate("&f" + (ArcadePlugin.getInstance().getArcadeManager().isEnabled() ? "&a&lOPEN" : "&c&lCLOSED &7(&fOpens in &d" + ArcadePlugin.getInstance().getArcadeManager().timeUntilArcadeEnabled() + "&7)")))
