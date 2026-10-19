@@ -132,7 +132,7 @@ Copy these jars from the repo into `plugins/` (paths are relative to the repo ro
 | NBTAPI 2.7.1 | `AstroCustomBlocks/lib/item-nbt-api-plugin-2.7.1.jar` | **required:** AstroArmorSets, AstroHypeBoxes |
 | TAB 3.1.2 | `AstroScoreboard/lib/TAB.v3.1.2.jar` | **required:** AstroScoreboard (built against TAB 3's `me.neznamy.tab.api.TabAPI`; the TAB 2.8.10 jar in the same folder doesn't have it) |
 | Kotlin 1.3.72 | `Dungeon/lib/Kotlin-1.3.72.jar` | **required:** ChatGames |
-| LibsDisguises | `Ark/lib/LibsDisguises.jar` | **required:** CosmicDisguises |
+| LibsDisguises 8.6.7 | `Disguises/lib/LibsDisguises_8.6.7.jar` | **required:** CosmicDisguises (built against 8.6.7). The 8.2.6 copy in `Ark/lib` also works but logs ~900 reflection warnings at startup on 1.8.8. |
 | Citizens | `Ark/lib/Citizens.jar` | optional: Arkkit |
 | mcMMO | `Ark/lib/mcMMO.jar` | optional: Arkkit, Enchantments |
 | CoreProtect 2.12.0 | `Ark/lib/CoreProtect.jar` | **required by FactionsKore** (its chest-logs feature fails with `NoClassDefFoundError: net/coreprotect/CoreProtectAPI` without it, and then AstroCore can't enable either); optional for Factions |
@@ -150,7 +150,8 @@ Copy these jars from the repo into `plugins/` (paths are relative to the repo ro
 ## 4. Worlds
 
 - [ ] `world_ruins` — AstroRuins' mob spawn and no-fly tasks use this world; without it they log NullPointerExceptions every few ticks.
-- [ ] Astro's other maps (not in the repo). Without them these plugins log errors or don't enable:
+- [ ] Astro's other maps (not in the repo). The plugins skip a missing world (CosmicDungeons logs which dungeon
+  it disabled), so they enable, but their areas only work once the maps are added:
   `world_arcade` with WorldGuard region `arcade_blocks` (AstroArcade), `space` and `mars` (SpaceRecode,
   AstroSpaceGrinding), `tournament_world` (AstroTournaments), `world_outpost_mars`, `world_outpost_pluto`
   (outposts), `event`, and the dungeon worlds named in CosmicDungeons' config (`dungeon_yijki_a`,
@@ -171,6 +172,11 @@ Copy these jars from the repo into `plugins/` (paths are relative to the repo ro
   defaults these features register `/ce`, `/coins`, `/mobcoins`, `/spectate` and `/withdraw` over AstroCore,
   AstroMobCoins, CosmicDuel and CosmicGUIShop. Astro's code only uses FactionsKore's shield, outpost, grace and
   KOTH features.
+
+## 4d. Envoy crate locations
+
+- [ ] Save envoy crate locations with `/aenvoy setup` (more than 7, or more than online players / 6). Until then
+  each timed envoy is skipped with a warning in the console.
 
 ## 5. Permissions and access
 
@@ -211,8 +217,8 @@ New defaults only apply when `plugins/Factions/config/default_permissions.conf` 
 
 - AstroCore uses FactionsKore without declaring it in `plugin.yml`; load order isn't guaranteed.
 - Factions' only unit test (JUnit 4) isn't picked up by Maven's runner (0 tests run).
-- Astro's own command bugs, left unchanged: `/akoth` without arguments and `/removeskin` (both OP-only) throw an
-  internal error; `/lootboxtoggle` and `/lootboxfilter` are rewritten by AstroCore to `/mctoggle`/`/mcfilter`
+- Astro's own command bugs, left unchanged: `/akoth`, `/givebucket` and `/fdp` without arguments and `/removeskin`
+  throw an internal error; `/randomtp` does too when no other player is online; `/lootboxtoggle` and `/lootboxfilter` are rewritten by AstroCore to `/mctoggle`/`/mcfilter`
   (unknown) - use `/lbtoggle` and `/lbfilter`. `/bombs` and `/roulette` are disabled in Astro's code.
 - HotFix removes OP from every player on join except the UUIDs in `auto-op-uuids`; give staff permissions
   through LuckPerms instead of `/op`.
