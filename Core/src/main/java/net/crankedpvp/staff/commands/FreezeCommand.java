@@ -28,6 +28,6 @@ public class FreezeCommand extends CommandBase {
         this.plugin.getFreezeManager().getFrozenPlayers().put(toFreeze.getUniqueId(), toFreeze.getLocation().clone());
         Bukkit.getOnlinePlayers().stream().filter(loopPlayer -> loopPlayer.hasPermission("staff.freeze")).forEach(loopPlayer -> loopPlayer.sendMessage(CC.translate("&b&lFreeze &8➥ &7The player &f" + toFreeze.getName() + " &7has been frozen by &f" + player.getName())));
         TitleUtils.sendTitle(toFreeze, CC.translate("&c&lFROZEN"), CC.translate("&7DO NOT LOG OUT"), 1, 10, 1);
-        toFreeze.sendMessage(CC.translate("&b&lFreeze &8➥ &7You have been &c&lFROZEN&7. Join discord.gg/astropvp immediately."));
+        toFreeze.sendMessage(CC.translate("&b&lFreeze &8➥ &7You have been &c&lFROZEN&7. Join discord.gg/b58nePVn immediately."));
     }
 }
