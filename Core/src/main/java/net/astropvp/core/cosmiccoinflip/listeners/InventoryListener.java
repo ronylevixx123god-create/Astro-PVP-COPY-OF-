@@ -110,6 +110,11 @@ implements Listener {
                         player.closeInventory();
                         return;
                     }
+                    if (joining.getStarterPlayer().getUniqueId().equals(player.getUniqueId())) {
+                        player.sendMessage(ChatColor.RED + "You can't coinflip yourself!");
+                        player.closeInventory();
+                        return;
+                    }
                     if (chosen == joining.getFirstColor()) {
                         player.sendMessage(ChatColor.RED + "Color already taken!");
                         return;
@@ -157,6 +162,10 @@ implements Listener {
                     if (match == null) {
                         event.getInventory().removeItem(item);
                     } else if (match.getMatchState() == CoinFlipMatch.MatchState.WAITING) {
+                        if (match.getStarterPlayer().getUniqueId().equals(player.getUniqueId())) {
+                            player.sendMessage(ChatColor.RED + "You can't coinflip yourself!");
+                            return;
+                        }
                         if (manager.getMatch(player) != null && !player.getName().equals("XaitX")) {
                             player.sendMessage(ChatColor.RED + "You are already in a Coin Flip Match!");
                             player.closeInventory();
