@@ -24,7 +24,7 @@ public class Gamble
 
     @Override
     public void enable() {
-        if (Arkkit.get().getConfig().contains("settings.gamble.disabledRolUUIDs")) {
+        if (Arkkit.get().getConfig().contains("settings.gamble.disabledRollUUIDs")) {
             for (String s : Arkkit.get().getConfig().getStringList("settings.gamble.disabledRollUUIDs")) {
                 disabledRollUUIDs.add(s);
             }
