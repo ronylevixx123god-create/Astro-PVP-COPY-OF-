@@ -431,6 +431,11 @@ public class AstroCore extends JavaPlugin {
         getCommand("givebucket").setExecutor(new CommandGiveMagicBucket());
         getServer().getPluginManager().registerEvents(new KillTitleSound(), this);
         getCommand("givesoulpearl").setExecutor(new SoulPearlCommand());
+        ClaimCommand claimCommand = new ClaimCommand();
+        getCommand("claim").setExecutor(claimCommand);
+        getServer().getPluginManager().registerEvents(claimCommand, this);
+        getCommand("clearlag").setExecutor(new ClearLagCommand());
+        getCommand("astroitem").setExecutor(new AstroItemCommand());
         getCommand("coinflip").setExecutor(new CommandCoinFlip());
         getCommand("list").setExecutor(new ListCommand());
         getCommand("grinding").setExecutor(new ToggleGrindingMessages());
