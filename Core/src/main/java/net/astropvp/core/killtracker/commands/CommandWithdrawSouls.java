@@ -46,32 +46,48 @@ public class CommandWithdrawSouls
                 p.sendMessage((Object) ChatColor.RED + "Please enter a valid number!");
                 return true;
             }
-            amount = Integer.parseInt(args[0]);
+            try {
+                amount = Integer.parseInt(args[0]);
+            } catch (NumberFormatException err) {
+                p.sendMessage((Object) ChatColor.RED + "Please enter a valid amount.");
+                return true;
+            }
             if (amount <= 0) {
                 p.sendMessage((Object) ChatColor.RED + "Please enter a valid amount.");
                 return true;
             }
             if (p.getItemInHand() != null && KillTrackerAPI.isSoulGem(p.getItemInHand())) {
-                if (p.getItemInHand().getAmount() > 1) {
-                    p.sendMessage((Object) ChatColor.RED + ChatColor.BOLD.toString() + "(!) " + (Object) ChatColor.RED + "You cannot split stacked Soul Gems.");
-                    return true;
-                }
-                int souls = KillTrackerAPI.getSouls(p.getItemInHand());
-                if (souls <= amount) {
+                ItemStack hand = p.getItemInHand();
+                int souls = KillTrackerAPI.getSouls(hand);
+                if (souls < amount) {
                     p.sendMessage((Object) ChatColor.RED + ChatColor.BOLD.toString() + "(!) " + (Object) ChatColor.RED + "You do not have enough souls on this item.");
                     p.sendMessage((Object) ChatColor.GRAY + "Item Souls: " + souls);
                     return true;
                 }
-                if (p.getInventory().firstEmpty() == -1) {
+                int newSouls = souls - amount;
+                // identical gems stack while Arkkit's item IDs are off: split one gem off, the rest moves to a free slot
+                int stacked = hand.getAmount();
+                int slotsNeeded = (stacked > 1 ? 1 : 0) + (newSouls > 0 ? 1 : 0);
+                if (this.getEmptyInventorySpace(p) < slotsNeeded) {
                     p.sendMessage((Object) ChatColor.RED + "You do not have enough inventory space to withdraw souls!");
                     return true;
                 }
-                int newSouls = souls - amount;
-                KillTrackerAPI.setSouls(p.getItemInHand(), newSouls);
+                if (stacked > 1) {
+                    ItemStack rest = hand.clone();
+                    rest.setAmount(stacked - 1);
+                    p.getInventory().setItem(p.getInventory().firstEmpty(), rest);
+                    hand.setAmount(1);
+                }
+                if (newSouls > 0) {
+                    KillTrackerAPI.setSouls(hand, newSouls);
+                    p.setItemInHand(hand);
+                } else {
+                    // every soul withdrawn: the emptied gem is used up
+                    p.setItemInHand(null);
+                }
                 ItemStack newSoulItem = KillTrackerAPI.createSoulShard(amount);
                 if (ArkPlugins.ITEM_ID.getArkPlugin().isRunning()) {
-                    long currentID = ItemID.getItemID((ItemStack) p.getItemInHand());
-                    if (currentID == -1L) {
+                    if (newSouls > 0 && ItemID.getItemID((ItemStack) p.getItemInHand()) == -1L) {
                         ItemID.assignItemID(null, (ItemStack) p.getItemInHand());
                     }
                     ItemID.assignItemID(null, (ItemStack) newSoulItem);
