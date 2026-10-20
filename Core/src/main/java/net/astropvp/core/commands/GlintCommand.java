@@ -20,13 +20,22 @@ public class GlintCommand extends CommandBase {
     @Default
     @Permission("glint.*")
     @WrongUsage("&cUsage: /addglint [colour number]")
-    public void glint(Player player, @Optional Integer colour) {
+    public void glint(Player player, @Optional String colour) {
         ItemStack item = player.getItemInHand();
         if (item == null || item.getType() == Material.AIR) {
             player.sendMessage(CC.translate("&cHold the item you want to glint. &7Usage: /addglint [colour number]"));
             return;
         }
-        GlintUtils.addGlint(item, colour == null ? DEFAULT_COLOUR : colour);
+        int value = DEFAULT_COLOUR;
+        if (colour != null) {
+            try {
+                value = Integer.parseInt(colour);
+            } catch (NumberFormatException e) {
+                player.sendMessage(CC.translate("&cUsage: /addglint [colour number]"));
+                return;
+            }
+        }
+        GlintUtils.addGlint(item, value);
         player.setItemInHand(item);
         player.updateInventory();
         player.sendMessage(CC.translate("&aGlinted Item!"));
