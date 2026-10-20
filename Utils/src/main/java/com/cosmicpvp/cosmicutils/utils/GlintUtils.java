@@ -6,15 +6,14 @@ import org.bukkit.inventory.ItemStack;
 
 public class GlintUtils {
     public static void addGlint(ItemStack item, Color color) {
-        NBTWrapper wrapper = new NBTWrapper(item);
-        com.cosmicpvp.cosmicutils.nbt.NBTTagCompoundBuilder cosmicData = wrapper.hasKey("cosmicData") ? new com.cosmicpvp.cosmicutils.nbt.NBTTagCompoundBuilder(wrapper.getNBTBase("cosmicData")) : new NBTTagCompoundBuilder();
-        cosmicData.setString("tintColor", String.valueOf(0xff000000 |getIntFromColor(color.getRed(), color.getGreen(), color.getBlue())));
+        addGlint(item, 0xff000000 | color.asRGB());
     }
 
     public static void addGlint(ItemStack item, int colorInt) {
         NBTWrapper wrapper = new NBTWrapper(item);
         com.cosmicpvp.cosmicutils.nbt.NBTTagCompoundBuilder cosmicData = wrapper.hasKey("cosmicData") ? new com.cosmicpvp.cosmicutils.nbt.NBTTagCompoundBuilder(wrapper.getNBTBase("cosmicData")) : new NBTTagCompoundBuilder();
         cosmicData.setString("tintColor", String.valueOf(colorInt));
+        save(item, wrapper, cosmicData);
     }
 
     public static void removeGlint(ItemStack item) {
@@ -22,6 +21,15 @@ public class GlintUtils {
         com.cosmicpvp.cosmicutils.nbt.NBTTagCompoundBuilder cosmicData = wrapper.hasKey("cosmicData") ? new com.cosmicpvp.cosmicutils.nbt.NBTTagCompoundBuilder(wrapper.getNBTBase("cosmicData")) : new NBTTagCompoundBuilder();
         if (cosmicData.getString("tintColor").equals("-10237440")) {
             cosmicData.remove("tintColor");
+            save(item, wrapper, cosmicData);
+        }
+    }
+
+    /** writes cosmicData back into the item (in place for a live CraftItemStack, via its meta otherwise) */
+    private static void save(ItemStack item, NBTWrapper wrapper, NBTTagCompoundBuilder cosmicData) {
+        ItemStack built = wrapper.setNBTBase("cosmicData", cosmicData.get()).build();
+        if (built != null && built != item) {
+            item.setItemMeta(built.getItemMeta());
         }
     }
 
