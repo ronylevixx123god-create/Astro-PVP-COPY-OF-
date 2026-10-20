@@ -68,7 +68,7 @@ public class MOTD implements Listener {
             player.sendMessage(CC.translate(StringUtils.getCenteredMessage("&fWelcome, &6" + player.getName() + "&f to &6&lAstro&f&lPvP&f!")));
             player.sendMessage(CC.translate(""));
             player.sendMessage(CC.translate(StringUtils.getCenteredMessage("&a&lSHOP &fbuy.astropvp.net")));
-            player.sendMessage(CC.translate(StringUtils.getCenteredMessage("&6&lDISCORD &fdiscord.astropvp.net")));
+            player.sendMessage(CC.translate(StringUtils.getCenteredMessage("&6&lDISCORD &fhttps://discord.gg/b58nePVn")));
             player.sendMessage(CC.translate(StringUtils.getCenteredMessage("&c&lRULES &frules.astropvp.net")));
             //player.sendMessage(CC.translate(StringUtils.getCenteredMessage("&e&lCRYPTO &fcrypto.astropvp.net")));
 
@@ -100,7 +100,7 @@ public class MOTD implements Listener {
             } else {
                 player.sendMessage("");
                 player.sendMessage(CC.translate("&a&l[!]&a Hello &f" + player.getName() + "&a, you are not on the supported version of &f&nCosmicClient&a."));
-                player.sendMessage(CC.translate("&7Please join our discord at &f&ndiscord.astropvp.net&7 and follow the turtorial in &f#cc-features&7."));
+                player.sendMessage(CC.translate("&7Please join our discord at &f&nhttps://discord.gg/b58nePVn&7 and follow the turtorial in &f#cc-features&7."));
                 player.sendMessage(CC.translate("&7You must be on a supported version of &fCosmicClient&7 to see skins, ping, roam etc..."));
                 player.sendMessage(CC.translate("&eYou will also get 1.5x EXP and 1.5x Grinding Lootboxes chance."));
                 player.sendTitle(new Title(CC.translate("&aPlease download Official CosmicClient!"), CC.translate("&7You can find it in &f#cc-features&7 in &f/discord&7."), 20, 120, 20));
