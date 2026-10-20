@@ -124,7 +124,10 @@ public class MysteryChestListener
                 Player player = event.getPlayer();
                 try {
                     MysteryChest chest = CosmicMysteryChest.get().getChestManager().getMysteryChestMap().get(builder.getString("mysteryChest"));
-                    if (chest == null) return;
+                    if (chest == null) {
+                        player.sendMessage(CC.RedB + "(!) " + CC.Red + "This lootbox (" + builder.getString("mysteryChest") + ") is not set up on this server yet.");
+                        return;
+                    }
                     int bundleSize = chest.getItemBundleSize();
                     if (bundleSize == 0) {
                         bundleSize = chest.getGarunteedItems().size();
