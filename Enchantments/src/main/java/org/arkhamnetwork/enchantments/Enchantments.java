@@ -97,6 +97,12 @@ public class Enchantments extends EnchantPlugin {
         //new SoulMaster(), new OpeningCombo(), new MasteryBlackout(), new MasteryNeutralize(),
         //new AvengingAngel()
         EnchantmentAPI.registerCustomEnchantments(array);
+        // Mastery Auto Sell reads the /shop sell prices, so it needs CosmicGUIShop
+        if (getServer().getPluginManager().isPluginEnabled("CosmicGUIShop")) {
+            EnchantmentAPI.registerCustomEnchantment(new MasteryAutoSell());
+        } else {
+            getLogger().warning("CosmicGUIShop is not enabled, the Auto Sell mastery enchant is not registered.");
+        }
 
 
         Bukkit.getScheduler().runTaskTimer(this, () -> {
