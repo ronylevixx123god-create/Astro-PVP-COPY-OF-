@@ -20,7 +20,7 @@ public class HitMe
 
     @Override
     public void enable() {
-        this.registerCommand(new CommandHitMe("hitme", "/<command>", "Deals 1/2 heart of damage to command executor.", new ArrayList<String>(Arrays.asList("hurtme"))));
+        this.registerCommand(new CommandHitMe("hitme", "/<command>", "Deals 1/2 heart of damage to command executor.", new ArrayList<String>(Arrays.asList("hurtme", "hit"))));
     }
 
     @Override
