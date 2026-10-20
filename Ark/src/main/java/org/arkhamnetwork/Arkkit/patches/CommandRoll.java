@@ -40,7 +40,7 @@ final class CommandRoll
                 p.sendMessage(ChatColor.GRAY + "Rolls a random number between 0 and X and outputs the result to local chat.");
                 return true;
             }
-            if (args[0].length() > 5) {
+            if (args[0].length() > 5 && !args[0].equalsIgnoreCase("toggle")) {
                 p.sendMessage(ChatColor.RED + "" + ChatColor.BOLD + "Incorrect Syntax. " + ChatColor.GRAY + "/roll <1-10000/toggle>");
                 return true;
             }
