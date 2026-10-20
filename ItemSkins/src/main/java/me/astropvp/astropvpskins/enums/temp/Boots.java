@@ -129,7 +129,7 @@ public enum Boots {
         lore.add("");
         lore.add(CC.RedB + "NOTE: " + CC.Red + "Requires the Cosmic Client");
         lore.add(CC.Red + "to render custom item skins.");
-        lore.add(CC.Gray + "* Download at " + CC.GrayU + "discord.astropvp.net");
+        lore.add(CC.Gray + "* Download at " + CC.GrayU + "https://discord.gg/b58nePVn");
         lore.add("");
         lore.add(CC.Gray + "Drag n' Drop onto item to attach.");
         lore.add(CC.Gray + "Right-Click item to detach skin.");
