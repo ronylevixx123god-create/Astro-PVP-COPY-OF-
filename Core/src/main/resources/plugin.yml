@@ -35,13 +35,16 @@ commands:
     description: /dupe
   givesoulpearl:
     description: Gives soulpearl
+  claim:
+    description: How to claim faction land, and a Claim Stick.
   spawnershop:
     description: /spawnershop
     aliases: ['spawnershop', 'spawners', 'spawner']
   givetracker:
     description: Gives a player a kill tracker.
   astroitem:
-    description: Custom items for astro
+    description: Give Astro custom items.
+    usage: /astroitem give <player> <item> [data...] | /astroitem list
   withdrawsouls:
     description: Take souls from items.
     aliases: [takesouls, removesouls, withdraws, splitsouls, ws, withdrawsoul]
