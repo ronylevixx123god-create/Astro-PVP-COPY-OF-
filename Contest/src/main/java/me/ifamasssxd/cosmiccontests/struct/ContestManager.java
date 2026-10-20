@@ -242,10 +242,12 @@ public class ContestManager {
             Contests contest;
             String extraData = "";
             if (active.contains("&")) {
-                extraData = active.split("&")[1];
-                active = active.split("&")[0];
+                String[] parts = active.split("&", 2);
+                extraData = parts[1];
+                active = parts[0];
             }
             if ((contest = Contests.getFromName(active)) == null) continue;
+            if (contest == Contests.MCMMO_SKILL && !CosmicContests.get().isMcMMOEnabled()) continue;
             if (contest.getContest() instanceof Rerollable) {
                 ((Rerollable)((Object)contest.getContest())).loadData(extraData);
             }
@@ -359,6 +361,9 @@ public class ContestManager {
                 continue;
             if (this.activeContests.size() >= MAX_CONTESTS)
                 break;
+            // the mcMMO contest needs mcMMO for its skill
+            if (contest == Contests.MCMMO_SKILL && !CosmicContests.get().isMcMMOEnabled())
+                continue;
             long time;
             if (contest.getChallengeResetDelay() != -1L && this.lastMapResetTime > 0L && (time = System.currentTimeMillis() - this.lastMapResetTime) < contest.getChallengeResetDelay()) {
                 Bukkit.getLogger().info("Excluding " + contest.getContest().getName() + " due to it only being " + time + " ms since reset (" + ((contest
