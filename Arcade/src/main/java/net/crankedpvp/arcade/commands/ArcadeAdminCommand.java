@@ -2,6 +2,7 @@ package net.crankedpvp.arcade.commands;
 
 import com.cosmicpvp.cosmicutils.utils.CC;
 import me.mattstudios.mf.annotations.Command;
+import me.mattstudios.mf.annotations.Default;
 import me.mattstudios.mf.annotations.Permission;
 import me.mattstudios.mf.annotations.SubCommand;
 import me.mattstudios.mf.annotations.WrongUsage;
@@ -22,8 +23,17 @@ public class ArcadeAdminCommand extends CommandBase {
         this.languageHandler = plugin.getLanguageHandler();
     }
 
+    @Default
+    @Permission("cranked.admin")
+    public void helpCommand(Player sender) {
+        sender.sendMessage(CC.translate("&3&lArcade Admin"));
+        sender.sendMessage(CC.translate("&b/aarcade reload &7- reload the language file"));
+        sender.sendMessage(CC.translate("&b/aarcade forceopen &7- force the arcade open / closed"));
+        sender.sendMessage(CC.translate("&b/aarcade fuckup &7- make every player visible to everyone again"));
+    }
+
     @SubCommand("reload")
-    @WrongUsage("&cUsage: /ca reload")
+    @WrongUsage("&cUsage: /aarcade reload")
     @Permission("cranked.admin")
     public void reloadCommand(Player sender) {
         Language.ADMIN_RELOADING.send(sender);
@@ -36,7 +46,7 @@ public class ArcadeAdminCommand extends CommandBase {
     }
 
     @SubCommand("fuckup")
-    @WrongUsage("&cUsage: /ca fuckup")
+    @WrongUsage("&cUsage: /aarcade fuckup")
     @Permission("cranked.admin")
     public void fuckupCommand(Player sender) {
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
