@@ -38,9 +38,9 @@ final class CommandTNT
         if (!(sender instanceof Player)) {
             return true;
         }
-        if (!sender.hasPermission("autocrafttnt.command.tnt")) {
-            sender.sendMessage(ChatColor.RED + "You do not have access to this command.");
-            sender.sendMessage(ChatColor.GRAY + "Unlock this command and more by upgrading your rank today at " + Arkkit.get().getConfig().getString("language.spigot_branding.store_url") + "!");
+        // staff only (Mod and above)
+        if (!sender.hasPermission("astro.staff.tnt")) {
+            sender.sendMessage(ChatColor.RED + "You do not have permission to use this command.");
             return true;
         }
         Player p = (Player) sender;
