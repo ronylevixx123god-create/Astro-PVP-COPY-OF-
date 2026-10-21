@@ -280,6 +280,13 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/CosmicMasks.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>me.neznamy</groupId>
+            <artifactId>tab</artifactId>
+            <version>3.1.2</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../AstroScoreboard/lib/TAB.v3.1.2.jar</systemPath>
+        </dependency>
 
 
         <dependency>
