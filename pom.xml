@@ -55,6 +55,7 @@
         <module>AstroCollectors</module>
         <module>AstroGamble</module>
         <module>GiftcardShop</module>
+        <module>ToggleParticles</module>
         <module>AstroArmorSets</module>
         <module>AstroDamageHandler</module>
         <module>AstroFactions</module>

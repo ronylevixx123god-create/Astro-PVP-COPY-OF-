@@ -1,0 +1,7 @@
+main: me.astropvp.astroparticles.ToggleParticles
+name: AstroToggleParticles
+version: 1.0
+commands:
+  toggleparticles:
+    description: /toggleparticles
+    aliases: ["particle", "particles", "toggleparticle"]
