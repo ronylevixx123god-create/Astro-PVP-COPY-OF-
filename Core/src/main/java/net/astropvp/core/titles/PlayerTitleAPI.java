@@ -60,6 +60,12 @@ public class PlayerTitleAPI {
         AstroCore.getInstance().getDataManager().setEquippedTitle(uuid, newTitle);
     }
 
+    // the spelling saved when the voucher was redeemed, else Astro's title list (LuckPerms lower-cases permissions)
+    private static String getTitleName(User user, String permissionTitle) {
+        String saved = user.getCachedData().getMetaData().getMetaValue("titlename-" + permissionTitle.toLowerCase());
+        return saved != null ? saved : TitleList.getTitle(permissionTitle);
+    }
+
     public static ArrayList<String> getUnlockedTitles(UUID uuid) {
         if (AstroCore.getInstance().getDataManager().getUnlockedTitles().containsKey(uuid)) {
             return AstroCore.getInstance().getDataManager().getUnlockedTitles().get(uuid);
@@ -71,7 +77,7 @@ public class PlayerTitleAPI {
             User user = LuckPermsProvider.get().getUserManager().getUser(uuid);
             for (String perm : user.getCachedData().getPermissionData().getPermissionMap().keySet()) {
                 if (!perm.toLowerCase().startsWith("titles.title.")) continue;
-                at.add(TitleList.getTitle(perm.replace("titles.title.", "")));
+                at.add(getTitleName(user, perm.replace("titles.title.", "")));
             }
             AstroCore.getInstance().getDataManager().getUnlockedTitles().put(uuid, at);
             return at;
@@ -80,7 +86,7 @@ public class PlayerTitleAPI {
         ArrayList<String> at = new ArrayList<String>();
         for (String perm : user.getCachedData().getPermissionData().getPermissionMap().keySet()) {
             if (!perm.toLowerCase().startsWith("titles.title.")) continue;
-            at.add(TitleList.getTitle(perm.replace("titles.title.", "")));
+            at.add(getTitleName(user, perm.replace("titles.title.", "")));
         }
         return at;
     }
