@@ -32,6 +32,7 @@ import net.astropvp.core.cosmiccoinflip.listeners.PlayerListener;
 import net.astropvp.core.cosmiccoinflip.struct.CoinFlipManager;
 import net.astropvp.core.cosmiccoinflip.struct.CoinFlipMatch;
 import net.astropvp.core.cosmicjackpot.struct.JackpotManager;
+import net.astropvp.core.cosmictoggles.commands.CommandScoreboard;
 import net.astropvp.core.cosmictoggles.commands.CommandToggles;
 import net.astropvp.core.cosmictoggles.manager.TogglesManager;
 import net.astropvp.core.giveaway.GiveAwayCommand;
@@ -426,6 +427,7 @@ public class AstroCore extends JavaPlugin {
         getCommand("lastmanstanding").setExecutor(new LastManStandingCommand());
         getCommand("togglepay").setExecutor(new CommandTogglePay());
         getCommand("toggles").setExecutor(new CommandToggles());
+        getCommand("togglesb").setExecutor(new CommandScoreboard());
         getCommand("armorcolor").setExecutor(new ArmorColorCommand());
         getCommand("spawnershop").setExecutor(new SpawnerShopCommand());
         getCommand("givebucket").setExecutor(new CommandGiveMagicBucket());
@@ -541,6 +543,7 @@ public class AstroCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new InventoryListener(), this);
         getServer().getPluginManager().registerEvents(new WarpCommand(), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+        getServer().getPluginManager().registerEvents(new net.astropvp.core.cosmictoggles.listeners.PlayerListener(), this);
         getServer().getPluginManager().registerEvents(new WorldBorderPearlFix(), this);
         //getServer().getPluginManager().registerEvents(new JackpotListener(), this);
         getServer().getPluginManager().registerEvents(new GrindingMessagesToggleListener(), this);

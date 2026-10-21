@@ -9,6 +9,8 @@
 package net.astropvp.core.cosmictoggles.listeners;
 
 import net.astropvp.core.AstroCore;
+import net.astropvp.core.cosmictoggles.commands.CommandScoreboard;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -19,6 +21,10 @@ implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (AstroCore.getInstance().getToggleManager().getScoreboardToggles().contains(event.getPlayer().getUniqueId())) {
             AstroCore.getInstance().getToggleManager().clearScoreboard(event.getPlayer());
+            // TAB sets the player up after joining
+            Bukkit.getScheduler().runTaskLater(AstroCore.getInstance(), () -> {
+                if (event.getPlayer().isOnline()) CommandScoreboard.setScoreboardVisible(event.getPlayer(), false);
+            }, 40L);
         }
     }
 }
