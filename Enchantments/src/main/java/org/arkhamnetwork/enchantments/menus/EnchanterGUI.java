@@ -19,6 +19,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.arkhamnetwork.enchantments.Enchantments;
 
 public class EnchanterGUI extends CosmicGUI {
     public EnchanterGUI(Player player) {
@@ -32,7 +36,7 @@ public class EnchanterGUI extends CosmicGUI {
             int xpPrice = (int) rarity.getPrice();
             String realPriceString = NumberUtils.formatMoney(rarity.getPrice());
             int adjustedPrice = capsInfernal ? (int) (xpPrice * 0.9D) : xpPrice;
-            setItem(index++, (new ItemBuilder(Material.STAINED_GLASS_PANE, rarity.getColor() + CC.Bold + rarity.getName() + " Enchantment" + CC.Gray + " (Right Click)", CC.Gray + "Examine to receive a random", rarity
+            setTierItem(rarity, index++, (new ItemBuilder(Material.STAINED_GLASS_PANE, rarity.getColor() + CC.Bold + rarity.getName() + " Enchantment" + CC.Gray + " (Right Click)", CC.Gray + "Examine to receive a random", rarity
 
                     .getColor() + rarity.getName().toLowerCase() + CC.Gray + " enchantment book.", "", CC.Gray + "Use " + rarity
 
@@ -73,4 +77,17 @@ public class EnchanterGUI extends CosmicGUI {
         setItem(13, new InventoryItem(ItemNametag.getNametagItem()));
     }
 
+
+    /** Right-click opens the tier's enchantment preview; every other click buys, as every click did on Astro. */
+    private void setTierItem(EnchanterRarity rarity, int slot, ItemStack item, Runnable buy) {
+        InventoryItem inventoryItem = new InventoryItem(item);
+        for (ClickType type : ClickType.values()) {
+            if (type == ClickType.RIGHT) {
+                inventoryItem.click(type, () -> new EnchantmentPreviewGUI(this.player, rarity, true, 0).openGUI((JavaPlugin) Enchantments.getInstance()));
+            } else {
+                inventoryItem.click(type, buy);
+            }
+        }
+        setItem(slot, inventoryItem);
+    }
 }
