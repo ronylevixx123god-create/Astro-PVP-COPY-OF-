@@ -354,6 +354,24 @@ public enum TieredEnchantments {
         return ce;
     }
 
+    /** Every enchantment a book of this tier can give, by the same rules as getRandomEnchantmentBook (for previews). */
+    public static List<CustomEnchantment> getObtainableEnchantments(final int tier) {
+        final List<CustomEnchantment> obtainable = new ArrayList<CustomEnchantment>();
+        for (final CustomEnchantment ce : getAllEnchantmentsInTier(tier)) {
+            if (TieredEnchantments.retiredEnchantments.contains(ce) || (tier != 7 && TieredEnchantments.heroicEnchantments.contains(ce))) {
+                continue;
+            }
+            if (ce.equals(EnchantmentAPI.getEnchantment("Revoke")) || ce.equals(EnchantmentAPI.getEnchantment("Rogue"))) {
+                continue;
+            }
+            if (!obtainable.contains(ce)) {
+                obtainable.add(ce);
+            }
+        }
+        obtainable.sort((a, b) -> a.name().compareToIgnoreCase(b.name()));
+        return obtainable;
+    }
+
     public static ItemStack getRandomEnchantmentBook(final int tier) {
         final CustomEnchantment ce = getRandomEnchantment(tier);
         if (TieredEnchantments.retiredEnchantments.contains(ce) || (tier != 7 && TieredEnchantments.heroicEnchantments.contains(ce))) {

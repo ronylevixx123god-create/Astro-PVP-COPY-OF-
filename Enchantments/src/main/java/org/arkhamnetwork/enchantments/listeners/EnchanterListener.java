@@ -1,5 +1,7 @@
 package org.arkhamnetwork.enchantments.listeners;
 
+import org.arkhamnetwork.enchantments.libs.EnchanterRarity;
+import org.arkhamnetwork.enchantments.menus.EnchantmentPreviewGUI;
 import com.compilex.CosmicKOTH.utils.InventoryUtils;
 import com.cosmicpvp.CosmicSpaceChests.libs.ItemRarity;
 import com.cosmicpvp.cosmicutils.utils.CC;
@@ -99,6 +101,15 @@ public class EnchanterListener implements Listener {
             final ItemStack i = p.getItemInHand();
             final int tier = TieredEnchantments.getBookTier(i);
             if (tier < 1) {
+                return;
+            }
+            // shift + right-click only previews the tier: the book is not opened or used
+            if (p.isSneaking()) {
+                e.setCancelled(true);
+                EnchanterRarity rarity = EnchantmentPreviewGUI.rarityForTier(tier);
+                if (rarity != null) {
+                    new EnchantmentPreviewGUI(p, rarity, false, 0).openGUI((JavaPlugin) Enchantments.getInstance());
+                }
                 return;
             }
             if (p.getInventory().firstEmpty() == -1) {
