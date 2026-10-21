@@ -6,6 +6,7 @@ import com.massivecraft.factions.Factions;
 import com.massivecraft.factions.FactionsPlugin;
 import com.massivecraft.factions.perms.Relation;
 import com.massivecraft.factions.perms.Role;
+import com.massivecraft.factions.util.CosmicClientStatus;
 import com.massivecraft.factions.util.MiscUtil;
 import com.massivecraft.factions.util.QuadFunction;
 import mkremins.fanciful.FancyMessage;
@@ -178,6 +179,8 @@ public enum FancyTag implements Tag {
             }
             lines.add(ChatColor.translateAlternateColorCodes('&', string));
         }
+        // Astro's Cosmic Client line from the chat hover, under the configured player info
+        lines.add(ChatColor.translateAlternateColorCodes('&', CosmicClientStatus.line(fplayer)));
         return lines;
     }
 
