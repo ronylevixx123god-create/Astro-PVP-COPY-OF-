@@ -1,5 +1,9 @@
 package net.astropvp.weaponbonuses;
 
+import me.bryside.weaponrunes.commands.CommandGiveWeaponRune;
+import me.bryside.weaponrunes.commands.CommandWeaponBonus;
+import me.bryside.weaponrunes.items.WeaponRuneExtractor;
+import me.bryside.weaponrunes.listeners.WeaponBonusListener;
 import java.util.Arrays;
 
 import co.aikar.commands.PaperCommandManager;
@@ -23,6 +27,12 @@ public class AstroWeaponBonuses extends JavaPlugin {
             return Arrays.asList("champion", "ultra", "superior");
         });
         this.getServer().getPluginManager().registerEvents(new BonusListener(), this);
+
+        // Astro's weapon bonus orbs: /weaponbonus menu, /giveweaponbonus, applying them and the rune extractor
+        CosmicSkyCustomItems.get().getItemManager().registerCustomItem(new WeaponRuneExtractor());
+        this.getCommand("giveweaponbonus").setExecutor(new CommandGiveWeaponRune());
+        this.getCommand("weaponbonus").setExecutor(new CommandWeaponBonus());
+        this.getServer().getPluginManager().registerEvents(new WeaponBonusListener(), this);
     }
 
     public static AstroWeaponBonuses getInstance() {
