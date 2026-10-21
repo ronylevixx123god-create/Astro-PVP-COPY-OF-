@@ -24,6 +24,10 @@ public class CrateKeyGUIListener implements Listener {
 
         Block clickedBlock = e.getClickedBlock();
         if (clickedBlock.getType() != Material.NOTE_BLOCK) return;
+        // only grinder blocks; getByUUID never returns null, so without this every note block click was cancelled
+        // (that blocked other plugins' note blocks, e.g. AstroCustomBlocks' Dark Matter XP shop)
+        AbilityData placed = AbilityData.getAbilityDataMap().get(AbilityData.getUUID(clickedBlock.getLocation()));
+        if (placed == null || placed.getAbilityType() == null) return;
 
         if (FactionUtils.getFaction(e.getPlayer()) != FactionUtils.getFactionAt(clickedBlock.getLocation()) && !e.getPlayer().isOp()) {
             e.getPlayer().sendMessage(CC.translate("&c&l(!)&c You need to be in the " + FactionUtils.getFactionAt(clickedBlock.getLocation()).getTag()) + " faction to open this grinder block!");
