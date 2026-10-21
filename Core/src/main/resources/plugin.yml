@@ -64,6 +64,8 @@ commands:
   armorcolor:
     aliases: ['colorarmor', 'armor']
     description: Color Armor Command
+  merchant:
+    aliases: ['scratchcard']
   jackpot:
     description: Jackpot command.
   togglepay:
