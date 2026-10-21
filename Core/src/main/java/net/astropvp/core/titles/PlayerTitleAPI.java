@@ -71,7 +71,7 @@ public class PlayerTitleAPI {
             User user = LuckPermsProvider.get().getUserManager().getUser(uuid);
             for (String perm : user.getCachedData().getPermissionData().getPermissionMap().keySet()) {
                 if (!perm.toLowerCase().startsWith("titles.title.")) continue;
-                at.add(perm.replace("titles.title.", ""));
+                at.add(TitleList.getTitle(perm.replace("titles.title.", "")));
             }
             AstroCore.getInstance().getDataManager().getUnlockedTitles().put(uuid, at);
             return at;
@@ -80,7 +80,7 @@ public class PlayerTitleAPI {
         ArrayList<String> at = new ArrayList<String>();
         for (String perm : user.getCachedData().getPermissionData().getPermissionMap().keySet()) {
             if (!perm.toLowerCase().startsWith("titles.title.")) continue;
-            at.add(perm.replace("titles.title.", ""));
+            at.add(TitleList.getTitle(perm.replace("titles.title.", "")));
         }
         return at;
     }
