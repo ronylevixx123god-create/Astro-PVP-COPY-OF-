@@ -12,6 +12,7 @@ import me.mattstudios.mf.annotations.Command;
 import me.mattstudios.mf.annotations.Default;
 import me.mattstudios.mf.base.CommandBase;
 import org.arkhamnetwork.Arkkit.utils.TimeUtils;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -21,7 +22,7 @@ public class MoreCommand extends CommandBase {
     @Default
     public void moreCommand(Player player) {
         if(player.hasPermission("essentials.more")) {
-            if(player.getInventory().getItemInHand() != null) {
+            if(player.getInventory().getItemInHand() != null && player.getInventory().getItemInHand().getType() != Material.AIR) {
                 player.getInventory().setItemInHand(addDataToItem(player.getInventory().getItemInHand(), player));
                 player.updateInventory();
                 sendWebHook(player.getName(), CC.strip(player.getInventory().getItemInHand().getItemMeta().getDisplayName()));
