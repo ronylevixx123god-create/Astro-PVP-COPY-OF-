@@ -22,7 +22,13 @@ public class CreateGiftcardCommand implements CommandExecutor {
             return false;
         }
         String playerName = args[0];
-        double amount = Double.parseDouble(args[1]);
+        double amount;
+        try {
+            amount = Double.parseDouble(args[1]);
+        } catch (NumberFormatException e) {
+            p.sendMessage(CC.Red + "Please enter a valid amount!");
+            return false;
+        }
         if (Bukkit.getPlayer(playerName) == null) {
             p.sendMessage(CC.Red + "This player is not online!");
             return false;
@@ -31,8 +37,8 @@ public class CreateGiftcardCommand implements CommandExecutor {
             p.sendMessage(CC.Red + "Please enter a valid amount!");
             return false;
         }
-        GiftcardAPI.createGiftCard(Bukkit.getPlayer(playerName), amount);
-        p.sendMessage(CC.Green + "Created Giftcard for " + playerName + " with amount: " + amount);
+        // "Created Giftcard for ..." is sent once Tebex has actually made it; errors are sent instead
+        GiftcardAPI.createGiftCard(Bukkit.getPlayer(playerName), amount, p);
         return true;
     }
 }
