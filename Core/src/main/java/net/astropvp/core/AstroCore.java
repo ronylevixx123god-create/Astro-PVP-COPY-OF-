@@ -1,5 +1,9 @@
 package net.astropvp.core;
 
+import me.ifamasssxd.cosmicheroicenvoys.commands.CommandSetHeroicBossSpawn;
+import me.ifamasssxd.cosmicheroicenvoys.commands.CommandSpawnHeroicBoss;
+import me.ifamasssxd.cosmicheroicenvoys.listeners.EnvoyListener;
+import me.ifamasssxd.cosmicheroicenvoys.managers.EnvoyManager;
 import co.aikar.commands.CommandManager;
 import co.aikar.commands.PaperCommandManager;
 import com.comphenix.protocol.PacketType;
@@ -131,6 +135,8 @@ public class AstroCore extends JavaPlugin {
     public static Map<UUID, Player> grindingMessages;
     public TitleDatabaseManager dataManager;
     public static boolean hcf;
+    // Heroic Envoy Boss event, restored from Astro's older Core-0.1.jar (off in final Astro)
+    private EnvoyManager envoyManager;
     private SoulItemListener soulItemListener;
     private EnchantmentCoderManager enchantmentCoderManager;
     private CoinFlipManager coinFlipManager;
@@ -252,6 +258,8 @@ public class AstroCore extends JavaPlugin {
         this.teleportTask.runTaskTimer(this, 80L, 20L);
 
 
+        this.envoyManager = new EnvoyManager();
+        this.envoyManager.startTimer();
         registerCommands();
         registerListeners();
         registerCustomItems();
@@ -294,6 +302,9 @@ public class AstroCore extends JavaPlugin {
             e.printStackTrace();
         }
         this.dataManager.saveAllEquippedTitlesToSQL();
+        if (this.envoyManager != null) {
+            this.envoyManager.removeBoss();
+        }
 
         Bukkit.getLogger().info("[AstroCore] Saving astrocore playerdata");
 
@@ -418,6 +429,8 @@ public class AstroCore extends JavaPlugin {
         getCommand("givesoulgem").setExecutor(new CommandGiveSoulGem());
         getCommand("title").setExecutor(new CommandTitle());
         getCommand("titleset").setExecutor(new CommandTitleSet());
+        getCommand("spawnheroicboss").setExecutor(new CommandSpawnHeroicBoss());
+        getCommand("setheroicbossspawn").setExecutor(new CommandSetHeroicBossSpawn());
         getCommand("forcegiveall").setExecutor(new CommandForceGiveAll());
         getCommand("nextgiveall").setExecutor(new CommandNextGiveAll());
         getCommand("giveenchantmentcrystal").setExecutor(new GiveEnchantmentCrystalCommand());
@@ -522,6 +535,7 @@ public class AstroCore extends JavaPlugin {
     }
 
     public void registerListeners() {
+        getServer().getPluginManager().registerEvents(new EnvoyListener(), this);
         getServer().getPluginManager().registerEvents(new WarzoneClaimListener(), this);
         //getServer().getPluginManager().registerEvents(new StaffModeListeners(this), this);
         //getServer().getPluginManager().registerEvents(new EnderpearlFixes(), this);
