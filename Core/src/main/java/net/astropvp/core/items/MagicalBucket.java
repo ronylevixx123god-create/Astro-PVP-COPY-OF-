@@ -124,7 +124,7 @@ public abstract class MagicalBucket implements Listener {
             return;
         }
         target.setType(this.liquid);
-        player.setItemInHand(create(uses - 1, getCapacity(compound)));
+        replaceOne(player, hand, create(uses - 1, getCapacity(compound)));
         player.updateInventory();
     }
 
@@ -137,7 +137,7 @@ public abstract class MagicalBucket implements Listener {
         NBTTagCompoundBuilder compound = getBucketData(hand);
         if (compound == null) return;
         event.setCancelled(true);
-        pickUp(player, compound, event.getBlockClicked());
+        pickUp(player, hand, compound, event.getBlockClicked());
     }
 
     // a part-filled magical bucket picks up the source the player is looking at
@@ -165,7 +165,7 @@ public abstract class MagicalBucket implements Listener {
             player.updateInventory();
             return;
         }
-        pickUp(player, compound, source);
+        pickUp(player, hand, compound, source);
     }
 
     // the first block in reach that a bucket would hit; flowing liquid is passed through like vanilla
@@ -180,13 +180,25 @@ public abstract class MagicalBucket implements Listener {
         return null;
     }
 
-    private void pickUp(Player player, NBTTagCompoundBuilder compound, Block source) {
+    private void pickUp(Player player, ItemStack hand, NBTTagCompoundBuilder compound, Block source) {
         int uses = compound.getInt(this.usesKey);
         int capacity = getCapacity(compound);
         if (isOwnSource(source) && uses < capacity && canUseHere(player, source.getLocation())) {
             source.setType(Material.AIR);
-            player.setItemInHand(create(uses + 1, capacity));
+            replaceOne(player, hand, create(uses + 1, capacity));
         }
         player.updateInventory();
+    }
+
+    // only the bucket that was used changes; the rest of a stack stays in hand
+    private void replaceOne(Player player, ItemStack hand, ItemStack updated) {
+        if (hand.getAmount() <= 1) {
+            player.setItemInHand(updated);
+            return;
+        }
+        hand.setAmount(hand.getAmount() - 1);
+        player.setItemInHand(hand);
+        for (ItemStack left : player.getInventory().addItem(updated).values())
+            player.getWorld().dropItemNaturally(player.getLocation(), left);
     }
 }
