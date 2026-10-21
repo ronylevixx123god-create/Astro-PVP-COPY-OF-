@@ -5,19 +5,19 @@ import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
 import com.cosmicpvp.cosmicutils.utils.CC;
 import com.cosmicpvp.cosmicutils.utils.StringUtils;
-import me.mattstudios.mf.annotations.Permission;
 import net.astropvp.lootfilter.AstroLootFilterPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 @CommandAlias("lootfrenzy")
 public class LootFrenzyCommand extends BaseCommand {
-    /*
+
     @Default
-    @Permission("astro.lootfrenzy")
-    public void onCommand(Player player) {
-        if (!player.isOp()) return;
+    public void onCommand(CommandSender sender) {
+        if (!sender.isOp() && !sender.hasPermission("astro.lootfrenzy")) return;
         boolean lootFrenzy = AstroLootFilterPlugin.getInstance().getConfig().getBoolean("loot-frenzy-enabled");
 
         if (!lootFrenzy) {
@@ -28,6 +28,9 @@ public class LootFrenzyCommand extends BaseCommand {
             sendCenteredMessage("&7Time to go crazy... All loottables");
             sendCenteredMessage("&7will now give &fx2 loot&7. Enjoy!");
             sendCenteredMessage("");
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                player.playSound(player.getLocation(), Sound.ENDERDRAGON_GROWL, 2f, 2f);
+            }
         } else {
             AstroLootFilterPlugin.getInstance().getConfig().set("loot-frenzy-enabled", false);
             AstroLootFilterPlugin.getInstance().saveConfig();
@@ -68,7 +71,5 @@ public class LootFrenzyCommand extends BaseCommand {
 
         Bukkit.broadcastMessage(sb + message);
     }
-
-     */
 
 }

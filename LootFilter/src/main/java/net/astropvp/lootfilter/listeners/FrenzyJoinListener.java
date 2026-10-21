@@ -14,7 +14,8 @@ public class FrenzyJoinListener implements Listener {
         boolean lootFrenzy = AstroLootFilterPlugin.getInstance().getConfig().getBoolean("loot-frenzy-enabled");
 
         if (lootFrenzy) {
-            Bukkit.getScheduler().runTaskLaterAsynchronously(AstroLootFilterPlugin.getInstance(), ()-> {
+            Bukkit.getScheduler().runTaskLater(AstroLootFilterPlugin.getInstance(), ()-> {
+                if (!event.getPlayer().isOnline()) return;
                 event.getPlayer().sendMessage(CC.translate(""));
                 event.getPlayer().sendMessage(CC.translate("&b✧&3✧&d✧ &f&lLoot &b&lFrenzy &f&l&nMODE&r &d✧&3✧&b✧"));
                 event.getPlayer().sendMessage(CC.translate("&7Time to go crazy... All loottables"));

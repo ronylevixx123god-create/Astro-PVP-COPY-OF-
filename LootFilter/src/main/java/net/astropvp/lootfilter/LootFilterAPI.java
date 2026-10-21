@@ -33,19 +33,20 @@ public class LootFilterAPI {
 
         if (lootFrenzy) {
             player.sendMessage(CC.translate("&bLoot Frenzy &7- &fDouble Loot"));
-            if (lootFilterData.isFiltered(lootTable, item)) {
+            ItemStack bonus = LootTableAPI.getRandomLootItem(lootTable);
+            if (lootFilterData.isFiltered(lootTable, bonus)) {
                 if (astroPlayer.isLootTableMessageEnabled()) {
-                    player.sendMessage(CC.translate("&c&l(!)&c " + ItemUtils.getDisplayName(item) + " &chas been filtered out, type &7\"/lootfilter\"&c to edit your &l" + lootTable.getFancy() + " Filter&c."));
+                    player.sendMessage(CC.translate("&c&l(!)&c " + ItemUtils.getDisplayName(bonus) + " &chas been filtered out, type &7\"/lootfilter\"&c to edit your &l" + lootTable.getFancy() + " Filter&c."));
                 }
 
                 return;
             }
             if (astroPlayer.isLootTableMessageEnabled()) {
-                player.sendMessage(CC.translate("&a&l(!)&a You have received " + ItemUtils.getDisplayName(item) + " &afrom the &l" + lootTable.getFancy() + "&a. Type &7\"/lootfilter\"&a to edit your &l" + lootTable.getFancy() + " Filter&a."));
+                player.sendMessage(CC.translate("&a&l(!)&a You have received " + ItemUtils.getDisplayName(bonus) + " &afrom the &l" + lootTable.getFancy() + "&a. Type &7\"/lootfilter\"&a to edit your &l" + lootTable.getFancy() + " Filter&a."));
                 player.sendMessage(CC.translate( "&7You can toggle this message with &f\"/lootfilter togglemessage\"&7."));
             }
 
-            PlayerUtil.giveOrDropProtectedItem(player,LootTableAPI.getRandomLootItem(lootTable), 60);
+            PlayerUtil.giveOrDropProtectedItem(player, bonus, 60);
         }
     }
 
