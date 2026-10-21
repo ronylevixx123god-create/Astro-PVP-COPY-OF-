@@ -59,6 +59,11 @@ public class AutoBroadcastTask
             e.printStackTrace();
         }
 
+        loadMessages(yamlConfiguration);
+    }
+
+    private void loadMessages(YamlConfiguration yamlConfiguration) {
+        if (!yamlConfiguration.isConfigurationSection("Messages")) return;
         for(String test : yamlConfiguration.getConfigurationSection("Messages").getKeys(false)) {
             messages.add(yamlConfiguration.getStringList("Messages." + test));
         }
@@ -75,13 +80,12 @@ public class AutoBroadcastTask
             e.printStackTrace();
         }
 
-        for(String test : yamlConfiguration.getConfigurationSection("Messages").getKeys(false)) {
-            messages.add(yamlConfiguration.getStringList("Messages." + test));
-        }
+        loadMessages(yamlConfiguration);
     }
 
     @Override
     public void run() {
+        if (messages.isEmpty()) return;
         List<String> message = getNextMessage();
         this.plugin.getServer().getOnlinePlayers().forEach(player -> {
             message.forEach(line -> player.sendMessage(CC.translate(line)));
