@@ -20,8 +20,8 @@ import java.util.List;
 
 /**
  * Read-only list of the enchantments a tier's book can give (right-click a tier in /enchanter, or shift + right-click
- * an unopened book). Nothing here can be taken: every click is cancelled by the GUI listener, and the entries are
- * ENCHANTED_BOOKs, which EnchantmentBook.isEnchantmentBook never accepts, so they can't be applied even if cloned.
+ * an unopened book). Nothing here can be taken: every click is cancelled by the GUI listener. The entries are plain
+ * BOOKs with Astro's book name and lore, so they would pass EnchantmentBook.isEnchantmentBook if one ever left the menu.
  */
 public class EnchantmentPreviewGUI extends CosmicGUI {
     private static final int PER_PAGE = 45;
@@ -90,7 +90,7 @@ public class EnchantmentPreviewGUI extends CosmicGUI {
             }
             lore.add(line);
         }
-        ItemStack preview = new ItemStack(Material.ENCHANTED_BOOK);
+        ItemStack preview = new ItemStack(Material.BOOK);
         ItemMeta meta = preview.getItemMeta();
         meta.setDisplayName(book.getItemMeta().getDisplayName());
         meta.setLore(lore);
