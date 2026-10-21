@@ -4,6 +4,7 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Syntax;
 import co.aikar.commands.bukkit.contexts.OnlinePlayer;
+import me.ifamasssxd.cosmicmasks.MaskType;
 import net.astropvp.core.utils.ChatManager;
 import net.astropvp.core.utils.InvseeManager;
 import org.bukkit.Bukkit;
@@ -19,6 +20,12 @@ public class Invsee extends BaseCommand {
     public void onCommand(Player player, OnlinePlayer target) {
         if (target.player == null) {
             player.sendMessage(ChatManager.translate("&cInvalid player."));
+            return;
+        }
+
+        // a player wearing the Ghast mask can only be checked by staff with /einvsee
+        if (MaskType.hasEquipped(target.player, "GHAST")) {
+            player.sendMessage(ChatManager.translate("&cYou cannot view this player's inventory."));
             return;
         }
 
