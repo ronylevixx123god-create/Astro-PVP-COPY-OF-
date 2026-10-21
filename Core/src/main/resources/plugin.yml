@@ -27,6 +27,8 @@ commands:
     aliases: ['lms']
   givebucket:
     description: gives magic bucket
+  stack:
+    description: Stack every item in your inventory.
   grinding:
     aliases: ['grind']
   list:
