@@ -1,5 +1,6 @@
 package net.astropvp.giftcardshop.commands;
 
+import net.astropvp.giftcardshop.GiftcardAPI;
 import com.cosmicpvp.cosmicutils.utils.CC;
 import lombok.SneakyThrows;
 import net.astropvp.giftcardshop.GiftcardShopPlugin;
@@ -21,7 +22,7 @@ public class ResetGiftcards implements CommandExecutor {
         System.out.println("VOIDING: " + giftcardID);
         URL urlObj = new URL("https://plugin.tebex.io/gift-cards/" + giftcardID);
         HttpsURLConnection httpsURLConnection = (HttpsURLConnection)urlObj.openConnection();
-        httpsURLConnection.setRequestProperty("X-Buycraft-Secret", "37fafff7553327e8b9e5b7502b5a9de604da817f");
+        httpsURLConnection.setRequestProperty("X-Tebex-Secret", GiftcardAPI.getSecret());
         httpsURLConnection.setRequestProperty("Content-Type", "text/plain");
         httpsURLConnection.setRequestProperty("Accept", "application/json");
         httpsURLConnection.setRequestMethod("DELETE");
@@ -35,7 +36,7 @@ public class ResetGiftcards implements CommandExecutor {
     public void voidAllGiftcardsOver10() {
         URL urlObj = new URL("https://plugin.tebex.io/gift-cards");
         HttpsURLConnection httpsURLConnection = (HttpsURLConnection)urlObj.openConnection();
-        httpsURLConnection.setRequestProperty("X-Buycraft-Secret", "37fafff7553327e8b9e5b7502b5a9de604da817f");
+        httpsURLConnection.setRequestProperty("X-Tebex-Secret", GiftcardAPI.getSecret());
         httpsURLConnection.setRequestProperty("Content-Type", "text/plain");
         httpsURLConnection.setRequestProperty("Accept", "application/json");
         httpsURLConnection.setRequestMethod("GET");
@@ -104,6 +105,15 @@ public class ResetGiftcards implements CommandExecutor {
             return false;
         }
         if (!sender.getName().equals("XaitX")) return false;
+        if (GiftcardAPI.getSecret().isEmpty()) {
+            sender.sendMessage(CC.translate("&c&l(!)&c No Tebex key: set &ftebex-secret&c in plugins/AstroGiftCardPlugin/config.yml."));
+            return true;
+        }
+        // voids every giftcard of the Tebex store (also bought ones), so it has to be confirmed
+        if (strings.length != 1 || !strings[0].equalsIgnoreCase("confirm")) {
+            sender.sendMessage(CC.translate("&c&l(!)&c This voids EVERY giftcard on your Tebex store worth $0.01 or more, including bought ones. Type &f/resetgiftcards confirm&c to do it."));
+            return true;
+        }
         voidAllGiftcardsOver10();
         sender.sendMessage(CC.Red + "Reset all gc's over 0.01");
         return true;
