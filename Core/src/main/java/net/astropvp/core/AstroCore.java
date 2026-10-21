@@ -532,7 +532,7 @@ public class AstroCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ApplyEnchantCrystalListener(), this);
         getServer().getPluginManager().registerEvents(new TitleInventoryListener(this.dataManager), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinQuitListener(this.dataManager), this);
-        getServer().getPluginManager().registerEvents(new PermissionListener(this.dataManager), this);
+        new PermissionListener(this.dataManager).register(this);
         getServer().getPluginManager().registerEvents(new DungeonInventoryEvent(), this);
         getServer().getPluginManager().registerEvents(new ServerFixes(), this);
         getServer().getPluginManager().registerEvents(new MOTD(), this);

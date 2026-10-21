@@ -1,51 +1,40 @@
-/*
- * Decompiled with CFR 0.150.
- * 
- * Could not load the following classes:
- *  com.compilex.CompilexPermissions.event.PermissionChangeEvent
- *  com.google.common.collect.Lists
- *  org.bukkit.Bukkit
- *  org.bukkit.ChatColor
- *  org.bukkit.event.EventHandler
- *  org.bukkit.event.Listener
- */
 package net.astropvp.core.titles.listeners;
 
 import net.astropvp.core.titles.sql.TitleDatabaseManager;
-import com.google.common.collect.Lists;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.UUID;
-
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.event.node.NodeAddEvent;
 import net.luckperms.api.event.node.NodeMutateEvent;
 import net.luckperms.api.model.user.User;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
-public class PermissionListener
-implements Listener {
-    private TitleDatabaseManager dbM;
+/**
+ * Keeps the cached unlocked titles in step with LuckPerms: titles are the titles.title.<name> permissions.
+ * NodeMutateEvent is a LuckPerms event, so it is subscribed on LuckPerms' event bus (Bukkit's registerEvents
+ * rejected it and the cache never updated).
+ */
+public class PermissionListener {
+    private final TitleDatabaseManager dbM;
 
     public PermissionListener(TitleDatabaseManager dm) {
         this.dbM = dm;
     }
 
-    @EventHandler
+    public void register(Plugin plugin) {
+        LuckPermsProvider.get().getEventBus().subscribe(plugin, NodeMutateEvent.class, this::onPermissionChange);
+    }
+
     public void onPermissionChange(NodeMutateEvent event) {
-        Set<String> titles = event.getTarget().getCachedData().getPermissionData().getPermissionMap().keySet();
-        boolean title_perms_changed = false;
-        ArrayList<String> newtitles = this.dbM.getUnlockedTitles().computeIfAbsent(((User)event.getTarget()).getUniqueId(), e -> Lists.newArrayList());
-        for (String s : titles) {
-            if (!s.startsWith("titles.title.") || newtitles.contains(s.replace("titles.title.", ""))) continue;
-            newtitles.add(s.replace("titles.title.", ""));
-            title_perms_changed = true;
-        }
-        if (Bukkit.getPlayer(((User)event.getTarget()).getUniqueId()) != null && title_perms_changed) {
-            this.dbM.getUnlockedTitles().put(((User)event.getTarget()).getUniqueId(), newtitles);
-            Bukkit.getPlayer(((User)event.getTarget()).getUniqueId()).sendMessage((Object)ChatColor.GREEN + "" + (Object)ChatColor.BOLD + ">> " + (Object)ChatColor.GRAY + "Your available titles have updated. Use " + (Object)ChatColor.YELLOW + (Object)ChatColor.BOLD + "/title" + (Object)ChatColor.GRAY + " to view them.");
+        if (!(event.getTarget() instanceof User)) return;
+        User user = (User) event.getTarget();
+        // rebuilt from the user's permissions the next time /title is opened
+        this.dbM.getUnlockedTitles().remove(user.getUniqueId());
+        if (event instanceof NodeAddEvent && ((NodeAddEvent) event).getNode().getKey().toLowerCase().startsWith("titles.title.")) {
+            Player player = Bukkit.getPlayer(user.getUniqueId());
+            if (player != null)
+                player.sendMessage(ChatColor.GREEN + "" + ChatColor.BOLD + ">> " + ChatColor.GRAY + "Your available titles have updated. Use " + ChatColor.YELLOW + ChatColor.BOLD + "/title" + ChatColor.GRAY + " to view them.");
         }
     }
 }
-
