@@ -462,7 +462,8 @@ public class AstroCore extends JavaPlugin {
         Arrays.asList(new GiveThrowableCreeperEgg(), new Broadcast()).forEach(this::registerCommand);
 
         this.commandManager = new PaperCommandManager(this);
-        this.commandManager.registerCommand(new Invsee());
+        // force: take /invsee over from Essentials (which keeps /einvsee for staff)
+        this.commandManager.registerCommand(new Invsee(), true);
         this.commandManager.registerCommand(new ReloadCommand());
         commandManager2.register(new GiftCommand(this));
         commandManager2.register(new GiftsCommand());
