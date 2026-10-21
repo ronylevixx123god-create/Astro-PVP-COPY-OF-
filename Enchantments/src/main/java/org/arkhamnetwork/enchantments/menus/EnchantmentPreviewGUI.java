@@ -3,6 +3,7 @@ package org.arkhamnetwork.enchantments.menus;
 import com.cosmicpvp.cosmicutils.gui.CosmicGUI;
 import com.cosmicpvp.cosmicutils.gui.InventoryItem;
 import com.cosmicpvp.cosmicutils.utils.CC;
+import com.cosmicpvp.cosmicutils.utils.NBTWrapper;
 import com.rit.sucy.CustomEnchantment;
 import org.arkhamnetwork.enchantments.EnchantmentBook;
 import org.arkhamnetwork.enchantments.Enchantments;
@@ -21,7 +22,7 @@ import java.util.List;
 /**
  * Read-only list of the enchantments a tier's book can give (right-click a tier in /enchanter, or shift + right-click
  * an unopened book). Nothing here can be taken: every click is cancelled by the GUI listener. The entries are plain
- * BOOKs with Astro's book name and lore, so they would pass EnchantmentBook.isEnchantmentBook if one ever left the menu.
+ * BOOKs with Astro's book name and lore plus a hidden PREVIEW_KEY tag, which EnchantmentBook.isEnchantmentBook rejects.
  */
 public class EnchantmentPreviewGUI extends CosmicGUI {
     private static final int PER_PAGE = 45;
@@ -95,7 +96,8 @@ public class EnchantmentPreviewGUI extends CosmicGUI {
         meta.setDisplayName(book.getItemMeta().getDisplayName());
         meta.setLore(lore);
         preview.setItemMeta(meta);
-        return preview;
+        // hidden marker: EnchantmentBook.isEnchantmentBook rejects it, so the icon can never act as a real book
+        return new NBTWrapper(preview).setString(EnchantmentBook.PREVIEW_KEY, "1").build();
     }
 
     private static ItemStack button(Material material, String name) {
