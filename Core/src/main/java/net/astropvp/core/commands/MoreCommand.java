@@ -32,7 +32,8 @@ public class MoreCommand extends CommandBase {
         }
     }
 
-    private ItemStack addDataToItem(ItemStack itemStack, Player player) {
+    // also used by /stack
+    public static ItemStack addDataToItem(ItemStack itemStack, Player player) {
         NBTItem nbtItem = new NBTItem(itemStack);
         nbtItem.setString("dupedBy", player.getName());
         nbtItem.setLong("dupedAt", System.currentTimeMillis());
@@ -46,6 +47,10 @@ public class MoreCommand extends CommandBase {
 
 
     public void sendWebHook(String playerName, String itemName) {
+        sendWebHook("/more", playerName, itemName);
+    }
+
+    public static void sendWebHook(String command, String playerName, String itemName) {
         String webhookUrl = net.astropvp.core.AstroCore.getInstance().getConfig().getString("discord-webhooks.more", "");
         if (webhookUrl.isEmpty()) {
             return;
@@ -54,7 +59,7 @@ public class MoreCommand extends CommandBase {
 
         builder.setThreadFactory((job) -> {
             Thread thread = new Thread(job);
-            thread.setName("Command: /more");
+            thread.setName("Command: " + command);
             thread.setDaemon(true);
             return thread;
         });
@@ -65,13 +70,13 @@ public class MoreCommand extends CommandBase {
 
         WebhookEmbed embed = new WebhookEmbedBuilder()
                 .setColor(0Xff7575)
-                .setTitle(new WebhookEmbed.EmbedTitle("**/more - " + itemName + "**", null))
+                .setTitle(new WebhookEmbed.EmbedTitle("**" + command + " - " + itemName + "**", null))
                 .setFooter(new WebhookEmbed.EmbedFooter("At: | " + TimeUtils.formatTime(System.currentTimeMillis()), null))
                 .setDescription("**Player:** `" + playerName + "`\n" + "**Item:** `" + itemName + "`\n")
                 .build();
 
         WebhookMessageBuilder idBuilder = new WebhookMessageBuilder();
-        idBuilder.setUsername("/more");
+        idBuilder.setUsername(command);
         idBuilder.setAvatarUrl("https://cdn.discordapp.com/avatars/1202888199903641640/cad565e0a6bcd051ce0fd36b70c1f023.webp");
         idBuilder.addEmbeds(embed);
 
