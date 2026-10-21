@@ -1,7 +1,5 @@
-Messages:
-  Example:
-    - "auto bc 1"
-  Example2:
-    - "auto bc 2"
-  Example3:
-    - "auto bc 3"
+# Each entry under Messages is one broadcast (a list of lines), sent in turn every 90 seconds.
+# Example:
+#   Discord:
+#     - "&7Make sure to join our discord at &f/discord&7."
+Messages: {}
