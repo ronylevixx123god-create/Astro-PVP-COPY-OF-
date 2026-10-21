@@ -29,10 +29,9 @@ public class TitleInterface {
         int titlecount = playertitlearray.size();
         int invSize = 9;
         invSize = titlecount % 9 == 0 ? titlecount : (titlecount / 9 + 1) * 9;
-        if (invSize < 9 || titlecount <= 0) {
-            player.sendMessage(ChatColor.RED.toString() + ChatColor.BOLD.toString() + "(!)" + (Object)ChatColor.RED + " You have not yet unlocked any titles!");
-            player.sendMessage((Object)ChatColor.GRAY + "Titles may be gained through accomplishing achievements in-game or purchasing them with /buy!");
-            return;
+        // no titles yet: still open the menu, filled with the locked "???" panes
+        if (invSize < 9) {
+            invSize = 9;
         }
         if (invSize > 54) {
             invSize = 54;
