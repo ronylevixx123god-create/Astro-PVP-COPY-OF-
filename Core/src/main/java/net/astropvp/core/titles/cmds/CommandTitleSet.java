@@ -9,6 +9,7 @@
  */
 package net.astropvp.core.titles.cmds;
 
+import net.astropvp.core.titles.TitleList;
 import net.astropvp.core.AstroCore;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -32,7 +33,8 @@ implements CommandExecutor {
             return true;
         }
         UUID uuid = Bukkit.getPlayer(args[0]).getUniqueId();
-        String t = args[1];
+        // the title IDs the /title menu uses (any capitalisation); unknown names are set as typed, like on Astro
+        String t = TitleList.getTitle(args[1]);
         AstroCore.getInstance().getDataManager().setEquippedTitle(uuid, t);
         return true;
     }
