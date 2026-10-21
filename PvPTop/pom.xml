@@ -61,6 +61,13 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/../.lib/CCVerify-1.0.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>com.compilex</groupId>
+            <artifactId>cosmickoth</artifactId>
+            <version>0.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../KoTHs/target/KoTHs-0.1.jar</systemPath>
+        </dependency>
     </dependencies>
 
 </project>
