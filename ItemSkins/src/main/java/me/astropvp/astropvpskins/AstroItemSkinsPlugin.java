@@ -1,6 +1,7 @@
 package me.astropvp.astropvpskins;
 
 import me.astropvp.astropvpskins.armorequip.ArmorListener;
+import me.astropvp.astropvpskins.commands.CommandGiveBackpack;
 import me.astropvp.astropvpskins.commands.CommandItemSkin;
 import me.astropvp.astropvpskins.commands.CommandMultiSkin;
 import me.astropvp.astropvpskins.commands.RemoveBrokenSkinCommand;
@@ -33,6 +34,7 @@ public class AstroItemSkinsPlugin extends JavaPlugin {
         getCommand("itemskin").setExecutor(new CommandItemSkin());
         getCommand("multiskin").setExecutor(new CommandMultiSkin());
         getCommand("removeskin").setExecutor(new RemoveBrokenSkinCommand());
+        getCommand("givebackpack").setExecutor(new CommandGiveBackpack());
         getServer().getPluginManager().registerEvents(new ItemSkinListener(), this);
         getServer().getPluginManager().registerEvents(new ArmorListener(), this);
         getServer().getPluginManager().registerEvents(new ItemSkinInventoryClickListener(), this);

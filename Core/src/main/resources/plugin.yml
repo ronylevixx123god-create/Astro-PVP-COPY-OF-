@@ -98,8 +98,6 @@ commands:
   toggles:
     description: Toggles.
     aliases: [settings, options]
-  givebackpack:
-    description: givebackpack.
   giveenchantmentcrystal:
     description: giveenchantmentcrystal
   clearlag:
