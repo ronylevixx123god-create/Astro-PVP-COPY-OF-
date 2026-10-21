@@ -42,13 +42,16 @@ public class TitleItemListener
                 p.sendMessage((Object)ChatColor.RED + "You cannot redeem stacked title vouchers.");
                 return;
             }
-            if (p.hasPermission(titlePerm)) {
+            // isPermissionSet: an op "has" every unset permission, which is not owning the title
+            if (p.isPermissionSet(titlePerm) && p.hasPermission(titlePerm)) {
                 p.sendMessage(ChatColor.RED.toString() + ChatColor.BOLD.toString() + "(!) " + (Object)ChatColor.RED + "You already have the " + title + " title unlocked!");
                 p.sendMessage((Object)ChatColor.GRAY + "Use /title to equip it!");
                 return;
             }
             try {
                 Bukkit.dispatchCommand((CommandSender)Bukkit.getConsoleSender(), (String)("lp user " + p.getName() + " permission set " + titlePerm + " true"));
+                // LuckPerms lower-cases permissions; keep the title's spelling for /title (read by AstroCore's PlayerTitleAPI)
+                Bukkit.dispatchCommand((CommandSender)Bukkit.getConsoleSender(), (String)("lp user " + p.getName() + " meta set \"titlename-" + title.toLowerCase().replace("\"", "") + "\" \"" + title.replace("\"", "") + "\""));
                 p.sendMessage(ChatColor.AQUA.toString() + ChatColor.BOLD.toString() + "(!) You've UNLOCKED the " + ChatColor.LIGHT_PURPLE.toString() + ChatColor.BOLD.toString() + title + ChatColor.AQUA.toString() + ChatColor.BOLD.toString() + " title!");
                 p.sendMessage((Object)ChatColor.GRAY + "Equip your new title in the /title menu!");
                 if (ArkPlugins.ITEM_ID.getArkPlugin().isRunning()) {
