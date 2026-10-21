@@ -76,6 +76,8 @@ public class CustomBlocks extends JavaPlugin {
     }
 
     public void onDisable() {
+        // drop the saved files of removed/broken blocks, otherwise they load back on the next start
+        customBlockManager.purge();
         customBlockManager.saveAll();
         instance = null;
     }

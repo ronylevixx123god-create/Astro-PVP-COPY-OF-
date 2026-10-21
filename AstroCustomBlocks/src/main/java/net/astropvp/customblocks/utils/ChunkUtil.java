@@ -18,6 +18,10 @@ import java.util.List;
 
 public class ChunkUtil {
     public static boolean isLocationAInSameChunkAsLocationB(Location aLocation, Location bLocation) {
+        // the same chunk coordinates in another world are a different chunk (/removecblock used to clear both)
+        if (aLocation.getWorld() == null || bLocation.getWorld() == null || !aLocation.getWorld().getName().equals(bLocation.getWorld().getName())) {
+            return false;
+        }
         double aX = Math.floor(aLocation.getBlockX() >> 4);
         double aZ = Math.floor(aLocation.getBlockZ() >> 4);
         double bX = Math.floor(bLocation.getBlockX() >> 4);
