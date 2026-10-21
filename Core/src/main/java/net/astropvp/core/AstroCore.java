@@ -451,7 +451,7 @@ public class AstroCore extends JavaPlugin {
 
         this.commandManager = new PaperCommandManager(this);
         // force: take /invsee over from Essentials (which keeps /einvsee for staff)
-        this.commandManager.registerCommand(new Invsee(), true);
+        ((PaperCommandManager) this.commandManager).registerCommand(new Invsee(), true);
         this.commandManager.registerCommand(new ReloadCommand());
         commandManager2.register(new GiftCommand(this));
         commandManager2.register(new GiftsCommand());
