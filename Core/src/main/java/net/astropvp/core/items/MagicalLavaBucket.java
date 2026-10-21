@@ -49,7 +49,7 @@ public class MagicalLavaBucket implements Listener {
         return wrapper.build();
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onLavaBucketPlace(PlayerBucketEmptyEvent event) {
         Player player = event.getPlayer();
         NBTWrapper nbtItem = new NBTWrapper(player.getItemInHand());
