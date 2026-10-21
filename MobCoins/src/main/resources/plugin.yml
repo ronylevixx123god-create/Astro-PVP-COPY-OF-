@@ -6,3 +6,6 @@ website: https://crankedpvp.net/
 depend:
   - CosmicPvPUtils
   - StorageUtil
+commands:
+  addmobcoins:
+    description: Adds mobcoins
