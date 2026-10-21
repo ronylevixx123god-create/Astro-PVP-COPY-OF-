@@ -433,6 +433,7 @@ public class AstroCore extends JavaPlugin {
         getCommand("armorcolor").setExecutor(new ArmorColorCommand());
         getCommand("spawnershop").setExecutor(new SpawnerShopCommand());
         getCommand("givebucket").setExecutor(new CommandGiveMagicBucket());
+        getCommand("merchant").setExecutor(new MerchantCommand());
         getServer().getPluginManager().registerEvents(new KillTitleSound(), this);
         getCommand("givesoulpearl").setExecutor(new SoulPearlCommand());
         ClaimCommand claimCommand = new ClaimCommand();
@@ -553,6 +554,7 @@ public class AstroCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
         getServer().getPluginManager().registerEvents(new WorldBorderPearlFix(), this);
         getServer().getPluginManager().registerEvents(new CustomPearlListener(), this);
+        getServer().getPluginManager().registerEvents(new MerchantGUIListener(), this);
         getServer().getPluginManager().registerEvents(new JackpotListener(), this);
         getServer().getPluginManager().registerEvents(new GrindingMessagesToggleListener(), this);
         getServer().getPluginManager().registerEvents(new DupePatch(), this);
