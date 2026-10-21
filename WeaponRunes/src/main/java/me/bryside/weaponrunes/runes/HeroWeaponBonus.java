@@ -14,7 +14,7 @@ public class HeroWeaponBonus
 extends WeaponBonus {
     @Override
     public List<String> getLore() {
-        return Lists.newArrayList((Object[])new String[]{CC.YellowB + " \u27a5 " + CC.Gray + "50% Chance to negate Ancient Ability", CC.YellowB + " \u27a5 " + CC.Gray + "-5% Incoming DMG", CC.YellowB + " \u27a5 " + CC.Gray + "Critical Strike Effect"});
+        return Lists.newArrayList(new String[]{CC.YellowB + " \u27a5 " + CC.Gray + "50% Chance to negate Ancient Ability", CC.YellowB + " \u27a5 " + CC.Gray + "-5% Incoming DMG", CC.YellowB + " \u27a5 " + CC.Gray + "Critical Strike Effect"});
     }
 
     @Override

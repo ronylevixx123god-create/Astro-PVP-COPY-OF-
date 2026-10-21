@@ -22,11 +22,11 @@ public enum WeaponBonusType {
     Short data;
     WeaponBonus instance;
 
-    private WeaponBonusType(String id, ChatColor color, String name, short data, WeaponBonus instance) {
+    private WeaponBonusType(String id, ChatColor color, String name, int data, WeaponBonus instance) {
         this.id = id;
         this.color = color;
         this.name = name;
-        this.data = data;
+        this.data = (short) data;
         this.instance = instance;
     }
 

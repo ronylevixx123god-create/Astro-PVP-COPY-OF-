@@ -31,7 +31,7 @@ implements CommandExecutor {
         ItemStack helpBook = new ItemStack(Material.BOOK);
         ItemMeta meta = helpBook.getItemMeta();
         meta.setDisplayName(CC.translate((String)"&b&lWeapon Bonuses"));
-        meta.setLore((List)Lists.newArrayList((Object[])new String[]{CC.translate((String)"&7Weapon Bonuses are orbs which you"), CC.translate((String)"&7apply onto Heroic Swords only and"), CC.translate((String)"&7imbue the weapon with special powers.")}));
+        meta.setLore((List)Lists.newArrayList(new String[]{CC.translate((String)"&7Weapon Bonuses are orbs which you"), CC.translate((String)"&7apply onto Heroic Swords only and"), CC.translate((String)"&7imbue the weapon with special powers.")}));
         helpBook.setItemMeta(meta);
         inventory.setItem(inventorySize - 1, helpBook);
         p.sendMessage(CC.translate((String)"&aOpening the Weapon Bonuses Menu..."));

@@ -64,7 +64,7 @@ implements InventoryInteractable {
         clicked = clickedWrapper.build();
         ItemMeta meta = clicked.getItemMeta();
         ArrayList<String> newLore = new ArrayList<String>();
-        List lore = meta.getLore();
+        List<String> lore = meta.getLore();
         for (String line : lore) {
             if (ChatColor.stripColor((String)line).contains(" \u27a5 ") || ChatColor.stripColor((String)line).contains("(!)")) continue;
             newLore.add(line);

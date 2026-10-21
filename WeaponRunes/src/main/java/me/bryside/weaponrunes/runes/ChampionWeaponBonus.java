@@ -18,7 +18,7 @@ public class ChampionWeaponBonus
 extends WeaponBonus {
     @Override
     public List<String> getLore() {
-        return Lists.newArrayList((Object[])new String[]{CC.GreenB + " \u27a5 " + CC.Gray + "50% Chance to block enemy Self Destruct", CC.GreenB + " \u27a5 " + CC.Gray + "-25% Incoming DMG from Axes", CC.GreenB + " \u27a5 " + CC.Gray + "Zeus Strike Effect"});
+        return Lists.newArrayList(new String[]{CC.GreenB + " \u27a5 " + CC.Gray + "50% Chance to block enemy Self Destruct", CC.GreenB + " \u27a5 " + CC.Gray + "-25% Incoming DMG from Axes", CC.GreenB + " \u27a5 " + CC.Gray + "Zeus Strike Effect"});
     }
 
     @Override
@@ -38,7 +38,7 @@ extends WeaponBonus {
             return;
         }
         Random rn = new Random();
-        List nearbyEnemies = damager.getNearbyEntities(8.0, 8.0, 8.0);
+        List<Entity> nearbyEnemies = damager.getNearbyEntities(8.0, 8.0, 8.0);
         for (Entity entity : nearbyEnemies) {
             Player player;
             if (!(entity instanceof Player) || !WorldGuardUtils.isPvPEnabled((Location)(player = ((Player)entity).getPlayer()).getLocation())) continue;

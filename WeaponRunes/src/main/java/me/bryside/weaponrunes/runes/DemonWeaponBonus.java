@@ -10,7 +10,7 @@ public class DemonWeaponBonus
 extends WeaponBonus {
     @Override
     public List<String> getLore() {
-        return Lists.newArrayList((Object[])new String[]{CC.RedB + " \u27a5 " + CC.Gray + "1.5x Divine Damage Multiplier", CC.RedB + " \u27a5 " + CC.Gray + "35% Chance to Block Banshee Pets & Astro Ability", CC.RedB + " \u27a5 " + CC.Gray + "15% Chance to Block Engineer Crystal on 1 Piece"});
+        return Lists.newArrayList(new String[]{CC.RedB + " \u27a5 " + CC.Gray + "1.5x Divine Damage Multiplier", CC.RedB + " \u27a5 " + CC.Gray + "35% Chance to Block Banshee Pets & Astro Ability", CC.RedB + " \u27a5 " + CC.Gray + "15% Chance to Block Engineer Crystal on 1 Piece"});
     }
 
     @Override

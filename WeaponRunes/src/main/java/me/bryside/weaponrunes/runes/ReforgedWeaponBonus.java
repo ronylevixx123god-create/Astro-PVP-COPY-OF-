@@ -13,7 +13,7 @@ public class ReforgedWeaponBonus
 extends WeaponBonus {
     @Override
     public List<String> getLore() {
-        return Lists.newArrayList((Object[])new String[]{CC.AquaB + " \u27a5 " + CC.Gray + "50% Chance to negate Soul Harvester", CC.AquaB + " \u27a5 " + CC.Gray + "1.5x Silence duration multiplier", CC.AquaB + " \u27a5 " + CC.Gray + "1.25x Divine Damage multiplier"});
+        return Lists.newArrayList(new String[]{CC.AquaB + " \u27a5 " + CC.Gray + "50% Chance to negate Soul Harvester", CC.AquaB + " \u27a5 " + CC.Gray + "1.5x Silence duration multiplier", CC.AquaB + " \u27a5 " + CC.Gray + "1.25x Divine Damage multiplier"});
     }
 
     @Override
