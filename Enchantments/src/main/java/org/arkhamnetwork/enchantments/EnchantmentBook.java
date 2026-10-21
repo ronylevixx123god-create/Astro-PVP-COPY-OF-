@@ -516,7 +516,17 @@ public class EnchantmentBook {
         return 3;
     }
 
+    /** NBT key on the icons of the enchantment preview menu; they look like books but are never real ones. */
+    public static final String PREVIEW_KEY = "astroEnchantPreview";
+
+    public static boolean isPreviewBook(final ItemStack is) {
+        return is != null && is.getType() == Material.BOOK && is.hasItemMeta() && new NBTWrapper(is).hasKey(PREVIEW_KEY);
+    }
+
     public static boolean isEnchantmentBook(final ItemStack is) {
+        if (isPreviewBook(is)) {
+            return false;
+        }
         if (is != null && is.getType() == Material.BOOK && is.hasItemMeta() && is.getItemMeta().hasDisplayName() && is.getItemMeta().hasLore()) {
             try {
                 if (!is.getItemMeta().getDisplayName().contains(ChatColor.BOLD.toString()) || !is.getItemMeta().getDisplayName().contains(ChatColor.UNDERLINE.toString())) {
