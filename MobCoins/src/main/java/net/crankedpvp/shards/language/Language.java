@@ -16,6 +16,7 @@ public enum Language {
 
     BALANCE,
     HELP,
+    ADMIN_HELP,
     NO_PERMISSION,
     ADMIN_RELOADING,
     ADMIN_RELOADED,

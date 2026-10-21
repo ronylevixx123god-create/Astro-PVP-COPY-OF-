@@ -1,6 +1,13 @@
 HELP:
   - "&6&lMobcoins Help"
   - "&7Add help message here bro, don't be lazy"
+ADMIN_HELP:
+  - "&6&lMobcoins Admin Help"
+  - "&6/amobcoins give <player> <amount> &8➥ &7Give a player Mobcoins."
+  - "&6/amobcoins reset <player> &8➥ &7Reset a player's Mobcoins."
+  - "&6/amobcoins additem <price> &8➥ &7Add the item in your hand to the shop."
+  - "&6/amobcoins removeitem &8➥ &7Remove the item in your hand from the shop."
+  - "&6/amobcoins reload &8➥ &7Reload the language and shop files."
 NO_PERMISSION: "&cYou do not have permission to do this"
 BALANCE: "&6&lMobcoins&8➥ &7You have &b%balance%&7 Mobcoins."
 ADMIN_RELOADING: "&6&lMobcoins&8➥ &7Reloading configs now..."

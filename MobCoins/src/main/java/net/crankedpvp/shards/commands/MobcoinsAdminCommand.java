@@ -5,6 +5,7 @@ import com.cosmicpvp.cosmicutils.utils.NumberUtils;
 import com.earth2me.essentials.Mob;
 import me.mattstudios.mf.annotations.Alias;
 import me.mattstudios.mf.annotations.Command;
+import me.mattstudios.mf.annotations.Default;
 import me.mattstudios.mf.annotations.Permission;
 import me.mattstudios.mf.annotations.SubCommand;
 import me.mattstudios.mf.base.CommandBase;
@@ -19,6 +20,14 @@ import org.bukkit.inventory.ItemStack;
 @Command("amobcoins")
 @Alias({"amc", "acoins", "acoin"})
 public class MobcoinsAdminCommand extends CommandBase {
+
+    @Default
+    @Permission("cranked.admin")
+    public void onDefault(CommandSender sender) {
+        for (String s : Language.ADMIN_HELP.getValuesAsList()) {
+            sender.sendMessage(CC.translate(s));
+        }
+    }
 
     @SubCommand("reload")
     @Permission("cranked.admin")
@@ -52,26 +61,24 @@ public class MobcoinsAdminCommand extends CommandBase {
     @SubCommand("give")
     @Permission("cranked.admin")
     public void onGiveShards(CommandSender sender, OfflinePlayer toPlayer, Integer amount) {
-        Player player = ((Player)sender);
         MobcoinPlugin.getInstance().getShardsManager().getShardsUser(toPlayer.getUniqueId()).addShards(amount);
         if (toPlayer.isOnline()) {
             toPlayer.getPlayer().sendMessage(CC.translate(Language.SHARDS_ADDED.getMessage().replace("%amount%", NumberUtils.formatMoney(amount))));
         }
         String giving = Language.SHARDS_GIVING.getMessage().replace("%amount%", NumberUtils.formatMoney(amount));
         giving = giving.replace("%player%", toPlayer.getName());
-        player.sendMessage(CC.translate(giving));
+        sender.sendMessage(CC.translate(giving));
     }
 
     @SubCommand("reset")
     @Permission("cranked.admin")
     public void onResetShards(CommandSender sender, OfflinePlayer toPlayer) {
-        Player player = ((Player)sender);
         MobcoinPlugin.getInstance().getShardsManager().getShardsUser(toPlayer.getUniqueId()).resetShards();
         if (toPlayer.isOnline()) {
             Language.RESET_SHARDS.send(toPlayer.getPlayer());
         }
         String reset = Language.RESET_SOMEONES_SHARDS.getMessage().replace("%player%", toPlayer.getName());
-        player.sendMessage(CC.translate(reset));
+        sender.sendMessage(CC.translate(reset));
 
     }
 
