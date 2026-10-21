@@ -19,7 +19,13 @@ public class LootTableAPI {
 
     public static ItemStack getRandomLootItem(LootTable lootTableType) {
         LootTableData lootTable = lootTableManager.getLootTable(lootTableType);
-        return RandomUtils.getRandomItem(lootTable.getLootFromEcoUpdate(lootTable.getCurrentEcoUpdateLoot()));
+        // Hand out a copy: the stored item is the loot table's own entry (and a map key).
+        return RandomUtils.getRandomItem(lootTable.getLootFromEcoUpdate(lootTable.getCurrentEcoUpdateLoot())).clone();
+    }
+
+    public static boolean hasLoot(LootTable lootTableType) {
+        LootTableData lootTable = lootTableManager.getLootTable(lootTableType);
+        return lootTable.getLootFromEcoUpdate(lootTable.getCurrentEcoUpdateLoot()).values().stream().mapToDouble(Double::doubleValue).sum() > 0;
     }
 
     public static List<ItemStack> getAllLootFromLootTable(LootTable type) {

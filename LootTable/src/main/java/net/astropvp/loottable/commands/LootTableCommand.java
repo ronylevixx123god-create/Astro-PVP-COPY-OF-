@@ -78,6 +78,11 @@ public class LootTableCommand extends CommandBase {
     @Permission("astro.admin")
     @SubCommand("random")
     public void onRandomItem(CommandSender sender, @Completion("#players") Player receiver, @Completion("#loottables") LootTable lootTableType) {
+        if (!LootTableAPI.hasLoot(lootTableType)) {
+            ECO_UPDATE current = LootTablePlugin.getInstance().getLootTableManager().getLootTable(lootTableType).getCurrentEcoUpdateLoot();
+            sender.sendMessage(CC.translate("&c&l(!)&c The " + lootTableType.getFancy() + " &cLoottable has no items for eco update: &f" + current.getFancy()));
+            return;
+        }
         PlayerUtil.giveOrDropProtectedItem(receiver, LootTableAPI.getRandomLootItem(lootTableType), 60);
         sender.sendMessage(CC.translate("&aGiven " + receiver.getName() + " a random " + lootTableType.getFancy() + " item."));
         receiver.sendMessage(CC.translate("&aReceived a random " + lootTableType.getFancy() + " item."));
