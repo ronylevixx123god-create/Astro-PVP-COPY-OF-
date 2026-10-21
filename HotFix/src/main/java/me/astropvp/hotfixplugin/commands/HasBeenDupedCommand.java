@@ -12,9 +12,12 @@ import me.astropvp.hotfixplugin.utils.TimeUtils;
 import me.mattstudios.mf.annotations.Command;
 import me.mattstudios.mf.annotations.Default;
 import me.mattstudios.mf.base.CommandBase;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 
 @Command("hasbeenduped")
 public class HasBeenDupedCommand extends CommandBase {
@@ -32,6 +35,26 @@ public class HasBeenDupedCommand extends CommandBase {
         } else {
             player.sendMessage(CC.translate("&aItem has been duped by " + nbtItem.getString("dupedBy")));
             sendWebHook(nbtItem.getString("dupedBy"), nbtItem.getLong("dupedAt"), CC.strip(itemStack.getItemMeta().getDisplayName()));
+        }
+        sendItemId(player, itemStack);
+    }
+
+    // Arkkit ItemID: the item's IID and whether Arkkit flagged it as a duplicate (same wording as /iid)
+    private void sendItemId(Player player, ItemStack itemStack) {
+        Plugin arkkit = Bukkit.getPluginManager().getPlugin("Arkkit");
+        if (arkkit == null) return;
+        try {
+            Class<?> itemId = Class.forName("org.arkhamnetwork.Arkkit.patches.ItemID", true, arkkit.getClass().getClassLoader());
+            long iid = (long) itemId.getMethod("getItemID", ItemStack.class).invoke(null, itemStack);
+            if (iid == -1L) return;
+            boolean blacklisted = (boolean) itemId.getMethod("isItemBlacklisted", ItemStack.class).invoke(null, itemStack);
+            player.sendMessage(ChatColor.GOLD + "The IID of the item in your hand is: " + ChatColor.WHITE + iid);
+            if (blacklisted) {
+                player.sendMessage(ChatColor.RED + "IID " + iid + " is " + ChatColor.BOLD + "BLACKLISTED!");
+            } else {
+                player.sendMessage(ChatColor.GREEN + "IID " + iid + " is " + ChatColor.BOLD + "NOT" + ChatColor.GREEN + " blacklisted.");
+            }
+        } catch (ReflectiveOperationException | ClassCastException ignored) {
         }
     }
 

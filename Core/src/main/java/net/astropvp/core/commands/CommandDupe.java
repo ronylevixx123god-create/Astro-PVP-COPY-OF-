@@ -7,6 +7,7 @@ import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.EssentialsConf;
 import com.earth2me.essentials.Worth;
 import com.rit.sucy.EnchantmentAPI;
+import de.tr7zw.nbtapi.NBTItem;
 import org.arkhamnetwork.enchantments.EnchantmentBook;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -68,7 +69,7 @@ public class CommandDupe implements CommandExecutor {
         }
 
         if (isBook) {
-            item.setAmount(64);
+            player.setItemInHand(markDuped(item, player));
             player.sendMessage(CC.Green + "You have successfully duplicated your item.");
             return false;
         }
@@ -76,19 +77,19 @@ public class CommandDupe implements CommandExecutor {
 
         if (display.contains(CC.WhiteB + "Black Scroll") && item.getType() == Material.INK_SACK ||
                 display.contains(CC.LightPurpleB + "Heroic Black Scroll") && item.getType() == Material.INK_SACK) {
-            item.setAmount(64);
+            player.setItemInHand(markDuped(item, player));
             player.sendMessage(CC.Green + "You have successfully duplicated your item.");
             return false;
         }
 
         if (display.contains(ChatColor.YELLOW + "White Scroll") && item.getType() == Material.EMPTY_MAP) {
-            item.setAmount(64);
+            player.setItemInHand(markDuped(item, player));
             player.sendMessage(CC.Green + "You have successfully duplicated your item.");
             return false;
         }
 
         if (isOpened && (!display.contains("Rogue") && !display.contains("Revoke"))) {
-            item.setAmount(64);
+            player.setItemInHand(markDuped(item, player));
 
             player.sendMessage(CC.Green + "You have successfully duplicated your item.");
             return false;
@@ -102,5 +103,15 @@ public class CommandDupe implements CommandExecutor {
         //item.setAmount(64);
         //player.sendMessage(CC.Green + "You have successfully duplicated your item.");
         return false;
+    }
+
+    // read by /hasbeenduped
+    private ItemStack markDuped(ItemStack item, Player player) {
+        NBTItem nbtItem = new NBTItem(item);
+        nbtItem.setString("dupedBy", player.getName());
+        nbtItem.setLong("dupedAt", System.currentTimeMillis());
+        ItemStack duped = nbtItem.getItem();
+        duped.setAmount(64);
+        return duped;
     }
 }
