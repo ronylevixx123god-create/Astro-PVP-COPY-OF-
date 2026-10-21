@@ -76,7 +76,7 @@ public class GiftcardAPI {
 
             code = code.split(",")[0].replace("\"", "");
 
-            code = java.util.Arrays.toString(code.split("(?<=\G.{4})"));
+            code = java.util.Arrays.toString(code.split("(?<=\\G.{4})"));
 
             code = code.replace("[", "").replace("]", "").replace(",", "");
 
