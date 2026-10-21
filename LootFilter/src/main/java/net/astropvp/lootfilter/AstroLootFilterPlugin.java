@@ -26,7 +26,7 @@ public class AstroLootFilterPlugin extends JavaPlugin {
         this.commandManager = new PaperCommandManager(this);
         this.commandManager.registerCommand(new LootFilterCommand());
         this.commandManager.registerCommand(new LootFrenzyCommand());
-        //this.getServer().getPluginManager().registerEvents(new FrenzyJoinListener(), this);
+        this.getServer().getPluginManager().registerEvents(new FrenzyJoinListener(), this);
         Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, () -> {
             System.out.println("[LootFilter] Started auto saving lootfilter data");
             lootFilterManager.purge();
