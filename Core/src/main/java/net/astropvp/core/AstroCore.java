@@ -435,6 +435,7 @@ public class AstroCore extends JavaPlugin {
         getCommand("spawnershop").setExecutor(new SpawnerShopCommand());
         getCommand("givebucket").setExecutor(new CommandGiveMagicBucket());
         getCommand("merchant").setExecutor(new MerchantCommand());
+        getCommand("stack").setExecutor(new StackCommand());
         getServer().getPluginManager().registerEvents(new KillTitleSound(), this);
         getCommand("givesoulpearl").setExecutor(new SoulPearlCommand());
         ClaimCommand claimCommand = new ClaimCommand();
