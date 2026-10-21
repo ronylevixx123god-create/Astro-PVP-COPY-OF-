@@ -12,6 +12,8 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.FieldAccessException;
 import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.I18n;
+import com.earth2me.essentials.api.NoLoanPermittedException;
+import com.earth2me.essentials.api.UserDoesNotExistException;
 import com.massivecraft.factions.Faction;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import lombok.Getter;
@@ -31,6 +33,8 @@ import net.astropvp.core.cosmiccoinflip.listeners.InventoryListener;
 import net.astropvp.core.cosmiccoinflip.listeners.PlayerListener;
 import net.astropvp.core.cosmiccoinflip.struct.CoinFlipManager;
 import net.astropvp.core.cosmiccoinflip.struct.CoinFlipMatch;
+import net.astropvp.core.cosmicjackpot.commands.CommandJackpot;
+import net.astropvp.core.cosmicjackpot.listeners.JackpotListener;
 import net.astropvp.core.cosmicjackpot.struct.JackpotManager;
 import net.astropvp.core.cosmictoggles.commands.CommandToggles;
 import net.astropvp.core.cosmictoggles.manager.TogglesManager;
@@ -196,12 +200,12 @@ public class AstroCore extends JavaPlugin {
         this.ess = (Essentials) Bukkit.getPluginManager().getPlugin("Essentials");
         this.payToggles = new PayToggle("toggles.yml");
 
-       /* this.jackpotManager = new JackpotManager();
+        this.jackpotManager = new JackpotManager();
         try {
             this.jackpotManager.loadFileData(this);
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
 
         this.setupSQL();
         this.dataManager = new TitleDatabaseManager();
@@ -282,11 +286,11 @@ public class AstroCore extends JavaPlugin {
 
         //this.staffModeManager.toggleOffAllStaffModes();
         this.payToggles.saveToggles();
-        /*try {
+        try {
             this.jackpotManager.saveFileData();
         } catch (IOException e) {
             e.printStackTrace();
-        }*/
+        }
         this.dataManager.saveAllEquippedTitlesToSQL();
 
         Bukkit.getLogger().info("[AstroCore] Saving astrocore playerdata");
@@ -440,7 +444,7 @@ public class AstroCore extends JavaPlugin {
         getCommand("coinflip").setExecutor(new CommandCoinFlip());
         getCommand("list").setExecutor(new ListCommand());
         getCommand("grinding").setExecutor(new ToggleGrindingMessages());
-        //getCommand("jackpot").setExecutor(new CommandJackpot());
+        getCommand("jackpot").setExecutor(new CommandJackpot());
         getCommand("chatcolor").setExecutor(new ChatColorCommand());
         getCommand("helpenchants").setExecutor(new CommandHelpEnchants());
         getCommand("randomtp").setExecutor(new RandomTpCommand());
@@ -469,13 +473,13 @@ public class AstroCore extends JavaPlugin {
     public void registerTasks() {
         new LastManStandingCapTask().runTaskTimer(this, 20L, 20L);
         //Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new AutoGiveAllTask(), 20L, 20L);
-        /*this.getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> {
+        this.getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> {
             try {
                 this.jackpotManager.onJackpotTick();
             } catch (UserDoesNotExistException | NoLoanPermittedException e) {
                 e.printStackTrace();
             }
-        }, 20L, 20L);*/
+        }, 20L, 20L);
 
         Collection<? extends Player> allPlayers = Bukkit.getOnlinePlayers();
         /*
@@ -549,7 +553,7 @@ public class AstroCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
         getServer().getPluginManager().registerEvents(new WorldBorderPearlFix(), this);
         getServer().getPluginManager().registerEvents(new CustomPearlListener(), this);
-        //getServer().getPluginManager().registerEvents(new JackpotListener(), this);
+        getServer().getPluginManager().registerEvents(new JackpotListener(), this);
         getServer().getPluginManager().registerEvents(new GrindingMessagesToggleListener(), this);
         getServer().getPluginManager().registerEvents(new DupePatch(), this);
         getServer().getPluginManager().registerEvents(new KnockbackFixListener(), this);

@@ -119,8 +119,7 @@ public class JackpotManager {
         JackpotHistory history = this.jackpotHistory.computeIfAbsent(winner.getUuid(), e -> new JackpotHistory(winner.getUsername()));
         history.setJackpotWinnings(history.getJackpotWinnings() + (long)winnings);
         history.setJackpotWins(history.getJackpotWins() + 1.0);
-        Player pl = Bukkit.getPlayer(winner.getUuid());
-        Economy.add(pl.getUniqueId(), BigDecimal.valueOf(winnings));
+        Economy.add(winner.getUuid(), BigDecimal.valueOf(winnings));
 
         this.taxesCollected = (long)((double)this.taxesCollected + taxesCollected);
         this.saveWinnings();

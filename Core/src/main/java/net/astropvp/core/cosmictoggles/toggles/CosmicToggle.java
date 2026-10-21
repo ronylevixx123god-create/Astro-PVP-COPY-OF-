@@ -72,9 +72,9 @@ public enum CosmicToggle {
         if (this == COINFLIP) {
             return !AstroCore.getInstance().getCoinFlipManager().getToggledNotifications().contains(player.getUniqueId());
         }
-        //if (this == JACKPOT) {
-          //return !AstroCore.getInstance().getJackpotManager().getToggledNofications().contains(player.getUniqueId());
-        //}
+        if (this == JACKPOT) {
+            return !AstroCore.getInstance().getJackpotManager().getToggledNofications().contains(player.getUniqueId());
+        }
         if (this == AUCTION) {
             return !Auction.getPlugin().getToggles().isBidMessageToggled(player);
         }
