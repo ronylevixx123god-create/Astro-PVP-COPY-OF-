@@ -59,17 +59,27 @@ public abstract class SaveLoadManager<T extends KeyToSave> {
         }
 
         for (File file : Objects.requireNonNull(dataDirectory.listFiles())) {
-            String deserialize = (file.getName().substring(0,file.getName().length()-5));
+            String deserialize = keyFromFileName(file.getName().substring(0,file.getName().length()-5));
             if (!this.contains(deserialize)) {
                 file.deleteOnExit();
             }
         }
     }
 
+    // ':' is not allowed in Windows file names (location keys such as AstroCustomBlocks' "world:x:y:z:yaw:pitch"
+    // could not be saved); it is written as %3A and turned back on load. Keys without ':' keep their file names.
+    private static String fileNameFromKey(String key) {
+        return key.replace(":", "%3A");
+    }
+
+    private static String keyFromFileName(String name) {
+        return name.replace("%3A", ":");
+    }
+
     private void load(File file) {
         String fileName = file.getName();
         int fileNameLength = fileName.length();
-        String key = fileName.substring(0,fileNameLength-5);
+        String key = keyFromFileName(fileName.substring(0,fileNameLength-5));
 
         try (FileReader reader = new FileReader(file)) {
             T t = this.gson.fromJson(reader, clazz);
@@ -84,7 +94,7 @@ public abstract class SaveLoadManager<T extends KeyToSave> {
     }
 
     private void save(String key, T t) {
-        File file = new File(dataDirectory,key + ".json");
+        File file = new File(dataDirectory, fileNameFromKey(key) + ".json");
         if (!file.exists()) {
             try {
                 file.createNewFile();
