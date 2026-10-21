@@ -29,6 +29,7 @@ public class PvPTopCommand extends CommandBase {
     @Permission("pvptop.admin")
     public void forceUpdateCommand(final CommandSender commandSender) {
         this.plugin.getUpdateLeaderboardTask().update();
+        commandSender.sendMessage(CC.translate("&aUpdated the PvP Top leaderboard."));
     }
 
     @SubCommand("add")

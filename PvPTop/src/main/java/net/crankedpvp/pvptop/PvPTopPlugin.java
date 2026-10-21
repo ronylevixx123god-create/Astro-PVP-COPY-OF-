@@ -11,6 +11,7 @@ import net.crankedpvp.pvptop.data.PvPTopManager;
 import net.crankedpvp.pvptop.inventory.ObtainPointsMethodsInventory;
 import net.crankedpvp.pvptop.inventory.PvPTopInventory;
 import net.crankedpvp.pvptop.listeners.FactionDisbandCheck;
+import net.crankedpvp.pvptop.listeners.CosmicKothCaptureListener;
 import net.crankedpvp.pvptop.listeners.KothCaptureListener;
 import net.crankedpvp.pvptop.listeners.PlayerDeathListener;
 import net.crankedpvp.pvptop.tasks.UpdateLeaderboardTask;
@@ -75,7 +76,10 @@ public class PvPTopPlugin extends JavaPlugin {
         PluginManager pluginManager = this.getServer().getPluginManager();
         pluginManager.registerEvents(new PlayerDeathListener(this), this);
         pluginManager.registerEvents(new FactionDisbandCheck(), this);
-        pluginManager.registerEvents(new KothCaptureListener(this), this);
+        if (pluginManager.getPlugin("FactionsKore") != null)
+            pluginManager.registerEvents(new KothCaptureListener(this), this);
+        if (pluginManager.getPlugin("CosmicKOTH") != null)
+            pluginManager.registerEvents(new CosmicKothCaptureListener(this), this);
     }
 
     @Override

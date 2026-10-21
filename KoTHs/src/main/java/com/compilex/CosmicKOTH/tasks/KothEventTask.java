@@ -1,5 +1,6 @@
 package com.compilex.CosmicKOTH.tasks;
 
+import com.compilex.CosmicKOTH.events.KothCapturedEvent;
 import com.compilex.CosmicKOTH.CosmicKOTHPlugin;
 import com.compilex.CosmicKOTH.customfiles.CustomConfig;
 import com.cosmicpvp.cosmicutils.utils.CC;
@@ -184,6 +185,7 @@ public class KothEventTask
         this.logFactionWin(player);
         this.playerCapped = player;
         this.playerCapping = null;
+        Bukkit.getPluginManager().callEvent(new KothCapturedEvent(player));
 
         Location l = this.playerCapped.getEyeLocation();
         for (int i = 0; i < 10; ++i) {
