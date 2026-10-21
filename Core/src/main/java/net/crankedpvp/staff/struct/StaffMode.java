@@ -47,12 +47,16 @@ public class StaffMode {
     }
 
     private void addRandomPlayerSelector() {
+        this.player.getInventory().setItem(4, getRandomPlayerSelector());
+    }
+
+    public static ItemStack getRandomPlayerSelector() {
         ItemBuilder itemBuilder = new ItemBuilder(Material.COMPASS, "&a&lRandom Player Teleporter",
                 "&7Right-Click this compass to teleport to",
                 "&7a random player outside of the safezone");
         NBTItem nbtItem = new NBTItem(itemBuilder.colorize().build());
         nbtItem.setString("staffModeItem", "randomPlayerSelector");
-        this.player.getInventory().setItem(4, nbtItem.getItem());
+        return nbtItem.getItem();
     }
 
     private void addVanish() {

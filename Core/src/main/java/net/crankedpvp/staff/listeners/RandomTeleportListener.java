@@ -39,7 +39,7 @@ public class RandomTeleportListener implements Listener {
         NBTItem nbtItem = new NBTItem(itemStack);
         Player player = event.getPlayer();
         if(!nbtItem.getString("staffModeItem").equals("randomPlayerSelector")) return;
-        if(!this.plugin.getStaffManager().isPlayerInStaffMode(player)) return;
+        if(!this.plugin.getStaffManager().isPlayerInStaffMode(player) && !player.hasPermission("essentials.tp")) return;
         event.setCancelled(true);
 
         if(cooldown.contains(player)) return;
@@ -48,12 +48,17 @@ public class RandomTeleportListener implements Listener {
                 .stream()
                 .filter(Objects::nonNull)
                 .filter(Player::isOnline)
+                .filter(possiblePlayer -> possiblePlayer != player)
                 //.filter(possiblePlayer -> !PLAYERS.contains(possiblePlayer.getName()))
                 //.filter(loopPlayer -> WorldGuardUtils.canPvPInRegion(player))
                 .collect(Collectors.toList());
         // ProxyPatch is optional; without this check /randomtp failed with an internal error
         if (Bukkit.getPluginManager().getPlugin("ProxyPatch") != null) {
             possibleSelectedPlayers.removeIf(checkPlayer -> ProxyPatch.playerNames.contains(checkPlayer.getName()));
+        }
+        if (possibleSelectedPlayers.isEmpty()) {
+            player.sendMessage(CC.translate("&cNo Valid Target found!"));
+            return;
         }
         Player selectedPlayer = possibleSelectedPlayers.get(ThreadLocalRandom.current().nextInt(possibleSelectedPlayers.size()));
         player.teleport(selectedPlayer, PlayerTeleportEvent.TeleportCause.UNKNOWN);
