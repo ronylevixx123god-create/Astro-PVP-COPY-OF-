@@ -7,5 +7,7 @@ commands:
     aliases: [skin, skins, itemskins]
   multiskin:
   removeskin:
+  giveskin:
+    description: /giveskin
   givebackpack:
     description: givebackpack.

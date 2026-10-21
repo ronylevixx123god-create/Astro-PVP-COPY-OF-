@@ -11,6 +11,7 @@ import me.astropvp.astropvpskins.enums.SkinType;
 import me.astropvp.astropvpskins.utils.ItemSkinUtils;
 import me.ifamasssxd.cosmicduel.DuelAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Entity;
@@ -51,6 +52,9 @@ public class ItemSkinListener implements Listener {
             return;
         if (clicked == null || clicked.getType() == Material.AIR)
             return;
+        // In creative the client keeps its own copy of the cursor, so attaching/detaching there duplicates items.
+        if (event.getWhoClicked().getGameMode() == GameMode.CREATIVE)
+            return;
         if (AstroItemSkinsAPI.isItemSkin(cursor) && event.getClick().isLeftClick()) {
             List<SkinType> typeList = AstroItemSkinsAPI.getItemSkin(cursor);
             if (AstroItemSkinsAPI.hasItemSkin(clicked, cursor))
@@ -64,6 +68,8 @@ public class ItemSkinListener implements Listener {
 
             if (cursor.getAmount() > 1) {
                 event.getWhoClicked().sendMessage(CC.RedB + "(!) " + CC.Red + "You cannot apply stacked itemskins!");
+                event.setCancelled(true);
+                return;
             }
 
             if (typeList.get(0).getItemSkinType() == ItemSkinType.BACKPACK && !AstroItemSkinsAPI.hasBackpackSocket(clicked)) {
