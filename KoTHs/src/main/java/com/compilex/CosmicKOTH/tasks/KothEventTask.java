@@ -189,7 +189,10 @@ public class KothEventTask
         for (int i = 0; i < 10; ++i) {
             Bukkit.getScheduler().runTaskLater(CosmicKOTHPlugin.get_(), () -> RandomFireworks.getManager().launchRandomFirework(l), 20 * i);
         }
-        if (this.playerCapped.getInventory().firstEmpty() != -1) {
+        if (CosmicMysteryChest.get().getChestManager().getMysteryChestMap().get("KothBag") == null) {
+            // no KothBag mystery chest configured: skip the lootbag instead of failing the rest of the capture
+            CosmicKOTHPlugin.get_().getLogger().warning("No 'KothBag' mystery chest in CosmicMysteryChest, " + player.getName() + " did not get a KOTH lootbag.");
+        } else if (this.playerCapped.getInventory().firstEmpty() != -1) {
             player.getInventory().addItem(CosmicMysteryChest.get().getChestManager().getMysteryChestMap().get("KothBag").createClaimableItem(false));
         } else {
             this.kothBroadcast("");
