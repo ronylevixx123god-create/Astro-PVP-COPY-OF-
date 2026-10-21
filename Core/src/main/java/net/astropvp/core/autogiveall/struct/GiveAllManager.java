@@ -72,8 +72,8 @@ public class GiveAllManager {
                 items[0] = giveAllItem;
                 collect.add(new CollectCategory(CollectType.GIVEALL, items, CC.YellowB + "Auto Giveall Loot", System.currentTimeMillis()));
             }
-            nextGiveAll = 2400;
         }
+        nextGiveAll = 2400;
     }
 
     public static ItemStack getGiveAllItem() {

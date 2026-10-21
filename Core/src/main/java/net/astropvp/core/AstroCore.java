@@ -24,6 +24,7 @@ import net.astropvp.core.autobroadcast.tasks.AutoBroadcastTask;
 import net.astropvp.core.autogiveall.commands.CommandForceGiveAll;
 import net.astropvp.core.autogiveall.commands.CommandNextGiveAll;
 import net.astropvp.core.autogiveall.struct.GiveAllManager;
+import net.astropvp.core.autogiveall.tasks.AutoGiveAllTask;
 import net.astropvp.core.betterpay.PayListener;
 import net.astropvp.core.betterpay.PayToggle;
 import net.astropvp.core.betterpay.commands.CommandTogglePay;
@@ -473,7 +474,7 @@ public class AstroCore extends JavaPlugin {
 
     public void registerTasks() {
         new LastManStandingCapTask().runTaskTimer(this, 20L, 20L);
-        //Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new AutoGiveAllTask(), 20L, 20L);
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new AutoGiveAllTask(), 20L, 20L);
         this.getServer().getScheduler().scheduleSyncRepeatingTask(this, () -> {
             try {
                 this.jackpotManager.onJackpotTick();
