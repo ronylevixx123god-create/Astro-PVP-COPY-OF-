@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.mattstudios.mf.base.CommandManager;
 import me.mattstudios.mf.base.components.TypeResult;
+import net.crankedpvp.shards.commands.AddMobcoinsCommand;
 import net.crankedpvp.shards.commands.MobcoinsAdminCommand;
 import net.crankedpvp.shards.commands.MobcoinsCommand;
 import net.crankedpvp.shards.managers.MobcoinManager;
@@ -36,6 +37,7 @@ public class MobcoinPlugin extends JavaPlugin {
         this.commandManager = new CommandManager(this);
         registerCommandParameters();
         commandManager.register(new MobcoinsCommand(this), new MobcoinsAdminCommand());
+        getCommand("addmobcoins").setExecutor(new AddMobcoinsCommand());
         this.languageHandler = new LanguageHandler(this);
         languageHandler.load();
         this.configManager = new ConfigManager(this);
