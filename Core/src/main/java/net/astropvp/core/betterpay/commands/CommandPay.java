@@ -24,6 +24,7 @@
  */
 package net.astropvp.core.betterpay.commands;
 
+import com.cosmicpvp.cosmicutils.utils.MoneyParser;
 import com.earth2me.essentials.ChargeException;
 import com.earth2me.essentials.CommandSource;
 import com.earth2me.essentials.I18n;
@@ -57,7 +58,10 @@ extends EssentialsLoopCommand {
         if (args.length < 2) {
             throw new NotEnoughArgumentsException();
         }
-        this.amount = new BigDecimal(args[1].replaceAll("[^0-9\\.]", ""));
+        this.amount = MoneyParser.parse(args[1]);   // 100k, 1.5m, 1b ...
+        if (this.amount == null) {
+            throw new NotEnoughArgumentsException();
+        }
         this.loopOnlinePlayers(server, new CommandSource(sender), false, user.isAuthorized("essentials.pay.multiple"), args[0], args);
     }
 

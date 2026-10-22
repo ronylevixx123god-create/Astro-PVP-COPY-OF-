@@ -1,5 +1,6 @@
 package net.astropvp.gambling.tower.commands;
 
+import net.astropvp.gambling.MoneyAmount;
 import com.cosmicpvp.cosmicutils.utils.CC;
 import com.cosmicpvp.cosmicutils.utils.EconomyUtils;
 import me.mattstudios.mf.annotations.*;
@@ -23,7 +24,12 @@ public class TowerCommand extends CommandBase {
     }
 
     @Default
-    public void defaultCommand(CommandSender commandSender, @Optional Double bet) {
+    public void defaultCommand(CommandSender commandSender, @Optional MoneyAmount betAmount) {
+        if (betAmount != null && betAmount.isInvalid()) {
+            commandSender.sendMessage(CC.translate("&cInvalid bet amount: " + betAmount.getInput()));
+            return;
+        }
+        Double bet = betAmount == null ? null : betAmount.getValue();
         Player player = (Player) commandSender;
         if(bet == null) {
             TowerInformationInventory towerInformationInventory = new TowerInformationInventory(player);
