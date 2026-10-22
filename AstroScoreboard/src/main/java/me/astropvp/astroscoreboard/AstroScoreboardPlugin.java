@@ -97,6 +97,9 @@ public class AstroScoreboardPlugin extends JavaPlugin {
     }
 
     public void registerDefaultAndFactionScoreboard() {
+        // nametag faction suffix (TAB tagsuffix): relation colour + faction tag, empty without a faction - Astro's own
+        // AstroScoreboardAPI.getDefaultSuffix, as used for nametags before the move to TAB (viewer first, target second)
+        TabAPI.getInstance().getPlaceholderManager().registerRelationalPlaceholder("%rel_astro_faction%", 500, (viewer, target) -> AstroScoreboardAPI.getDefaultSuffix((Player) target.getPlayer(), (Player) viewer.getPlayer()));
         TabAPI.getInstance().getPlaceholderManager().registerPlayerPlaceholder("%has-faction%", getMS(1), player -> !FactionUtils.getFPlayer((Player) player.getPlayer()).getFaction().isWilderness());
         TabAPI.getInstance().getPlaceholderManager().registerPlayerPlaceholder("%kills%", getMS(5), player -> FactionUtils.getFPlayer((Player) player.getPlayer()).getKills());
         TabAPI.getInstance().getPlaceholderManager().registerPlayerPlaceholder("%deaths%", getMS(5), player -> FactionUtils.getFPlayer((Player) player.getPlayer()).getDeaths());
