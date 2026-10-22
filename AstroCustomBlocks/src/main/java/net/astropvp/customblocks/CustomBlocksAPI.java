@@ -44,7 +44,8 @@ public class CustomBlocksAPI {
             NBTWrapper nbtItem = new NBTWrapper(itemStack);
             NBTTagCompoundBuilder cosmicData = nbtItem.hasKey("cosmicData") ? new NBTTagCompoundBuilder(nbtItem.getNBTBase("cosmicData")) : new NBTTagCompoundBuilder();
             NBTTagCompoundBuilder customBlockData = cosmicData.hasKey("customBlockData") ? new NBTTagCompoundBuilder(cosmicData.getNBTBase("customBlockData")) : new NBTTagCompoundBuilder();
-            return CustomBlockType.valueOf(customBlockData.getString("type"));
+            // items tagged by an older /addcblock may have a lowercase or unknown type: null for an unknown one
+            return CustomBlockType.fromName(customBlockData.getString("type"));
         }
         return null;
     }

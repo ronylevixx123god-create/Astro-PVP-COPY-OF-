@@ -235,6 +235,21 @@ public enum CustomBlockType {
     }
 
 
+    /** the type with this name, ignoring case (dark_matter, Dark_Matter...), or null */
+    public static CustomBlockType fromName(String name) {
+        if (name == null) return null;
+        for (CustomBlockType type : values()) {
+            if (type.name().equalsIgnoreCase(name.trim())) return type;
+        }
+        return null;
+    }
+
+    public static String unknownTypeMessage(String name) {
+        StringBuilder types = new StringBuilder();
+        for (CustomBlockType type : values()) types.append(types.length() == 0 ? "" : ", ").append(type.name());
+        return CC.translate("&c&l(!)&c Unknown custom block type '" + name + "'. Types: &7" + types);
+    }
+
     public ItemStack build(int level) {
         String title = level != 0 ? getColor() + "&l" + getDisplayName() + " &7(&fLVL " + level + "&7)": getColor() + "&l" + getDisplayName();
         ItemStack block = new ItemBuilder(Material.NOTE_BLOCK)

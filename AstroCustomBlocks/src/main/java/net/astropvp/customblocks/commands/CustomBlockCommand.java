@@ -29,7 +29,12 @@ public class CustomBlockCommand extends CommandBase {
     @SubCommand("give")
     @Permission("astro.admin")
     public void onGive(Player player, String type, Integer level) {
-        player.getInventory().addItem(CustomBlockType.valueOf(type).build(level));
+        CustomBlockType customBlockType = CustomBlockType.fromName(type);
+        if (customBlockType == null) {
+            player.sendMessage(CustomBlockType.unknownTypeMessage(type));
+            return;
+        }
+        player.getInventory().addItem(customBlockType.build(level));
         player.sendMessage(CC.Green + "Received Custom Block!");
     }
 
