@@ -94,5 +94,9 @@ public class CustomBlocks extends JavaPlugin {
         Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, new TickAbleBlocksRunnable(), 40L, 20L);
         // stored EXP, grinder keys and Pinata hits are also written every 5 minutes, not only at shutdown
         Bukkit.getScheduler().runTaskTimer(this, () -> customBlockManager.saveAll(), 20L * 300, 20L * 300);
+        // the Cosmic Client's custom block data, sent by the plugin itself (see CustomBlockVisuals)
+        net.astropvp.customblocks.tasks.CustomBlockVisuals visuals = new net.astropvp.customblocks.tasks.CustomBlockVisuals();
+        getServer().getPluginManager().registerEvents(visuals, this);
+        Bukkit.getScheduler().runTaskTimer(this, visuals, 40L, 20L);
     }
 }
