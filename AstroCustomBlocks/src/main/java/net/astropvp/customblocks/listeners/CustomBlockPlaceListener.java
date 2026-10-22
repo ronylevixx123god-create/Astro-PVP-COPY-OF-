@@ -35,6 +35,8 @@ public class CustomBlockPlaceListener implements Listener {
         if (event.isCancelled()) return;
         if (CustomBlocksAPI.isCustomBlockItem(item)) {
             CustomBlockType type = CustomBlocksAPI.getTypeFromItem(item);
+            // disabled types are CustomSkullBlocks' blocks (same item format), placed and run by that plugin
+            if (!type.isEnabled()) return;
             if (!FPlayers.getInstance().getByPlayer(event.getPlayer()).hasFaction()) {
                 event.getPlayer().sendMessage(CC.translate("&c&l(!)&c You cannot place custom blocks without a faction (/f create <name>)"));
                 event.setCancelled(true);
