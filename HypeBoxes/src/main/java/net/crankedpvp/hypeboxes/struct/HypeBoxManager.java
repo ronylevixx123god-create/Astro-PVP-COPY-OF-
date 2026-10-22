@@ -1,5 +1,6 @@
 package net.crankedpvp.hypeboxes.struct;
 
+import com.cosmicpvp.cosmicutils.utils.CC;
 import com.cosmicpvp.cosmicutils.utils.StringUtils;
 import de.tr7zw.nbtapi.NBTItem;
 import net.crankedpvp.hypeboxes.HypeboxesPlugin;
@@ -78,9 +79,7 @@ public class HypeBoxManager {
             }
         }
         YamlConfiguration yamlConfiguration = new YamlConfiguration();
-        String[] colors = new String[]{"&a", "&b", "&c", "&d", "&e", "&2", "&3", "&4", "&5", "&6", "&9"};
-        String color = colors[ThreadLocalRandom.current().nextInt(1, 10)];
-        yamlConfiguration.set("Item.Display.Name", "&f&ki&r " + color + "&l" + StringUtils.toNiceString(name) + " &f&ki&r &f&lHypebox");
+        yamlConfiguration.set("Item.Display.Name", defaultDisplayName(name));
         yamlConfiguration.set("Item.Display.Lore", Config.HYPEBOX_LORE.getValuesAsList());
         yamlConfiguration.set("Item.Material", "" + Config.HYPEBOX_MATERIAL.getValue());
         yamlConfiguration.set("Item.Glowing", true);
@@ -90,6 +89,23 @@ public class HypeBoxManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private String defaultDisplayName(String name) {
+        String[] colors = new String[]{"&a", "&b", "&c", "&d", "&e", "&2", "&3", "&4", "&5", "&6", "&9"};
+        String color = colors[ThreadLocalRandom.current().nextInt(1, 10)];
+        return "&f&ki&r " + color + "&l" + StringUtils.toNiceString(name) + " &f&ki&r &f&lHypebox";
+    }
+
+    /** the reward's name: its display name, or the material's name for an unnamed item */
+    private static String rewardName(ItemStack itemStack) {
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        return itemMeta != null && itemMeta.hasDisplayName() ? itemMeta.getDisplayName() : StringUtils.toNiceString(itemStack.getType().name());
+    }
+
+    /** config key of a reward (a '.' would split the YAML path) */
+    private static String rewardKey(ItemStack itemStack) {
+        return ChatColor.stripColor(rewardName(itemStack)).replace('.', '_') + itemStack.getAmount();
     }
 
     public void createDefaultConfigFromItemStack(ItemStack itemStack, String name) {
@@ -104,8 +120,9 @@ public class HypeBoxManager {
         }
         ItemMeta itemMeta = itemStack.getItemMeta();
         YamlConfiguration yamlConfiguration = new YamlConfiguration();
-        yamlConfiguration.set("Item.Display.Name", itemMeta.getDisplayName());
-        yamlConfiguration.set("Item.Display.Lore", itemMeta.getLore());
+        // an unnamed item keeps the default name and lore, so the box always has a name
+        yamlConfiguration.set("Item.Display.Name", itemMeta.hasDisplayName() ? itemMeta.getDisplayName() : defaultDisplayName(name));
+        yamlConfiguration.set("Item.Display.Lore", itemMeta.hasLore() ? itemMeta.getLore() : Config.HYPEBOX_LORE.getValuesAsList());
         yamlConfiguration.set("Item.Material", "" + itemStack.getType().name());
         yamlConfiguration.set("Item.Glowing", itemMeta.hasEnchants());
         yamlConfiguration.set("Misc.Broadcast.Rewards", true);
@@ -196,17 +213,26 @@ public class HypeBoxManager {
     public void addItem(Player player, String lootbox, double chance, double value) {
         try {
             File file = new File(this.plugin.getDataFolder() + "/Hypeboxes/" + lootbox + ".yml");
-            if(file.exists()) {
+            if(!file.exists()) {
+                player.sendMessage(Language.PREFIX.getMessage() + Language.HYPEBOX_INVALID.getMessage().replace("%lootbox%", lootbox));
+                player.playSound(player.getLocation(), Sound.ANVIL_LAND, 2.0F, 2.0F);
+                return;
+            }
+            if(player.getItemInHand() == null || player.getItemInHand().getType() == Material.AIR) {
+                player.sendMessage(CC.translate("&eUsage: /hb addreward <lootbox> <chance> <value>"));
+                player.playSound(player.getLocation(), Sound.ANVIL_LAND, 2.0F, 2.0F);
+                return;
+            }
+            {
                 YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(file);
-                String itemName = ChatColor.stripColor(player.getItemInHand().getItemMeta().getDisplayName());
                 String toBase64 = ItemStackSerializer.serialize(player.getItemInHand());
-                if(!yamlConfiguration.contains("rewards") || !yamlConfiguration.getConfigurationSection("rewards").getKeys(true).contains(itemName + player.getItemInHand().getAmount())) {
-                    String name = itemName + player.getItemInHand().getAmount();
+                if(!yamlConfiguration.contains("rewards") || !yamlConfiguration.getConfigurationSection("rewards").getKeys(false).contains(rewardKey(player.getItemInHand()))) {
+                    String name = rewardKey(player.getItemInHand());
                     yamlConfiguration.set("rewards." + name + ".item", toBase64);
                     yamlConfiguration.set("rewards." + name + ".chance", chance);
                     yamlConfiguration.set("rewards." + name + ".value", value);
                     yamlConfiguration.save(file);
-                    player.sendMessage(Language.PREFIX.getMessage() + Language.HYPEBOX_ADDITEM.getMessage().replace("%lootbox%", lootbox).replace("%item%", player.getItemInHand().getItemMeta().getDisplayName()));
+                    player.sendMessage(Language.PREFIX.getMessage() + Language.HYPEBOX_ADDITEM.getMessage().replace("%lootbox%", lootbox).replace("%item%", rewardName(player.getItemInHand())));
                     player.playSound(player.getLocation(), Sound.LEVEL_UP, 2.0F, 2.0F);
                     reloadHypebox(lootbox);
                 } else {
@@ -222,18 +248,27 @@ public class HypeBoxManager {
     public void removeItemFromHypebox(Player player, ItemStack itemStack, String lootbox) {
         try {
             File file = new File(this.plugin.getDataFolder() + "/Hypeboxes/" + lootbox + ".yml");
-            if (file.exists()) {
+            if(!file.exists()) {
+                player.sendMessage(Language.PREFIX.getMessage() + Language.HYPEBOX_INVALID.getMessage().replace("%lootbox%", lootbox));
+                player.playSound(player.getLocation(), Sound.ANVIL_LAND, 2.0F, 2.0F);
+                return;
+            }
+            if (itemStack == null || itemStack.getType() == Material.AIR) {
+                player.sendMessage(Language.PREFIX.getMessage() + Language.HYPEBOX_ITEM_NOT_FOUND.getMessage().replace("%lootbox%", lootbox));
+                player.playSound(player.getLocation(), Sound.ANVIL_LAND, 2.0F, 2.0F);
+                return;
+            }
+            {
                 YamlConfiguration yamlConfiguration = YamlConfiguration.loadConfiguration(file);
-                String itemName = ChatColor.stripColor(itemStack.getItemMeta().getDisplayName());
                 if (!yamlConfiguration.contains("rewards")) {
                     player.sendMessage(Language.PREFIX.getMessage() + Language.HYPEBOX_ITEM_NOT_FOUND.getMessage().replace("%lootbox%", lootbox));
                     player.playSound(player.getLocation(), Sound.ANVIL_LAND, 2.0F, 2.0F);
                     return;
                 }
-                if (yamlConfiguration.getConfigurationSection("rewards").getKeys(true).contains(itemName + itemStack.getAmount())) {
-                    yamlConfiguration.set("rewards." + itemName + itemStack.getAmount(), null);
+                if (yamlConfiguration.getConfigurationSection("rewards").getKeys(false).contains(rewardKey(itemStack))) {
+                    yamlConfiguration.set("rewards." + rewardKey(itemStack), null);
                     yamlConfiguration.save(file);
-                    player.sendMessage(Language.PREFIX.getMessage() + Language.HYPEBOX_REMOVE_ITEM.getMessage().replace("%lootbox%", lootbox).replace("%item%", itemStack.getItemMeta().getDisplayName()));
+                    player.sendMessage(Language.PREFIX.getMessage() + Language.HYPEBOX_REMOVE_ITEM.getMessage().replace("%lootbox%", lootbox).replace("%item%", rewardName(itemStack)));
                     player.playSound(player.getLocation(), Sound.CHICKEN_EGG_POP, 2.0F, 2.0F);
                     reloadHypebox(lootbox);
                 } else {

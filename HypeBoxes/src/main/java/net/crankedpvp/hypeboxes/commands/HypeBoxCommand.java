@@ -10,6 +10,7 @@ import net.crankedpvp.hypeboxes.language.Language;
 import net.crankedpvp.hypeboxes.struct.HypeBox;
 import net.crankedpvp.hypeboxes.utils.SoundUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -62,7 +63,7 @@ public class HypeBoxCommand extends CommandBase {
             return;
         }
 
-        if(player.getItemInHand() == null) {
+        if(player.getItemInHand() == null || player.getItemInHand().getType() == Material.AIR) {
             plugin.getHypeBoxManager().createHypebox(lootbox);
         } else {
             plugin.getHypeBoxManager().createHypeboxFromItemStack(player.getItemInHand(), lootbox);
@@ -183,7 +184,7 @@ public class HypeBoxCommand extends CommandBase {
         }
 
         this.plugin.getHypeBoxManager().giveHypebox(player, this.plugin.getHypeBoxRegister().getHypebox(lootbox), amount);
-        commandSender.sendMessage(Language.PREFIX.getMessage() + Language.HYPEBOX_GIVEN.getMessage().replace("%lootbox%", lootbox));
+        commandSender.sendMessage(Language.PREFIX.getMessage() + Language.HYPEBOX_GIVEN.getMessage().replace("%lootbox%", lootbox).replace("%player%", player.getName()));
         //sender.playSound(sender.getLocation(), Sound.SUCCESSFUL_HIT, 2.0F, 2.0F);
         //player.playSound(sender.getLocation(), Sound.SUCCESSFUL_HIT, 2.0F, 2.0F);
         player.sendMessage(Language.PREFIX.getMessage() + Language.HYPEBOX_RECEIVED.getMessage().replace("%lootbox%", CC.translate(this.plugin.getHypeBoxRegister().getHypebox(lootbox).getDisplayName())));
@@ -201,7 +202,7 @@ public class HypeBoxCommand extends CommandBase {
             return;
         }
 
-        commandSender.sendMessage(Language.PREFIX.getMessage() + Language.HYPEBOX_GIVEN.getMessage().replace("%lootbox%", lootbox));
+        commandSender.sendMessage(Language.PREFIX.getMessage() + Language.HYPEBOX_GIVEN.getMessage().replace("%lootbox%", lootbox).replace("%player%", "everyone online"));
         SoundUtils.tryPlaySuccessSound(commandSender);
 
         final Map<String, Integer> ipMap = new HashMap<>();
@@ -211,7 +212,7 @@ public class HypeBoxCommand extends CommandBase {
                     continue;
                 }
             }
-            final String ip = p.getAddress().getAddress().toString();
+            final String ip = p.getAddress() == null ? p.getUniqueId().toString() : p.getAddress().getAddress().toString();
             if (ipMap.containsKey(ip) && ipMap.get(ip) > 0) {
                 continue;
             }

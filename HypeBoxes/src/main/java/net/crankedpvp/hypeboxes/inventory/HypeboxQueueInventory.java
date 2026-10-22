@@ -76,8 +76,7 @@ public class HypeboxQueueInventory {
 
     private void tryCancelHypeboxBattle(Player player, Map<String, Integer> hypeboxes) {
         player.closeInventory();
-        BattleQueueManager.getBattleQueue().remove(player);
-        hypeboxes.forEach((hb, amt) -> player.getInventory().addItem(HypeboxesPlugin.getInstance().getHypeBoxRegister().getHypebox(hb).createHypeBox(amt)));
+        BattleQueueManager.refund(player);
         player.sendMessage(CC.translate(Language.PREFIX.getMessage() + " &aYou have cancelled your hypebox battle"));
 
     }
@@ -102,20 +101,18 @@ public class HypeboxQueueInventory {
     private void takeHypeboxes(Player whoClicked, Map<String, Integer> hypeboxes) {
         for (Map.Entry<String, Integer> kv : hypeboxes.entrySet()) {
             HypeBox hypeBox = HypeboxesPlugin.getInstance().getHypeBoxRegister().getHypebox(kv.getKey());
-            int amount = kv.getValue();
+            int remaining = kv.getValue();   // every box type of the battle, from as many stacks as needed
             ItemStack[] items = whoClicked.getInventory().getContents();
-            for (int i = 0; i < items.length; i++) {
+            for (int i = 0; i < items.length && remaining > 0; i++) {
                 if (ItemUtils.isAirOrNull(items[i])) continue;
                 if (HypeBoxManager.isHypebox(items[i]) && HypeBoxManager.getHypeBoxFromItemStack(items[i]) == hypeBox) {
                     int amt = items[i].getAmount();
-                    if (amt == amount) {
+                    if (amt <= remaining) {
                         whoClicked.getInventory().setItem(i, null);  // Clears the slot
-                        return;
-                    } else if (amt > amount) {
-                        items[i].setAmount(items[i].getAmount() - amount);
-                        return;
+                        remaining -= amt;
                     } else {
-                        continue;
+                        items[i].setAmount(amt - remaining);
+                        remaining = 0;
                     }
                 }
             }
@@ -168,12 +165,13 @@ public class HypeboxQueueInventory {
     }
 
     private boolean playerHasHypeboxes(Player player, HypeBox hypeBox, int amount) {
+        int found = 0;
         for (ItemStack content : player.getInventory().getContents()) {
             if(HypeBoxManager.isHypebox(content) && HypeBoxManager.getHypeBoxFromItemStack(content) == hypeBox) {
-                return content.getAmount() >= amount;
+                found += content.getAmount();
             }
         }
-        return false;
+        return found >= amount;
     }
 
 }
