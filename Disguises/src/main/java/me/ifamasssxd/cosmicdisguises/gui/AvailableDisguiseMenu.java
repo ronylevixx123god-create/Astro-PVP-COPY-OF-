@@ -48,15 +48,24 @@ extends CosmicGUI {
     private final Set disguiseTypes;
 
     public AvailableDisguiseMenu(Player player, Set availableTypes) {
-        super(player, "Available Disguises", 36);
+        super(player, "Available Disguises", AvailableDisguiseMenu.menuSize());
         this.disguiseTypes = availableTypes;
+    }
+
+    /** room for every disguise (36 slots cut off Wolf and Zombie) */
+    private static int menuSize() {
+        int shown = 0;
+        for (DisguiseType type : DisguiseType.values()) {
+            if (!CosmicDisguises.get().getDisguiseManager().isDisabledDisguise(type) && !type.name().equals("UNKNOWN")) shown++;
+        }
+        return Math.max(36, (shown + 8) / 9 * 9);
     }
 
     public void redraw() {
         int index = 0;
         Disguise active = DisguiseAPI.getDisguise(this.player);
         for (DisguiseType type : DisguiseType.values()) {
-            if (CosmicDisguises.get().getDisguiseManager().isDisabledDisguise(type)) continue;
+            if (CosmicDisguises.get().getDisguiseManager().isDisabledDisguise(type) || type.name().equals("UNKNOWN")) continue;
             if (index >= this.size) break;
             EntityType entityType = type.getEntityType();
             boolean equipped = active != null && active.getType() == type;
