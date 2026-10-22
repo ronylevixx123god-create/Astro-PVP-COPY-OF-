@@ -164,10 +164,20 @@ public class EntityStackerListener implements Listener {
                 exp *= 2;
             }
 
+            // Treasure Chest custom block in the player's chunk: +50% mob EXP (metadata set by CustomSkullBlocks)
+            if (p.hasMetadata("astro_cb_mob_exp_multiplier")) {
+                exp *= p.getMetadata("astro_cb_mob_exp_multiplier").get(0).asDouble();
+            }
+
             GrindingCache cache = grindingManager.getGrindingCache(p);
             cache.addMobKilled(remove);
+            // Leviathan Totem custom block in the player's chunk: chance to double each mob's drops (metadata set by CustomSkullBlocks)
+            double doubleDropChance = p.hasMetadata("astro_cb_spawner_double_drop_chance") ? p.getMetadata("astro_cb_spawner_double_drop_chance").get(0).asDouble() : 0;
             while (remove != 0) {
                 blazeLoot(cache, p);
+                if (doubleDropChance > 0 && Math.random() < doubleDropChance) {
+                    blazeLoot(cache, p);
+                }
                 remove--;
             }
             cache.addExp((int) exp);
