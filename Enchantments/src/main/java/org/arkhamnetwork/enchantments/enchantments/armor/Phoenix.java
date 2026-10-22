@@ -91,10 +91,10 @@ public class Phoenix extends CustomEnchantment {
          boolean canUse = canUsePhoenix(player);
 
         if (!canUse) {
-            if (120L - (System.currentTimeMillis() - Phoenix.last_phoenix.get(player.getUniqueId().toString())) / 1000L != 0L) {
+            if (cooldownSeconds(player) - (System.currentTimeMillis() - Phoenix.last_phoenix.get(player.getUniqueId().toString())) / 1000L != 0L) {
                 player.sendMessage("");
             }
-            player.sendMessage(CC.translate("&c&l** PHOENIX ON COOLDOWN ** &7[" + TimeUtils.formatSeconds(120L - (System.currentTimeMillis() - Phoenix.last_phoenix.get(player.getUniqueId().toString())) / 1000L) + "]"));
+            player.sendMessage(CC.translate("&c&l** PHOENIX ON COOLDOWN ** &7[" + TimeUtils.formatSeconds(cooldownSeconds(player) - (System.currentTimeMillis() - Phoenix.last_phoenix.get(player.getUniqueId().toString())) / 1000L) + "]"));
             player.sendMessage("");
         }
         if (canUse) {
@@ -302,8 +302,16 @@ public class Phoenix extends CustomEnchantment {
         return false;
     }
 
+    /** 120 seconds; a Cauldron custom block in the player's chunk makes it 33% shorter (metadata set by CustomSkullBlocks) */
+    public static long cooldownSeconds( Player pl) {
+        if (pl.hasMetadata("astro_cb_phoenix_cooldown_multiplier")) {
+            return Math.round(120L * pl.getMetadata("astro_cb_phoenix_cooldown_multiplier").get(0).asDouble());
+        }
+        return 120L;
+    }
+
     public static boolean canUsePhoenix( Player pl) {
-        return !Phoenix.last_phoenix.containsKey(pl.getUniqueId().toString()) || System.currentTimeMillis() - Phoenix.last_phoenix.get(pl.getUniqueId().toString()) > 120000L;
+        return !Phoenix.last_phoenix.containsKey(pl.getUniqueId().toString()) || System.currentTimeMillis() - Phoenix.last_phoenix.get(pl.getUniqueId().toString()) > cooldownSeconds(pl) * 1000L;
     }
 
     public static int getPhoenixProcSoulCost( Player player) {

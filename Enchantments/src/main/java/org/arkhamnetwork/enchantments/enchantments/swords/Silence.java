@@ -41,6 +41,10 @@ public class Silence extends CustomEnchantment {
             solitudeLevel = EnchantmentAPI.getEnchantments(user.getEquipment().getItemInHand()).get(EnchantmentAPI.getEnchantment("Perfect Solitude")) * 2;
         }
         double chance = (double)(enchantLevel + solitudeLevel) * 0.09;
+        // Pumpkin Pie custom block in the attacker's chunk: +50% Silence chance (metadata set by CustomSkullBlocks)
+        if (user.hasMetadata("astro_cb_silence_chance_multiplier")) {
+            chance *= user.getMetadata("astro_cb_silence_chance_multiplier").get(0).asDouble();
+        }
         if (Math.random() < chance) {
             final Player pTarget = (Player) target;
             final long durationTicks = (enchantLevel + solitudeLevel) * 20L;
