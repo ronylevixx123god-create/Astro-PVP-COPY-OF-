@@ -103,7 +103,7 @@ public class CollectCategory implements Serializable {
     }
 
     public void sort() {
-        Arrays.sort(items, Comparator.comparing(a -> a.hasItemMeta() ? a.getItemMeta().getDisplayName(): a.getType().name()));
+        Arrays.sort(items, Comparator.comparing(a -> a.hasItemMeta() && a.getItemMeta().hasDisplayName() ? a.getItemMeta().getDisplayName() : a.getType().name()));
         List<ItemStack> stackedItems =  Arrays.stream(items).collect(Collectors.toList());
         stackedItems.removeIf(item -> item == null || item.getType() == Material.AIR);
         items = stackedItems.toArray(new ItemStack[0]);
