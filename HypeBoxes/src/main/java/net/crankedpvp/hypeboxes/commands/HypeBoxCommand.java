@@ -57,8 +57,9 @@ public class HypeBoxCommand extends CommandBase {
     @WrongUsage("&eUsage: /hb create <name> [amount of rewards]")
     public void createCommand(CommandSender commandSender, String lootbox) {
         Player player = (Player) commandSender;
-        if(plugin.getHypeBoxRegister().isHypebox(lootbox)) {
-            player.sendMessage(Language.PREFIX.getMessage() + Language.ALREADY_HYPEBOX.getMessage().replace("%lootbox%", lootbox));
+        String existing = this.findExistingName(lootbox);
+        if(existing != null) {
+            player.sendMessage(Language.PREFIX.getMessage() + Language.ALREADY_HYPEBOX.getMessage().replace("%lootbox%", existing));
             player.playSound(player.getLocation(), Sound.ANVIL_LAND, 2.0F, 2.0F);
             return;
         }
@@ -71,6 +72,23 @@ public class HypeBoxCommand extends CommandBase {
         player.sendMessage(Language.PREFIX.getMessage() + Language.CREATED_HYPEBOX.getMessage().replace("%lootbox%", lootbox));
         player.playSound(player.getLocation(), Sound.SUCCESSFUL_HIT, 2.0F, 2.0F);
         plugin.registerCommandCompletion();
+    }
+
+    /**
+     * A box with this name ignoring case, or null. Box files are <name>.yml and Windows file names ignore
+     * case, so "roni" would overwrite Roni.yml.
+     */
+    private String findExistingName(String lootbox) {
+        for (String id : this.plugin.getHypeBoxRegister().getHypeboxesAsIDs()) {
+            if (id.equalsIgnoreCase(lootbox)) return id;
+        }
+        File[] files = new File(this.plugin.getDataFolder(), "Hypeboxes").listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.getName().equalsIgnoreCase(lootbox + ".yml")) return file.getName().replace(".yml", "");
+            }
+        }
+        return null;
     }
 
     @SubCommand("delete")
