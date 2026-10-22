@@ -225,6 +225,13 @@
             <systemPath>${project.basedir}/lib/CosmicSpaceChests.jar</systemPath>
         </dependency>
         <dependency>
+            <groupId>net.astropvp</groupId>
+            <artifactId>Collect</artifactId>
+            <version>0.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/../AstroCollect/target/Collect.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>com.conaxgames</groupId>
             <artifactId>gkit</artifactId>
             <version>0.1</version>

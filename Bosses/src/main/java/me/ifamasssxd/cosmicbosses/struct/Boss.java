@@ -456,6 +456,8 @@ public abstract class Boss extends Equipable implements Healable {
 
     public HashMap<UUID, List<ItemStack>> givePlayerLootPool() {
         HashMap<UUID, List<ItemStack>> loot = new HashMap<>();
+        // rewards that don't fit in a player's inventory, put in their /collect stash at the end
+        Map<UUID, List<ItemStack>> overflow = new LinkedHashMap<>();
         LinkedList<Player> topDamage = getTopDamage(getLootPool().size(), true);
         int amountPerPerson = (int)Math.floor(getLootPool().size() / topDamage.size());
         if (amountPerPerson > 2)
@@ -472,7 +474,7 @@ public abstract class Boss extends Equipable implements Healable {
         Random random = new Random();
         int placement = 1;
         for (Player player : topDamage) {
-            boolean noRoom = title != null && this.random.nextInt(100) == 0 && !addItem(player, title);
+            boolean noRoom = title != null && this.random.nextInt(100) == 0 && !addItem(player, title, overflow);
             int coinsAmount = random.nextInt(250 - 100) + 100;
             MobcoinAPI.addMobcoins(player, coinsAmount);
             player.sendMessage(CC.translate("&6&l+ &6⛃&e" + coinsAmount));
@@ -481,7 +483,7 @@ public abstract class Boss extends Equipable implements Healable {
             for (int i = 0; i < amountPerPerson && !getLootPool().isEmpty(); i++) {
                 ItemStack reward = getLootPool().remove();
                 itemsReceived.add(reward);
-                if (!addItem(player, reward))
+                if (!addItem(player, reward, overflow))
                     noRoom = true;
                 player.playSound(player.getLocation(), Sound.LEVEL_UP, 3.0F, 0.4F);
             }
@@ -506,7 +508,7 @@ public abstract class Boss extends Equipable implements Healable {
                     continue;
                 ItemStack reward2 = getLootPool().remove();
                 lootGiven.add(reward2);
-                if (!addItem(pl, reward2))
+                if (!addItem(pl, reward2, overflow))
                     (new BukkitRunnable() {
                         public void run() {
                             if (pl.isValid())
@@ -516,10 +518,18 @@ public abstract class Boss extends Equipable implements Healable {
                 loot.put(pl.getUniqueId(), lootGiven);
             }
         }
+        if (!overflow.isEmpty()) {
+            for (Map.Entry<UUID, List<ItemStack>> entry : overflow.entrySet()) BossCollect.store(entry.getKey(), entry.getValue(), getName());
+        }
         return loot;
     }
 
-    private boolean addItem(Player player, ItemStack item) {
+    /** false when the inventory is full and the item goes to /collect instead (dropped on the floor when /collect isn't installed) */
+    private boolean addItem(Player player, ItemStack item, Map<UUID, List<ItemStack>> overflow) {
+        if (player.getInventory().firstEmpty() == -1 && BossCollect.available()) {
+            overflow.computeIfAbsent(player.getUniqueId(), k -> new ArrayList<>()).add(item.clone());
+            return false;
+        }
         PlayerUtil.giveOrDropProtectedItem(player, item.clone(), 1);
         return true;
     }
