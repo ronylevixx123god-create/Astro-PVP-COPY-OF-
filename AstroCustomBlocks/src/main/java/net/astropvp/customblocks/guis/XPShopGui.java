@@ -8,6 +8,8 @@ import com.google.common.collect.Lists;
 import dev.triumphteam.gui.guis.GuiItem;
 import dev.triumphteam.gui.guis.PaginatedGui;
 import me.ifamasssxd.cosmicguishop.CosmicGUIShop;
+import net.astropvp.customblocks.CustomBlocks;
+import net.astropvp.customblocks.struct.impl.DarkMatter;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -31,6 +33,11 @@ public class XPShopGui{
 
 
     public XPShopGui(Player player) {
+        this(player, null);
+    }
+
+    /** storage: the clicked Dark Matter, whose stored EXP can be deposited and withdrawn here */
+    public XPShopGui(Player player, DarkMatter storage) {
 
         this.expShopUI = new PaginatedGui(6, "EXP Space Storage");
         expShopUI.setDefaultClickAction(event -> {
@@ -65,7 +72,34 @@ public class XPShopGui{
             event.setCancelled(true);
         }));
 
-        expShopUI.setItem(6, 5, new GuiItem(createGUIItem(player)));
+        expShopUI.setItem(6, 5, new GuiItem(createGUIItem(player, storage)));
+        if (storage != null) {
+            expShopUI.setItem(6, 1, new GuiItem(createStorageButton(true), event -> {
+                int exp = player.getTotalExperience();
+                if (exp <= 0) {
+                    player.sendMessage(CC.Red + "You do not have any exp to deposit.");
+                    return;
+                }
+                player.setTotalExperience(0);
+                player.setExp(0);
+                player.setLevel(0);
+                storage.addExp(exp);
+                CustomBlocks.getInstance().getCustomBlockManager().saveAll();
+                player.sendMessage(CC.translate("&a&l(!)&a Deposited &f" + NumberFormat.getInstance().format(exp) + "&a XP into the Dark Matter."));
+                expShopUI.updateItem(6, 5, createGUIItem(player, storage));
+            }));
+            expShopUI.setItem(6, 9, new GuiItem(createStorageButton(false), event -> {
+                int exp = storage.takeExp(Integer.MAX_VALUE - Math.max(0, player.getTotalExperience()));
+                if (exp <= 0) {
+                    player.sendMessage(CC.Red + "There is no exp stored in this Dark Matter.");
+                    return;
+                }
+                player.giveExp(exp);
+                CustomBlocks.getInstance().getCustomBlockManager().saveAll();
+                player.sendMessage(CC.translate("&a&l(!)&a Withdrew &f" + NumberFormat.getInstance().format(exp) + "&a XP from the Dark Matter."));
+                expShopUI.updateItem(6, 5, createGUIItem(player, storage));
+            }));
+        }
 
 
         for (Map.Entry<ItemStack, Float> s : CosmicGUIShop.getInstance().getItemListSorted().entrySet()) {
@@ -120,6 +154,10 @@ public class XPShopGui{
 
 
     public ItemStack createGUIItem(Player player) {
+        return createGUIItem(player, null);
+    }
+
+    public ItemStack createGUIItem(Player player, DarkMatter storage) {
         ItemStack item = new ItemStack(Material.EXP_BOTTLE);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(CC.GreenB + "Astro EXP Shop");
@@ -128,10 +166,22 @@ public class XPShopGui{
         lore.add(CC.Gray + "you set up on AstroPvP");
         lore.add("");
         lore.add(CC.Green + "EXP Storage: " + CC.White + NumberFormat.getInstance().format(player.getTotalExperience()));
+        if (storage != null) {
+            lore.add(CC.Green + "Stored in this Dark Matter: " + CC.White + NumberFormat.getInstance().format(storage.getStoredExp()));
+        }
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;
     }
+    private ItemStack createStorageButton(boolean deposit) {
+        ItemStack item = new ItemStack(deposit ? Material.EXP_BOTTLE : Material.GLASS_BOTTLE);
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(deposit ? CC.GreenB + "Deposit EXP" : CC.YellowB + "Withdraw EXP");
+        meta.setLore(Lists.newArrayList(CC.Gray + (deposit ? "Click to store all of your EXP in this Dark Matter." : "Click to take all of the stored EXP.")));
+        item.setItemMeta(meta);
+        return item;
+    }
+
     public ItemStack createFillerItem() {
         ItemStack item = new ItemStack(Material.STAINED_GLASS_PANE, 1, DyeColor.GRAY.getData());
         ItemMeta meta = item.getItemMeta();

@@ -14,6 +14,7 @@ import net.astropvp.customblocks.struct.CustomBlock;
 import net.astropvp.customblocks.struct.CustomBlockType;
 import net.astropvp.customblocks.struct.abilities.LevelAble;
 import net.astropvp.customblocks.struct.abilities.SellBot;
+import net.astropvp.customblocks.struct.impl.Pinata;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -60,6 +61,13 @@ public class CustomBlockPlaceListener implements Listener {
             }
 
 
+            // a picked-up Pinata keeps its id; a copy of one that is placed or already claimed can't be placed
+            if (type == CustomBlockType.SPRING_2021_LOOTINATA && !Pinata.canPlace(Pinata.idOf(item))) {
+                event.getPlayer().sendMessage(CC.translate("&c&l(!)&c This Pinata can't be placed, it already exists or was already claimed."));
+                event.setCancelled(true);
+                return;
+            }
+
 /*            if (CustomBlocksAPI.getFactionCustomBlocksOfType(FactionUtils.getFactionId(event.getPlayer()), type) >= CustomBlocks.getInstance().getConfigManager().getConfig(ConfigManager.ConfigFile.SETTINGS).getInt("maxCustomBlocksPerTypeFaction") * FactionUtils.getFaction(event.getPlayer()).getFPlayers().size()) {
                 event.getPlayer().sendMessage(CC.translate("&c&l(!)&c This chunk already contains a " + type.getDisplayName() + " Custom Block!"));
                 event.setCancelled(true);
@@ -75,7 +83,13 @@ public class CustomBlockPlaceListener implements Listener {
             if (customBlock instanceof LevelAble) {
                 ((LevelAble) customBlock).setLevel(CustomBlocksAPI.getLevelFromItem(item));
             }
+            if (customBlock instanceof Pinata) {
+                ((Pinata) customBlock).loadFromItem(item);
+            }
             customBlockManager.addToCache(customBlock);
+            if (customBlock instanceof Pinata) {
+                customBlockManager.saveAll();
+            }
 
             if(customBlock instanceof SellBot) {
                 if (CollectorManager.DELEGATE.isCollectorContained(event.getBlock().getLocation().getChunk())) {
