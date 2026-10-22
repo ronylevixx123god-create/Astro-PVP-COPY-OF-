@@ -1,0 +1,12 @@
+name: CosmicCrate
+main: com.compilex.CosmicCrate.CosmicCrate
+version: 1.0
+softdepend: [CosmicPvPUtils]
+commands:
+  cosmiccrate:
+    description: Root command.
+    usage: /<command>
+    aliases: [ccrate, cc]
+  givecc:
+    description: Give a CC item to player.
+    usage: /<command>
