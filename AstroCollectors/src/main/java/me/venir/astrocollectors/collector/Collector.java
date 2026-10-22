@@ -59,7 +59,11 @@ public final class Collector {
     @Getter
     private Hologram hologram;
 
-    private final ItemStack mysteryLootbox = CosmicMysteryChest.get().getChestManager().getMysteryChestMap().get("GrindingLootbox").createClaimableItem(false);
+    // looked up when claimed: building it here threw (and no collector could be created) when the GrindingLootbox isn't set up
+    private static ItemStack grindingLootbox() {
+        me.ifamasssxd.cosmicmysterychest.struct.MysteryChest chest = CosmicMysteryChest.get().getChestManager().getMysteryChestMap().get("GrindingLootbox");
+        return chest == null ? null : chest.createClaimableItem(false);
+    }
 
     @Getter
     private List<EntityType> boosters;
@@ -157,11 +161,12 @@ public final class Collector {
     }
 
     public void addBooster(EntityType entity) {
-        this.boosters.add(entity);
+        // listed once: a second entry stayed behind when the booster was broken, so the boost never went away
+        if (!this.boosters.contains(entity)) this.boosters.add(entity);
     }
 
     public void removeBooster(EntityType entity) {
-        this.boosters.remove(entity);
+        this.boosters.removeIf(type -> type == entity);
     }
 
     public void sellWorth(Player player) {
@@ -173,6 +178,11 @@ public final class Collector {
     }
 
     public void claimLootboxes(Player player) {
+        ItemStack mysteryLootbox = grindingLootbox();
+        if (mysteryLootbox == null) {
+            player.sendMessage(CC.translate("&c&l(!)&c The Grinding Lootbox is not set up on this server yet, your lootboxes stay in the collector."));
+            return;
+        }
         while (player.getInventory().firstEmpty() != -1 && lootboxes > 0) {
             PlayerUtil.giveOrDropProtectedItem(player, mysteryLootbox, 60);
             removeLootbox(1);
@@ -218,12 +228,12 @@ public final class Collector {
         for (Map.Entry<EntityType, Integer> entry : getSpawnersInChunk().entrySet()) {
             EntityType type = entry.getKey();
             int amountSpawners = entry.getValue();
-            total += AstroCollectors.INSTANCE.getSpawnerUtil().getMoneyPerSecond(type) * secondsPassed * amountSpawners;
-            if(!(this.getBoosters() == null) && !this.getBoosters().isEmpty()) {
-                if (this.boosters.contains(type)) {
-                    total *= 1.2;
-                }
+            double earned = AstroCollectors.INSTANCE.getSpawnerUtil().getMoneyPerSecond(type) * secondsPassed * amountSpawners;
+            // a booster multiplies its own mob's money (it used to multiply everything added up before it)
+            if (this.getBoosters() != null && this.boosters.contains(type)) {
+                earned *= 1.2;
             }
+            total += earned;
         }
         if (HCFOutpostAPI.isControllingOutpost(FactionUtils.getFactionAt(this.getLocation()), OutpostType.THE_GREAT_HALL)) {
             total *= 1.25;
@@ -237,6 +247,8 @@ public final class Collector {
 
     public void updateBoosters() {
         List<EntityType> entityTypes = Arrays.asList(EntityType.ENDERMAN, EntityType.IRON_GOLEM, EntityType.MUSHROOM_COW, EntityType.GHAST, EntityType.SNOWMAN);
+        // rebuilt from the boosters actually in the chunk
+        this.boosters.clear();
         for (EntityType entityType : entityTypes) {
             if(checkCustomBlocks(entityType)) {
                 this.boosters.add(entityType);
