@@ -1,5 +1,6 @@
 package net.astropvp.gambling.crash.commands;
 
+import net.astropvp.gambling.MoneyAmount;
 import com.cosmicpvp.cosmicutils.utils.CC;
 import me.mattstudios.mf.annotations.*;
 import me.mattstudios.mf.base.CommandBase;
@@ -25,7 +26,8 @@ public class CrashCommand extends CommandBase {
     }
 
     @Default
-        public void defaultCommand(CommandSender commandSender, @Optional Double bet) {
+        public void defaultCommand(CommandSender commandSender, @Optional MoneyAmount betAmount) {
+        Double bet = betAmount == null ? null : betAmount.getValue();
         Player player = (Player)commandSender;
         if(bet == null) {
             CrashInventory crashInventory = new CrashInventory(player);

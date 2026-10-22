@@ -16,6 +16,7 @@
  */
 package net.astropvp.core.cosmiccoinflip.commands;
 
+import com.cosmicpvp.cosmicutils.utils.MoneyParser;
 import net.astropvp.core.cosmiccoinflip.struct.CoinFlipManager;
 import net.astropvp.core.cosmiccoinflip.struct.CoinFlipMatch;
 import net.astropvp.core.cosmiccoinflip.struct.WinLossStats;
@@ -113,9 +114,13 @@ implements CommandExecutor {
                 sender.sendMessage(ChatColor.RED + "You are already in a Coin Flip Match!");
                 return true;
             }
-            String number = args[0].replace("k", "000").replace("m", "000000").replace("b", "000000000");
-            if (StringUtils.isNumeric(number)) {
-                double val = Double.parseDouble(number);
+            Long wager = MoneyParser.parseWhole(args[0]);   // 100k, 1.5m, 1b ... whole dollars, as before
+            if (wager == null) {
+                sender.sendMessage(ChatColor.RED + "You must enter a valid amount to bet!");
+                return true;
+            }
+            {
+                double val = wager;
                 if (val <= 0.0) {
                     sender.sendMessage(ChatColor.RED + "You must enter a valid amount to bet!");
                     return true;

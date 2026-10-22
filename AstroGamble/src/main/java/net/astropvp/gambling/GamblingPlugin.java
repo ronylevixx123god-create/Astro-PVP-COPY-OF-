@@ -86,6 +86,12 @@ public class GamblingPlugin extends JavaPlugin {
     }
 
     private void registerCommandParameters() {
+        // bets: plain amounts or shorthand (100k, 1.5m, 1b); anything else is a wrong usage, like before
+        this.commandManager.getParameterHandler().register(MoneyAmount.class, argument -> {
+            java.math.BigDecimal amount = com.cosmicpvp.cosmicutils.utils.MoneyParser.parse(argument.toString());
+            if (amount == null) return new TypeResult(argument);
+            return new TypeResult(new MoneyAmount(amount.doubleValue()), argument);
+        });
         this.commandManager.getParameterHandler().register(OfflinePlayer.class, argument -> {
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(argument.toString());
             if(offlinePlayer == null) return new TypeResult(argument);

@@ -28,6 +28,7 @@
  */
 package me.recolance.auction.command;
 
+import com.cosmicpvp.cosmicutils.utils.MoneyParser;
 import com.cosmicpvp.cosmicutils.nbt.NBTTagCompoundBuilder;
 import com.cosmicpvp.cosmicutils.utils.CC;
 import com.cosmicpvp.cosmicutils.utils.NBTWrapper;
@@ -234,23 +235,14 @@ public class CommandHandler
         } else if (AuctionUtil.getItemsToCollectAmount(player) >= 6) {
             Util.message(player, "&cYou have too many items in your Collection Bin.");
             Util.message(player, "&7Claim those items before they vanish, &c/ah expired");
-        } else if (!Util.stringIsNumerical(price) && !CommandHandler.isValidAlternatePrice(price)) {
+        } else if (MoneyParser.parseWhole(price) == null) {
             Util.message(player, "&cThat is not a valid price.");
-        } else if (price.length() > 11) {
+        } else if (MoneyParser.parseWhole(price) > 99_999_999_999L) {   // was a text-length check that 100b slipped past
             Util.message(player, "&cYou can only list something for a max of $99,999,999,999.");
         } else {
-            Controller.attemptSell(player, item, CommandHandler.isValidAlternatePrice(price) ? Util.getMoneyValue(price) : Double.parseDouble(price));
+            Controller.attemptSell(player, item, MoneyParser.parseWhole(price));
         }
         return true;
-    }
-
-    private static boolean isValidAlternatePrice(String priceString) {
-        try {
-            long money = Util.getMoneyValue(priceString);
-            return money >= 0L && money <= Double.MAX_VALUE;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     public static boolean handleExpired(Player player) {
@@ -448,15 +440,7 @@ public class CommandHandler
     }
 
     private Long parseLongOrNull(String val) {
-        Long originalParse = Util.parseLongOrNull(val);
-        if (originalParse == null) {
-            try {
-                originalParse = Util.getMoneyValue(val);
-            } catch (Exception exception) {
-                // empty catch block
-            }
-        }
-        return originalParse;
+        return MoneyParser.parseWhole(val);   // 100k, 1.5m, 1b ...
     }
 
     private void handleToggle(Player pl) {
