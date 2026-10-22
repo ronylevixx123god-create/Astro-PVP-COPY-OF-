@@ -8,6 +8,7 @@ import net.crankedpvp.hypeboxes.HypeboxesPlugin;
 import net.crankedpvp.hypeboxes.interfaces.ActiveInventory;
 import net.crankedpvp.hypeboxes.struct.HypeBox;
 import net.crankedpvp.hypeboxes.utils.Arrow;
+import net.crankedpvp.hypeboxes.utils.InventoryUtils;
 import net.crankedpvp.hypeboxes.utils.ItemBuilder;
 import net.crankedpvp.hypeboxes.utils.LuckpermUtils;
 import org.bukkit.Bukkit;
@@ -29,7 +30,10 @@ public class HypeBoxAnimationInventory implements ActiveInventory {
 
     private final ItemStack[] itemStacks = new ItemStack[9];
 
+    @lombok.Getter
     private final Player player;
+
+    private final HypeBox hypebox;
 
     private boolean active = true;
 
@@ -44,6 +48,8 @@ public class HypeBoxAnimationInventory implements ActiveInventory {
 
     public HypeBoxAnimationInventory(Player player, HypeBox hypebox) {
         this.player = player;
+        this.hypebox = hypebox;
+        HypeboxesPlugin.getInstance().getActiveOpenings().add(this);
         this.amountOfSpins = 0;
         this.receivingItem = hypebox.pickRandomReward();
         this.hypeBoxAnimationInventory = new Gui(3, CC.translate(hypebox.getDisplayName()));
@@ -54,14 +60,7 @@ public class HypeBoxAnimationInventory implements ActiveInventory {
         this.hypeBoxAnimationInventory.setCloseGuiAction(inventoryCloseEvent -> {
             if(!inventoryCloseEvent.getPlayer().equals(player)) return;
             System.out.println(player.getName() + " has finished opening hypebox: " + hypebox.getId());
-            if(given) return;
-            active = false;
-            if(this.spinningTask != null) this.spinningTask.cancel();
-            given = true;
-            player.getInventory().addItem(receivingItem);
-            if(hypebox.doesBroadcast())Bukkit.broadcastMessage(CC.translate("&d&lHype Boxes &8" + Arrow.arrow() + " &f" + LuckpermUtils.getDisplayName(player) + " &fhas just opened a " + hypebox.getDisplayName() + "&r &fand received:"));
-            if(hypebox.doesBroadcast())Bukkit.broadcastMessage(CC.translate(" &f• &l" + receivingItem.getAmount() + "x &r" + (receivingItem.hasItemMeta() ? receivingItem.getItemMeta().getDisplayName() : receivingItem.getType().name())));
-
+            deliver();
         });
 
         for(int i = 0; i < 9; i++) {
@@ -71,6 +70,18 @@ public class HypeBoxAnimationInventory implements ActiveInventory {
         }
 
         runTask(hypebox);
+    }
+
+    /** gives the reward exactly once: when the opener closes the menu, logs out, or the plugin shuts down */
+    public void deliver() {
+        if(given) return;
+        active = false;
+        if(this.spinningTask != null) this.spinningTask.cancel();
+        given = true;
+        HypeboxesPlugin.getInstance().getActiveOpenings().remove(this);
+        InventoryUtils.giveItemToPlayer(player, receivingItem.clone());   // dropped at the player's feet if the inventory is full
+        if(hypebox.doesBroadcast())Bukkit.broadcastMessage(CC.translate("&d&lHype Boxes &8" + Arrow.arrow() + " &f" + LuckpermUtils.getDisplayName(player) + " &fhas just opened a " + hypebox.getDisplayName() + "&r &fand received:"));
+        if(hypebox.doesBroadcast())Bukkit.broadcastMessage(CC.translate(" &f• &l" + receivingItem.getAmount() + "x &r" + (receivingItem.hasItemMeta() ? receivingItem.getItemMeta().getDisplayName() : receivingItem.getType().name())));
     }
 
     public void shiftAllItems(HypeBox hypeBox) {

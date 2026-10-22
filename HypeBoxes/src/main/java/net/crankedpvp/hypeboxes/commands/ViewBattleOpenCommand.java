@@ -22,6 +22,7 @@ public class ViewBattleOpenCommand extends CommandBase {
 
     @Default
     public void defaultCommand(final Player player, String crateID) {
+        try { UUID.fromString(crateID); } catch (IllegalArgumentException e) { return; }
         if(!this.plugin.getHypeboxBattles().containsKey(UUID.fromString(crateID))) return;
 
         HypeboxBattleInventory hypeboxBattleInventory = this.plugin.getHypeboxBattles().get(UUID.fromString(crateID));

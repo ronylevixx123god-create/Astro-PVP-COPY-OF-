@@ -9,6 +9,7 @@ import net.crankedpvp.hypeboxes.struct.HypeBox;
 import net.crankedpvp.hypeboxes.struct.HypeBoxManager;
 import net.crankedpvp.hypeboxes.struct.battle.BattleQueueManager;
 import net.crankedpvp.hypeboxes.utils.Clickable;
+import net.crankedpvp.hypeboxes.utils.InventoryUtils;
 import net.crankedpvp.hypeboxes.utils.ItemBuilder;
 import net.crankedpvp.hypeboxes.utils.LuckpermUtils;
 import net.crankedpvp.hypeboxes.utils.SkullUtils;
@@ -37,11 +38,15 @@ public class HypeboxBattleCreateInventory {
 
     private boolean isSpinning = false;
 
+    @lombok.Getter
     private final Player player;
+
+    private boolean refunded = false;
 
     public HypeboxBattleCreateInventory(Player player) {
 
         this.player = player;
+        HypeboxesPlugin.getInstance().getActiveBattleCreates().add(this);
 
         this.preBattleInv = new Gui(3, "Create Battle");
         this.preBattleInv.setDefaultTopClickAction(event -> event.setCancelled(true));
@@ -73,16 +78,20 @@ public class HypeboxBattleCreateInventory {
             //tryOpenHypeboxBattle(player);
         }));
 
-        this.preBattleInv.setCloseGuiAction(event -> {
-            if(!isSpinning) {
-                hypeboxAmounts.forEach((hb, amt) -> {
-                    ItemStack itemStack = HypeboxesPlugin.getInstance().getHypeBoxRegister().getHypebox(hb).createHypeBox(amt);
-                    player.getInventory().addItem(itemStack);
-                    player.sendMessage(CC.translate("&aYour hype boxes have been refunded"));
-                });
-            }
-        });
+        this.preBattleInv.setCloseGuiAction(event -> refund());
 
+    }
+
+    /** gives back inserted boxes unless they went into a battle; runs once */
+    public void refund() {
+        HypeboxesPlugin.getInstance().getActiveBattleCreates().remove(this);
+        if(isSpinning || refunded) return;
+        refunded = true;
+        hypeboxAmounts.forEach((hb, amt) -> {
+            ItemStack itemStack = HypeboxesPlugin.getInstance().getHypeBoxRegister().getHypebox(hb).createHypeBox(amt);
+            InventoryUtils.giveItemToPlayer(player, itemStack);
+            player.sendMessage(CC.translate("&aYour hype boxes have been refunded"));
+        });
     }
 
     private void addPlayerToQueue(Player player) {

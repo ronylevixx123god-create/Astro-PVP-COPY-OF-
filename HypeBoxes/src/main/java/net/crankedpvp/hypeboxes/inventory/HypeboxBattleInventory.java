@@ -13,6 +13,7 @@ import net.crankedpvp.hypeboxes.struct.HypeBox;
 import net.crankedpvp.hypeboxes.struct.HypeBoxReward;
 import net.crankedpvp.hypeboxes.struct.battle.BattleInfo;
 import net.crankedpvp.hypeboxes.utils.Arrow;
+import net.crankedpvp.hypeboxes.utils.InventoryUtils;
 import net.crankedpvp.hypeboxes.utils.ItemBuilder;
 import net.crankedpvp.hypeboxes.utils.LuckpermUtils;
 import net.crankedpvp.hypeboxes.utils.SkullUtils;
@@ -114,10 +115,34 @@ public class HypeboxBattleInventory implements ActiveInventory {
     private void handleDraw() {
         Bukkit.broadcastMessage(CC.translate("&4&lHype Box Battles &8" + Arrow.arrow() + "&f" + LuckpermUtils.getDisplayName(player) + " &8(&e$" + this.playerWins.getValue() + "&8) &fhas &b&lDREW &fwith " + getDisplayName(opponent) + " &8(&e$" + this.opponentWins.getValue() + "&8) &fin a hype box battle &8(&4" + this.amountOfHypeboxes * 2 + " Hypeboxes&8)"));
         Bukkit.broadcastMessage(CC.translate("&fVisit &6buy.astropvp.net &fto purchase hype boxes! &7(/hypebox battle)"));
-        toGive.forEach((lb, amt) -> player.getInventory().addItem(HypeboxesPlugin.getInstance().getHypeBoxRegister().getHypebox(lb).createHypeBox(amt)));
+        refundBoxes(player);
         if(opponent != null) {
-            toGive.forEach((lb, amt) -> opponent.getInventory().addItem(HypeboxesPlugin.getInstance().getHypeBoxRegister().getHypebox(lb).createHypeBox(amt)));
+            refundBoxes(opponent);
         }
+    }
+
+    /** gives a player back the battle's boxes: inventory (dropped if full), or /collect when they're offline */
+    private void refundBoxes(Player to) {
+        List<ItemStack> boxes = new ArrayList<>();
+        toGive.forEach((lb, amt) -> {
+            HypeBox hypeBox = HypeboxesPlugin.getInstance().getHypeBoxRegister().getHypebox(lb);
+            if (hypeBox != null && amt > 0) boxes.add(hypeBox.createHypeBox(amt));
+        });
+        if (to.isOnline()) {
+            boxes.forEach(box -> InventoryUtils.giveItemToPlayer(to, box));
+        } else if (!boxes.isEmpty()) {
+            PlayerCollect collect = CollectPlugin.getInstance().getCollectManager().getOrCreate(to.getUniqueId().toString());
+            collect.add(new CollectCategory(CollectType.HYPEBOX_BATTLE, boxes.toArray(new ItemStack[0]), CC.DarkRedB + "Hype Box Battle Loot", System.currentTimeMillis()));
+        }
+    }
+
+    /** the server is shutting down before the battle finished: nobody wins, both get their boxes back */
+    public void refundIfUnfinished() {
+        if (!this.active) return;
+        this.active = false;
+        if (this.roller != null) this.roller.cancel();
+        refundBoxes(player);
+        if (opponent != null) refundBoxes(opponent);
     }
 
     private void handlePlayerWin() {

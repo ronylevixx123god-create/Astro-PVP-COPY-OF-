@@ -28,6 +28,10 @@ public class HypeboxPreviewListener implements Listener {
                 event.setCancelled(true);
                 final NBTItem nbtItem = new NBTItem(event.getItem());
                 final String name = nbtItem.getCompound("cosmicData").getString("hypeboxID");
+                if (!this.plugin.getHypeBoxRegister().isHypebox(name)) {
+                    event.getPlayer().sendMessage(Language.PREFIX.getMessage() + Language.HYPEBOX_INVALID.getMessage().replace("%lootbox%", name));
+                    return;
+                }
                 PreviewLootboxInventory previewLootInventory = new PreviewLootboxInventory(event.getPlayer(), name, this.plugin);
                 previewLootInventory.getUI().open(event.getPlayer());
                 event.getPlayer().sendMessage(Language.PREFIX.getMessage() + Language.PREVIEW_LOOT.getMessage().replace("%lootbox%", StringUtils.toNiceString(name)));
