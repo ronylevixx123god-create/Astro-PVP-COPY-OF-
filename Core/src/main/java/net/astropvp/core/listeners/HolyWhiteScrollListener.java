@@ -97,7 +97,7 @@ public class HolyWhiteScrollListener implements Listener {
                 boolean killerIsControllingFrozen = (FactionUtils.getFaction(killer).isNormal() && HCFOutpostAPI.isControllingOutpost(FactionUtils.getFaction(killer), OutpostType.THE_GREAT_HALL));
                 boolean isBansheed = e.getEntity().hasMetadata("banshee_scrolls");
                 boolean isUltraad = false;
-                double monoChance = getMonoChance(killer, killerIsControllingFrozen);
+                double monoChance = customBlockMonopoly(killer, getMonoChance(killer, killerIsControllingFrozen));
                 if (AstroArmorSetsAPI.getBonusCrystalsEquipped(e.getEntity().getPlayer()).containsKey(ArmorSetType.ASTRO))
                     monoChance *= 1.05;
                 if (AstroArmorSetsAPI.getCurrentArmorSet(e.getEntity().getPlayer()) != null) {
@@ -285,6 +285,14 @@ public class HolyWhiteScrollListener implements Listener {
 
     private String getPrefixFromMono(Player killer) {
         return MaskUtils.hasMaskEquipped(killer, "M_MONOPOLY") ? CC.translate("MUTATED MONOPOLY") : MaskUtils.hasMaskEquipped(killer, "MONOPOLY") ? "MONOPOLY" : "";
+    }
+
+    private static double customBlockMonopoly(Player killer, double chance) {
+        // Pumpkin Pie custom block in the killer's chunk: +25% Monopoly chance (metadata set by CustomSkullBlocks)
+        if (killer != null && killer.hasMetadata("astro_cb_monopoly_chance_multiplier")) {
+            return chance * killer.getMetadata("astro_cb_monopoly_chance_multiplier").get(0).asDouble();
+        }
+        return chance;
     }
 
     private double getMonoChance(Player killer, boolean killerIsControllingFrozen) {

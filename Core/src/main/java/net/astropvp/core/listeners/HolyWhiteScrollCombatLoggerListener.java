@@ -44,7 +44,7 @@ public class HolyWhiteScrollCombatLoggerListener implements Listener {
             for (ItemStack item : Lists.newArrayList(event.getInventoryItems())) {
                 if (item != null && item.getType() != Material.AIR) {
                     if (HolyWhiteScrollUtils.itemHasHolyWhitescroll(item)) {
-                        double chance = getChance(killer);
+                        double chance = customBlockMonopoly(killer, getChance(killer));
                         if (wearingMonopolyMask && Math.random() <= chance) {
                             HolyWhiteScrollUtils.removeHolyWhitescroll(item);
                             try {
@@ -80,6 +80,14 @@ public class HolyWhiteScrollCombatLoggerListener implements Listener {
             killer.sendMessage(CC.GreenB + "* MONOPOLY MASK [" + CC.Gray + event.getPlayerName() + " (+ " + ItemUtils.getDisplayName(item) + CC.Gray + ")" + CC.GreenB + "] *");
 
         }
+    }
+
+    private static double customBlockMonopoly(Player killer, double chance) {
+        // Pumpkin Pie custom block in the killer's chunk: +25% Monopoly chance (metadata set by CustomSkullBlocks)
+        if (killer != null && killer.hasMetadata("astro_cb_monopoly_chance_multiplier")) {
+            return chance * killer.getMetadata("astro_cb_monopoly_chance_multiplier").get(0).asDouble();
+        }
+        return chance;
     }
 
     private double getChance(Player killer) {
