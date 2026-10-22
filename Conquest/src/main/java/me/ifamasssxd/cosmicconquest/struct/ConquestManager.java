@@ -336,7 +336,13 @@ public class ConquestManager
         }
         location.getBlock().setType(Material.CHEST);
         final List<ItemStack> loot = new ArrayList<>();
-        loot.add(CosmicMysteryChest.get().getChestManager().getMysteryChestMap().get("ConquestLootbox").createClaimableItem(false));
+        // the chest used to fail to register (no defenders, hits did nothing) when this lootbox isn't set up
+        final me.ifamasssxd.cosmicmysterychest.struct.MysteryChest conquestLootbox = CosmicMysteryChest.get().getChestManager().getMysteryChestMap().get("ConquestLootbox");
+        if (conquestLootbox != null) {
+            loot.add(conquestLootbox.createClaimableItem(false));
+        } else {
+            Bukkit.getLogger().warning("[CosmicConquests] The ConquestLootbox lootbox is not set up (/mc create ConquestLootbox ...), this Conquest Chest has no final loot.");
+        }
         final Chest chest = (Chest) location.getBlock().getState();
         if (chest != null) {
             chest.getInventory().addItem(new ItemStack(Material.DIRT));
