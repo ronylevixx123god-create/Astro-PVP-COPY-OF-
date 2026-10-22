@@ -14,6 +14,7 @@
  */
 package me.ifamasssxd.cosmicguishop.commands;
 
+import com.cosmicpvp.cosmicutils.utils.MoneyParser;
 import me.ifamasssxd.cosmicguishop.ArkhamMoneyNotesAPI;
 import me.ifamasssxd.cosmicguishop.CosmicGUIShop;
 import org.bukkit.ChatColor;
@@ -34,18 +35,16 @@ public class CommandBankNote implements CommandExecutor {
             sender.sendMessage((Object)ChatColor.GRAY + "You can use keywords 'million', 'billion', 'trillion' for withdrawls.");
             return true;
         }
-        if (args[0].contains(".")) {
-            sender.sendMessage((Object)ChatColor.RED + "You cannot sign decimal amounts on cosmic notes.");
-            return true;
-        }
-        long withdraw_val = 0L;
-        try {
-            withdraw_val = ArkhamMoneyNotesAPI.getMoneyValue(args[0]);
-        }
-        catch (Exception err) {
+        java.math.BigDecimal amount = MoneyParser.parse(args[0]);   // 100k, 1.5m, 1b, 2 million ...
+        if (amount == null) {
             sender.sendMessage((Object)ChatColor.RED + "You specified an invalid withdrawl amount.");
             return true;
         }
+        if (amount.scale() > 0) {
+            sender.sendMessage((Object)ChatColor.RED + "You cannot sign decimal amounts on cosmic notes.");
+            return true;
+        }
+        long withdraw_val = amount.longValueExact();
         if ((double)withdraw_val > 1.0E15) {
             sender.sendMessage((Object)ChatColor.RED + "You cannot withdraw more than 1 Quadrillion in a single cosmic note!");
             return true;
