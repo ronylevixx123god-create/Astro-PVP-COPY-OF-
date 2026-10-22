@@ -6,17 +6,23 @@ import net.crankedpvp.hypeboxes.commands.HypeBoxCommand;
 import net.crankedpvp.hypeboxes.commands.ViewBattleOpenCommand;
 import net.crankedpvp.hypeboxes.commands.ViewHypeboxOpenCommand;
 import net.crankedpvp.hypeboxes.inventory.HypeBoxAnimationInventory;
+import net.crankedpvp.hypeboxes.inventory.HypeboxBattleCreateInventory;
 import net.crankedpvp.hypeboxes.inventory.HypeboxBattleInventory;
 import net.crankedpvp.hypeboxes.language.FileHandler;
+import net.crankedpvp.hypeboxes.listeners.BattleQueueListener;
 import net.crankedpvp.hypeboxes.listeners.HypeboxOpenListener;
 import net.crankedpvp.hypeboxes.listeners.HypeboxPreviewListener;
 import net.crankedpvp.hypeboxes.struct.HypeBoxManager;
 import net.crankedpvp.hypeboxes.struct.HypeBoxRegister;
+import net.crankedpvp.hypeboxes.struct.battle.BattleQueueManager;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 public class HypeboxesPlugin extends JavaPlugin {
 
@@ -40,6 +46,12 @@ public class HypeboxesPlugin extends JavaPlugin {
 
     @Getter
     private Map<UUID, HypeboxBattleInventory> hypeboxBattles;
+
+    @Getter
+    private final Set<HypeBoxAnimationInventory> activeOpenings = new HashSet<>();
+
+    @Getter
+    private final Set<HypeboxBattleCreateInventory> activeBattleCreates = new HashSet<>();
 
 
     @Override
@@ -69,10 +81,28 @@ public class HypeboxesPlugin extends JavaPlugin {
         this.registerListeners();
     }
 
+    @Override
+    public void onDisable() {
+        // a restart must not swallow rewards or boxes: finish openings, refund battles that haven't been played
+        for (HypeBoxAnimationInventory opening : new ArrayList<>(this.activeOpenings)) {
+            opening.deliver();
+            opening.getPlayer().closeInventory();
+        }
+        for (HypeboxBattleCreateInventory create : new ArrayList<>(this.activeBattleCreates)) {
+            create.refund();
+            create.getPlayer().closeInventory();
+        }
+        for (org.bukkit.entity.Player queued : new ArrayList<>(BattleQueueManager.getBattleQueue().keySet())) {
+            BattleQueueManager.refund(queued);
+        }
+        if (this.hypeboxBattles != null) this.hypeboxBattles.values().forEach(HypeboxBattleInventory::refundIfUnfinished);
+    }
+
     private void registerListeners() {
         PluginManager pluginManager = this.getServer().getPluginManager();
         pluginManager.registerEvents(new HypeboxOpenListener(this), this);
         pluginManager.registerEvents(new HypeboxPreviewListener(this), this);
+        pluginManager.registerEvents(new BattleQueueListener(), this);
     }
 
     public void registerCommandCompletion() {

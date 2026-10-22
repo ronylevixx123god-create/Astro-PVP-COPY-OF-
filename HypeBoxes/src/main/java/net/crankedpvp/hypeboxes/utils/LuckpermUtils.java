@@ -43,7 +43,9 @@ public class LuckpermUtils {
 
 
     public static String getDisplayName(Player player) {
-        return CC.translate(Objects.requireNonNull(lpUserManager.getUser(player.getUniqueId())).getCachedData().getMetaData().getPrefix() + " " +  player.getName());
+        User user = lpUserManager.getUser(player.getUniqueId());
+        String prefix = user == null ? null : user.getCachedData().getMetaData().getPrefix();
+        return CC.translate(prefix == null ? player.getName() : prefix + " " + player.getName());
     }
 
     public static String getRankPrefix(Player player) {

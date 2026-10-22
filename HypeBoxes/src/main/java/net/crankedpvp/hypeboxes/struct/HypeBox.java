@@ -92,11 +92,7 @@ public class HypeBox {
     }
 
     public ItemStack pickRandomReward() {
-        final Map<ItemStack, Double> rewards = new HashMap<>();
-        this.getRewards().stream()
-                .filter(Objects::nonNull)
-                .forEach(reward -> rewards.put(reward.getItemStack(), reward.getChance()));
-        return RandomUtils.getRandomItem(rewards);
+        return pickRandomRewardAsReward().getItemStack();
     }
 
     public boolean doesBroadcast() {
