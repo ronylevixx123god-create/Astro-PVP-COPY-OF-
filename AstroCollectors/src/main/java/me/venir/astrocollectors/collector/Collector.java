@@ -59,7 +59,11 @@ public final class Collector {
     @Getter
     private Hologram hologram;
 
-    private final ItemStack mysteryLootbox = CosmicMysteryChest.get().getChestManager().getMysteryChestMap().get("GrindingLootbox").createClaimableItem(false);
+    // looked up when claimed: building it here threw (and no collector could be created) when the GrindingLootbox isn't set up
+    private static ItemStack grindingLootbox() {
+        me.ifamasssxd.cosmicmysterychest.struct.MysteryChest chest = CosmicMysteryChest.get().getChestManager().getMysteryChestMap().get("GrindingLootbox");
+        return chest == null ? null : chest.createClaimableItem(false);
+    }
 
     @Getter
     private List<EntityType> boosters;
@@ -174,6 +178,11 @@ public final class Collector {
     }
 
     public void claimLootboxes(Player player) {
+        ItemStack mysteryLootbox = grindingLootbox();
+        if (mysteryLootbox == null) {
+            player.sendMessage(CC.translate("&c&l(!)&c The Grinding Lootbox is not set up on this server yet, your lootboxes stay in the collector."));
+            return;
+        }
         while (player.getInventory().firstEmpty() != -1 && lootboxes > 0) {
             PlayerUtil.giveOrDropProtectedItem(player, mysteryLootbox, 60);
             removeLootbox(1);
