@@ -10,13 +10,6 @@ commands:
   lbtoggle:
     description: Lootbox Anmiation Toggle
     aliases: [ togglelb, lootboxtoggle, am ]
-  cosmiccrate:
-    description: Root command.
-    usage: /<command>
-    aliases: [ ccrate, cc ]
-  givecc:
-    description: Give a CC item to player.
-    usage: /<command>
   givehalflootbox:
     description: Gives a half lootbox
     aliases: [halflootbox]
