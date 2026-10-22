@@ -564,7 +564,7 @@ public class AstroCore extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ArmorColorClickListener(), this);
         getServer().getPluginManager().registerEvents(new BlockCommand(), this);
         getServer().getPluginManager().registerEvents(new SoulItemListener(), this);
-        getServer().getPluginManager().registerEvents(new HolyWhiteScrollListener(), this);
+        getServer().getPluginManager().registerEvents(this.holyWhiteScrollListener = new HolyWhiteScrollListener(), this);
         getServer().getPluginManager().registerEvents(new ThrowableCreeperEggs(), this);
         getServer().getPluginManager().registerEvents(new EnchantmentCoderInventoryListener(), this);
         getServer().getPluginManager().registerEvents(new EnchantmentCoderItemListener(), this);
