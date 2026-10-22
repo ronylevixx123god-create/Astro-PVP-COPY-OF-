@@ -223,7 +223,8 @@ public final class Collector {
         long current = System.currentTimeMillis();
         long secondsPassed = (current - this.getLastUpdated()) / 1000;
         double total = 0;
-
+        // rescanned here: collectors load before AstroCustomBlocks' blocks at startup, so boosters were lost after a restart
+        this.updateBoosters();
 
         for (Map.Entry<EntityType, Integer> entry : getSpawnersInChunk().entrySet()) {
             EntityType type = entry.getKey();
