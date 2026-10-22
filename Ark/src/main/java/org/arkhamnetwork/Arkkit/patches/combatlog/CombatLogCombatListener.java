@@ -69,6 +69,7 @@ public class CombatLogCombatListener
                 if (e.getEntity() instanceof Player) {
                     Player pHurt = (Player) e.getEntity();
                     pHurt.setMetadata("lastPlayerDamagerUUID", new FixedMetadataValue(Arkkit.get(), pDamager.getUniqueId()));
+                    pHurt.setMetadata("lastPlayerDamagerTime", new FixedMetadataValue(Arkkit.get(), System.currentTimeMillis()));
                     if (!pHurt.canSee(pDamager)) {
                         boolean allowedToOverride;
                         boolean hasFeignDeath = pDamager.hasMetadata("feign_vanish");
