@@ -7,6 +7,9 @@ import com.cosmicpvp.cosmicutils.utils.CC;
 import com.cosmicpvp.cosmicutils.utils.ItemUtils;
 import com.cosmicpvp.cosmicutils.utils.MaskUtils;
 import com.google.common.collect.Lists;
+import net.astropvp.CollectPlugin;
+import net.astropvp.struct.CollectCategory;
+import net.astropvp.struct.CollectType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,6 +44,7 @@ public class HolyWhiteScrollCombatLoggerListener implements Listener {
                     killer = (e.getDamager() instanceof Player) ? (Player)e.getDamager() : (Player)((Projectile)e.getDamager()).getShooter();
             }
             boolean wearingMonopolyMask = isWearingMonopoly(killer);
+            boolean toCollect = killer != null && isCollectWorld(entity.getWorld().getName()) && isCollectWorld(killer.getWorld().getName());
             for (ItemStack item : Lists.newArrayList(event.getInventoryItems())) {
                 if (item != null && item.getType() != Material.AIR) {
                     if (HolyWhiteScrollUtils.itemHasHolyWhitescroll(item)) {
@@ -57,8 +61,10 @@ public class HolyWhiteScrollCombatLoggerListener implements Listener {
                             entity.getWorld().playSound(entity.getLocation(), Sound.WITHER_SHOOT, 3.0F, 10.0F);
                             sendMessage(killer, event, item);
                             Bukkit.getLogger().info("Dropping " + item + " due to " + killer.getName() + "'s Monopoly Mask procing.");
-                            event.getInventoryItems().remove(item);
-                            entity.getWorld().dropItemNaturally(entity.getLocation(), item);
+                            if (!toCollect) {
+                                event.getInventoryItems().remove(item);
+                                entity.getWorld().dropItemNaturally(entity.getLocation(), item);
+                            }
                         } else {
                             savedItems.add(item);
                             event.getInventoryItems().remove(item);
@@ -70,7 +76,29 @@ public class HolyWhiteScrollCombatLoggerListener implements Listener {
                     }
                 }
             }
+            if (toCollect)
+                collectLoot(killer, event);
         }
+    }
+
+    private static boolean isCollectWorld(String world) {
+        return world.equals("world") || world.equals("flat") || world.equals("world_ruins");
+    }
+
+    // like a PvP kill (HolyWhiteScrollListener.onPlayerDeath): the logger's loot goes to the killer's /collect, potions
+    // removed; the emptied list leaves Arkkit nothing to drop
+    private void collectLoot(Player killer, CombatLoggerDeathEvent event) {
+        List<ItemStack> loot = new ArrayList<>();
+        for (ItemStack item : event.getInventoryItems()) {
+            if (item != null && item.getType() != Material.AIR && item.getType() != Material.POTION)
+                loot.add(item);
+        }
+        event.getInventoryItems().clear();
+        if (loot.isEmpty()) return;
+        CollectPlugin.getInstance().getCollectManager().getOrCreate(killer.getUniqueId().toString()).add(new CollectCategory(CollectType.DEATH_INVENTORY, loot.toArray(new ItemStack[0]), CC.RedB + event.getPlayerName() + "'s Death Inventory", System.currentTimeMillis()));
+        killer.sendMessage("");
+        killer.sendMessage(CC.translate("&3&l(&b&lCOLLECT&3&l)&b The Death Loot from &f" + event.getPlayerName() + "&b has been put into your &f/collect&b."));
+        killer.sendMessage("");
     }
 
     private void sendMessage(Player killer, CombatLoggerDeathEvent event, ItemStack item) {
@@ -91,7 +119,7 @@ public class HolyWhiteScrollCombatLoggerListener implements Listener {
     }
 
     private double getChance(Player killer) {
-        return MaskUtils.hasMaskEquipped(killer, "M_MONOPOLY") ? 0.66 : MaskUtils.hasMaskEquipped(killer, "M_MONOPOLY") ? 0.33 : 0;
+        return MaskUtils.hasMaskEquipped(killer, "M_MONOPOLY") ? 0.66 : MaskUtils.hasMaskEquipped(killer, "MONOPOLY") ? 0.33 : 0;
     }
 
     private boolean isWearingMonopoly(Player killer) {
