@@ -22,6 +22,8 @@ public enum LootTable {
     ABANDONED_SPACESHIP_DUNGEON(Material.EYE_OF_ENDER, ChatColor.GOLD),
     DESTROYED_OUTPOST_DUNGEON(Material.EYE_OF_ENDER, ChatColor.RED),
     PLANET_NUL_DUNGEON(Material.EYE_OF_ENDER, ChatColor.DARK_GRAY),
+    // AstroCustomBlocks Pinata rewards
+    PINATA(Material.NOTE_BLOCK, ChatColor.LIGHT_PURPLE),
     ;
 
     private final Material material;
