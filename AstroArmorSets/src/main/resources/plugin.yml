@@ -21,6 +21,9 @@ commands:
     aliases: ['aarmorset', 'aset', 'asets' ]
 
   heroicfix:
+  masteryshard:
+    description: Mastery Shard
+    aliases: [masteryshards]
 permissions:
   astroarmorsets.admin:
     description: Take armor out of the /armorsets menu.

@@ -54,6 +54,7 @@ public class AstroArmorSets extends JavaPlugin {
         getCommand("armorsets").setExecutor(new CommandOpenGUI());
         getCommand("aarmorset").setExecutor(new CommandAdminArmorSet());
         getCommand("heroicfix").setExecutor(new CommandHeroicFix());
+        getCommand("masteryshard").setExecutor(new CommandMasteryShard());
 
 
 
@@ -68,6 +69,7 @@ public class AstroArmorSets extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new GUIInventoryListener(), this);
         getServer().getPluginManager().registerEvents(new ArmorSetDamageListener(), this);
         getServer().getPluginManager().registerEvents(new RangerSetListener(), this);
+        getServer().getPluginManager().registerEvents(new MasteryShardListener(), this);
 
 
 

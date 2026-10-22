@@ -43,9 +43,11 @@ public enum AntiMkit {
                 CC.Gray + "Apply to an enchantment book",
                 CC.Gray + "to imbue it with the power to",
                 CC.Gray + "affect " + this.displayName + CC.Gray + " Mastery Kit items.")).data(this.masteryShardItem.getData()).build())).setString("cosmicType", "MASTERY_SHARD")
-                .setNBTBase("cosmicData", (new NBTTagCompoundBuilder())
+                .setNBTBase("conaxData", (new NBTTagCompoundBuilder())
                         .setString("masteryShard", name()).get())
                 .build();
+        if (applyIID)
+            item = new NBTWrapper(item).assignIID().build();
 
         return item;
     }
@@ -53,7 +55,7 @@ public enum AntiMkit {
     public static AntiMkit getSetFromMasteryShard(ItemStack masteryShard) {
         NBTWrapper cursorWrapper = new NBTWrapper(masteryShard);
         if (cursorWrapper.getString("cosmicType").equals("MASTERY_SHARD")) {
-            NBTTagCompoundBuilder builder = cursorWrapper.getCompound("cosmicData");
+            NBTTagCompoundBuilder builder = cursorWrapper.getCompound("conaxData");
             if (builder != null && builder.hasKey("masteryShard"))
                 return AstroArmorSetsAPI.mkitFromName(builder.getString("masteryShard"));
         }
@@ -61,10 +63,10 @@ public enum AntiMkit {
     }
 
     public NBTWrapper applyAbilityNBT(NBTWrapper wrapper) {
-        NBTTagCompoundBuilder builder = wrapper.getCompoundOrCreate("cosmicData");
+        NBTTagCompoundBuilder builder = wrapper.getCompoundOrCreate("conaxData");
         builder.setString("abilitySet", name());
         builder.setShort("noEnchants", (short) 1);
-        wrapper.setNBTBase("cosmicData", builder.get());
+        wrapper.setNBTBase("conaxData", builder.get());
         return wrapper;
     }
 
