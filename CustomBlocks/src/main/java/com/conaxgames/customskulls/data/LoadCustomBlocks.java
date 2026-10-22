@@ -33,6 +33,10 @@ public class LoadCustomBlocks {
             String ability = ymlFile.getString("ability");
             Location location = (Location) ymlFile.get("location");
             AbilityType abilityType = AbilityType.valueOf(ability);
+            if (CoreSkulls.isRunByAstroCustomBlocks(ability)) {
+                // AstroCustomBlocks has its own record of this block; the file is left as it is
+                continue;
+            }
             long lastActivated = ymlFile.getLong("lastActivated");
             int level = ymlFile.getInt("level");
 

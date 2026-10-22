@@ -39,6 +39,14 @@ public class CoreSkulls extends JavaPlugin {
 
     public static Map<String, CustomBlock> customBlocks = new HashMap<>();
 
+    // these have the same item as an AstroCustomBlocks block and are placed and run by AstroCustomBlocks
+    private static final java.util.Set<String> RUN_BY_ASTRO_CUSTOM_BLOCKS = new java.util.HashSet<>(java.util.Arrays.asList(
+            "COSMIC_TOKEN_GENERATOR", "BLAZE_STONE_TOTEM", "SECURITY_SYSTEM"));
+
+    public static boolean isRunByAstroCustomBlocks(String type) {
+        return RUN_BY_ASTRO_CUSTOM_BLOCKS.contains(type);
+    }
+
     private static Field bukkitCommand;
 
     @Setter
@@ -74,6 +82,9 @@ public class CoreSkulls extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new CustomBlockListener(), this);
         getServer().getPluginManager().registerEvents(new CustomAbilityListener(), this);
         getServer().getPluginManager().registerEvents(new CrateKeyGUIListener(), this);
+        com.conaxgames.customskulls.listeners.SeasonalEffects seasonalEffects = new com.conaxgames.customskulls.listeners.SeasonalEffects();
+        getServer().getPluginManager().registerEvents(seasonalEffects, this);
+        getServer().getScheduler().runTaskTimer(this, seasonalEffects, 20L, 20L);
         mobStackerUtils = AstroSpawners.getInstance().getMobStackerUtils();
         this.mobGrinderManager = new MobGrinderManager();
 

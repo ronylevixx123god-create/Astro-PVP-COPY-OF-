@@ -105,6 +105,23 @@ public class CustomBlockListener implements Listener {
         if (!(CustomBlockUtil.isCustomItem(item))) {
             return;
         }
+        // AstroCustomBlocks items have the same format: not ours, or a type AstroCustomBlocks runs
+        CustomBlock placing = CustomBlockUtil.getCustomItem(item);
+        if (placing == null || CoreSkulls.isRunByAstroCustomBlocks(placing.getIdentifier())) {
+            return;
+        }
+        // a player without a faction used to pass the own-claim check in wilderness (both are "Wilderness")
+        com.massivecraft.factions.FPlayer fPlayer = com.massivecraft.factions.FPlayers.getInstance().getByPlayer(player);
+        if (fPlayer == null || !fPlayer.hasFaction()) {
+            player.sendMessage(CC.translate("&c&l(!)&c You cannot place custom blocks without a faction (/f create <name>)"));
+            event.setCancelled(true);
+            return;
+        }
+        if (com.cosmicpvp.cosmicutils.utils.FactionUtils.isWilderness(event.getBlock().getLocation())) {
+            player.sendMessage(CC.translate("&c&l(!)&c You cannot place custom blocks in wilderness!"));
+            event.setCancelled(true);
+            return;
+        }
 
 /*        if (!ChunkUtil.isLocationAInSameChunkAsLocationB(event.getPlayer().getLocation(), event.getBlockAgainst().getLocation())) {
             player.sendMessage(CC.translate("&c&l(!)&c You must stand in the same chunk as the block you are placing against."));
