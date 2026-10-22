@@ -20,10 +20,10 @@ public class CommandPhoenixCooldown
         if (args.length == 0) {
             boolean canUse = Phoenix.canUsePhoenix(player);
             if (!canUse) {
-                if (120L - (System.currentTimeMillis() - Phoenix.last_phoenix.get(player.getUniqueId().toString())) / 1000L != 0L) {
+                if (Phoenix.cooldownSeconds(player) - (System.currentTimeMillis() - Phoenix.last_phoenix.get(player.getUniqueId().toString())) / 1000L != 0L) {
                     player.sendMessage("");
                 }
-                player.sendMessage(CC.translate((String)("&c&l** PHOENIX ON COOLDOWN ** &7[" + TimeUtils.formatSeconds((long)(120L - (System.currentTimeMillis() - Phoenix.last_phoenix.get(player.getUniqueId().toString())) / 1000L)) + "]")));
+                player.sendMessage(CC.translate((String)("&c&l** PHOENIX ON COOLDOWN ** &7[" + TimeUtils.formatSeconds((long)(Phoenix.cooldownSeconds(player) - (System.currentTimeMillis() - Phoenix.last_phoenix.get(player.getUniqueId().toString())) / 1000L)) + "]")));
                 player.sendMessage("");
                 return true;
             }
@@ -42,10 +42,10 @@ public class CommandPhoenixCooldown
             }
             boolean canUse = Phoenix.canUsePhoenix(target);
             if (!canUse) {
-                if (120L - (System.currentTimeMillis() - Phoenix.last_phoenix.get(target.getUniqueId().toString())) / 1000L != 0L) {
+                if (Phoenix.cooldownSeconds(target) - (System.currentTimeMillis() - Phoenix.last_phoenix.get(target.getUniqueId().toString())) / 1000L != 0L) {
                     player.sendMessage("");
                 }
-                player.sendMessage(CC.translate((String)("&c&l** " + target.getName() + "'s PHOENIX IS ON COOLDOWN ** &7[" + TimeUtils.formatSeconds((long)(120L - (System.currentTimeMillis() - Phoenix.last_phoenix.get(target.getUniqueId().toString())) / 1000L)) + "]")));
+                player.sendMessage(CC.translate((String)("&c&l** " + target.getName() + "'s PHOENIX IS ON COOLDOWN ** &7[" + TimeUtils.formatSeconds((long)(Phoenix.cooldownSeconds(target) - (System.currentTimeMillis() - Phoenix.last_phoenix.get(target.getUniqueId().toString())) / 1000L)) + "]")));
                 player.sendMessage("");
                 return true;
             }
