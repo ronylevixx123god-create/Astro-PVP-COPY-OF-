@@ -27,6 +27,10 @@ public class CrashCommand extends CommandBase {
 
     @Default
         public void defaultCommand(CommandSender commandSender, @Optional MoneyAmount betAmount) {
+        if (betAmount != null && betAmount.isInvalid()) {
+            commandSender.sendMessage(CC.translate("&cInvalid bet amount: " + betAmount.getInput()));
+            return;
+        }
         Double bet = betAmount == null ? null : betAmount.getValue();
         Player player = (Player)commandSender;
         if(bet == null) {
