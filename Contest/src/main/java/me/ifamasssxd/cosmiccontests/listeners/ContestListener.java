@@ -161,7 +161,7 @@ implements Listener {
         if (event.getEntity().getKiller() != null) {
             Player killer = event.getEntity().getKiller();
             ContestUser user = ContestUser.getUser(killer.getUniqueId());
-            if (event.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+            if (user != null && event.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
                 for (Contests active : CosmicContests.get().getContestManager().getActiveContests()) {
                     EntityKillContest found;
                     if (!(active.getContest() instanceof EntityKillContest) || (found = (EntityKillContest)active.getContest()).getEntityType() != null && found.getEntityType() != EntityType.UNKNOWN && found.getEntityType() != event.getEntityType()) continue;
