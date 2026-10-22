@@ -64,7 +64,7 @@ public class CustomBlocks extends JavaPlugin {
 
     private void registerCommandParameters() {
         this.commandManager.getParameterHandler().register(CustomBlockType.class, argument -> {
-            CustomBlockType ecoUpdate = CustomBlockType.valueOf(String.valueOf(argument));
+            CustomBlockType ecoUpdate = CustomBlockType.fromName(String.valueOf(argument));
             return new TypeResult(ecoUpdate, argument);
         });
     }

@@ -17,6 +17,13 @@ public class AddCBlockCommand extends CommandBase {
     @Default
     @Permission("sav.*")
     public void defCmd(Player player, String string) {
+        // an unknown or lowercase name used to be stored as typed, and the block then failed when placed
+        net.astropvp.customblocks.struct.CustomBlockType type = net.astropvp.customblocks.struct.CustomBlockType.fromName(string);
+        if (type == null) {
+            player.sendMessage(net.astropvp.customblocks.struct.CustomBlockType.unknownTypeMessage(string));
+            return;
+        }
+        string = type.name();
         ItemStack itemStack = player.getItemInHand();
         NBTWrapper nbtItem = new NBTWrapper(itemStack);
         NBTTagCompoundBuilder cosmicData = nbtItem.hasKey("cosmicData") ? new NBTTagCompoundBuilder(nbtItem.getNBTBase("cosmicData")) : new NBTTagCompoundBuilder();

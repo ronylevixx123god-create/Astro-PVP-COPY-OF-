@@ -15,7 +15,12 @@ public class RemoveCustomBlockCommand extends CommandBase {
 
     @Default
     @Permission("cblocks.remove")
-    public void removeCblock(Player player, @Completion("#cblocks") CustomBlockType customBlockType) {
+    public void removeCblock(Player player, @Completion("#cblocks") String typeName) {
+        CustomBlockType customBlockType = CustomBlockType.fromName(typeName);
+        if (customBlockType == null) {
+            player.sendMessage(CustomBlockType.unknownTypeMessage(typeName));
+            return;
+        }
         if(!CustomBlocksAPI.chunkContainsCustomBlock(player.getLocation(), customBlockType)) {
             player.sendMessage(CC.translate("&cThere is no " + customBlockType.name() + " in this chunk"));
             return;
