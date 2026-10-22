@@ -1,0 +1,13 @@
+name: CosmicCrate
+main: com.compilex.CosmicCrate.CosmicCrate
+version: 1.0
+depend: [CosmicPvPUtils, Arkkit, CosmicSpaceChests, CosmicMysteryChest, AstroSlotBot, CosmicSkyCustomItems, Enchantments]
+softdepend: [LuckPerms]
+commands:
+  cosmiccrate:
+    description: Root command.
+    usage: /<command>
+    aliases: [ccrate, cc]
+  givecc:
+    description: Give a CC item to player.
+    usage: /<command>

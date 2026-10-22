@@ -90,6 +90,7 @@
         <module>ChatGames</module>
         <module>SpaceRecode</module>
         <module>LPXPatches</module>
+        <module>CosmicCrate</module>
     </modules>
 
     <properties>
