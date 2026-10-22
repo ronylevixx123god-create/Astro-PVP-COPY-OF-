@@ -42,7 +42,9 @@ public class SeasonalEffects implements Listener, Runnable {
     public static final String SLOTBOT_FREE_ROLL = "astro_cb_slotbot_free_roll_chance";
     public static final String LOOTBOX_BONUS = "astro_cb_lootbox_bonus_chance";
     public static final String SPAWNER_DOUBLE_DROPS = "astro_cb_spawner_double_drop_chance";
-    private static final String[] KEYS = {OUTGOING_DAMAGE, INCOMING_DAMAGE, SILENCE_CHANCE, MONOPOLY_CHANCE, PHOENIX_COOLDOWN, SLOTBOT_FREE_ROLL, LOOTBOX_BONUS, SPAWNER_DOUBLE_DROPS};
+    // stacked spawner mobs (AstroSpawners) give their EXP through the grinding menu, not as dropped orbs
+    public static final String MOB_EXP = "astro_cb_mob_exp_multiplier";
+    private static final String[] KEYS = {OUTGOING_DAMAGE, INCOMING_DAMAGE, SILENCE_CHANCE, MONOPOLY_CHANCE, PHOENIX_COOLDOWN, SLOTBOT_FREE_ROLL, LOOTBOX_BONUS, SPAWNER_DOUBLE_DROPS, MOB_EXP};
 
     private static final Set<AbilityType> SEASONAL = EnumSet.of(AbilityType.HALLOWEEN_CAULDRON, AbilityType.THANKSGIVING_PIE, AbilityType.TREASURE_CHEST,
             AbilityType.COSMIC_TROPHY, AbilityType.LEVIATHAN_TOTEM, AbilityType.HALLOWEEN_CANDLES);
@@ -96,6 +98,9 @@ public class SeasonalEffects implements Listener, Runnable {
                         break;
                     case LEVIATHAN_TOTEM:
                         values.put(SPAWNER_DOUBLE_DROPS, setting("leviathanTotemDoubleDropChance", 0.25));
+                        break;
+                    case TREASURE_CHEST:
+                        values.put(MOB_EXP, setting("treasureChestMobExp", 1.5));
                         break;
                     default:
                         break;
