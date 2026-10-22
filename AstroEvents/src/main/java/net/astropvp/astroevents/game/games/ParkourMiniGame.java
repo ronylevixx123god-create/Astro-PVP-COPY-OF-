@@ -26,9 +26,11 @@ import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -47,6 +49,7 @@ public class ParkourMiniGame extends MiniGame<ParkourPlayer> {
     private final String parkourTimeMessage;
     private final ItemStack checkpointItem;
     private final ItemStack leaveItem;
+    private final double fallTeleportY;
 
     public ParkourMiniGame(AstroEvents plugin) {
         super(plugin, MiniGameType.PARKOUR, new HashMap<>(), MiniGameOptions.builder().excludedBlockedCommands(new String[]{"parkour"}).build(), CosmicMysteryChest.get().getChestManager().getMysteryChestMap().get("ParkourLootbox"), Material.FEATHER);
@@ -71,6 +74,12 @@ public class ParkourMiniGame extends MiniGame<ParkourPlayer> {
         this.parkourTimeMessage = Utils.color(this.getConfiguration().getString("parkour-time-message"));
         this.leaveItem = ConfigParser.parseItem(super.getConfiguration().getConfigurationSection("items.leave-item"));
         this.checkpointItem = ConfigParser.parseItem(super.getConfiguration().getConfigurationSection("items.checkpoint-item"));
+
+        // Falls are caught a few blocks under the course, before FactionsKore's void teleport
+        // (voidTPSpawn, y <= 0) can send the player to the wilderness. Override with fall-teleport-y.
+        double lowestY = Math.min(super.getSpawnLocation().getY(), this.endLocation.getY());
+        for (Location location : this.parkourCheckpoints.keySet()) lowestY = Math.min(lowestY, location.getY());
+        this.fallTeleportY = super.getConfiguration().getDouble("fall-teleport-y", lowestY - 5);
     }
 
     public Byte getCheckPoint(Location location) {
@@ -158,6 +167,20 @@ public class ParkourMiniGame extends MiniGame<ParkourPlayer> {
         event.setCancelled(true);
     }
 
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onFallWhileInParkour(PlayerMoveEvent event) {
+        Location to = event.getTo();
+        if (to == null || to.getY() >= this.fallTeleportY) return;
+        if (!super.isParticipant(event.getPlayer())) return;
+        if (!to.getWorld().equals(super.getGameWorld())) return;
+
+        // changing the destination (instead of teleporting) means later move listeners see the safe spot
+        event.setTo(super.getMiniGameState() == MiniGameState.IN_PROGRESS
+                ? this.getCheckpointLocation(event.getPlayer())
+                : super.getSpawnLocation());
+        event.getPlayer().setFallDistance(0);
+    }
+
     @EventHandler
     public void checkpointCross(PlayerInteractEvent event) {
         if (event.getAction() != Action.PHYSICAL) return;
@@ -208,6 +231,10 @@ public class ParkourMiniGame extends MiniGame<ParkourPlayer> {
     }
 
     public void teleportParticipantToCheckpoint(Player player) {
+        player.teleport(this.getCheckpointLocation(player), PlayerTeleportEvent.TeleportCause.UNKNOWN);
+    }
+
+    private Location getCheckpointLocation(Player player) {
         Byte checkpoint = super.getParticipant(player).getCurrentCheckpoint();
         Location location = this.getCheckpoints().inverse().get(checkpoint);
 
@@ -217,7 +244,7 @@ public class ParkourMiniGame extends MiniGame<ParkourPlayer> {
             location.setYaw(parkourYawCheckpoints.get(checkpoint));
         }
 
-        player.teleport(Utils.defaultIfNull(location, getSpawnLocation()), PlayerTeleportEvent.TeleportCause.UNKNOWN);
+        return Utils.defaultIfNull(location, getSpawnLocation());
     }
 
     private void createCheckpointHolo(byte number, Location location) {

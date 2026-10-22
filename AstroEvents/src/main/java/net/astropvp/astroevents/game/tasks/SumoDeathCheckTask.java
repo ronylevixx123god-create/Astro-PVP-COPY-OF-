@@ -27,6 +27,7 @@ public class SumoDeathCheckTask extends BukkitRunnable {
 
         if (this.isPlayerInWater(this.miniGame.getDuelPlayers().getLeft())) {
             this.miniGame.choseWinner(this.miniGame.getDuelPlayers().getRight().getPlayer(), this.miniGame.getDuelPlayers().getLeft().getPlayer());
+            return; // the duel is over (duel players were cleared), don't check the right player too
         }
 
         if (this.isPlayerInWater(this.miniGame.getDuelPlayers().getRight())) {
