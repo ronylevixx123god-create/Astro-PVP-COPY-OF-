@@ -131,6 +131,12 @@ public class SlotBotInventoryListener implements Listener {
                     player.sendMessage(CC.translate("&e&l* PLUTO OUTPOST &7Saved Slotbot Ticket(s) &e&l*"));
                     player.sendMessage("");
 
+                } else if (player.hasMetadata("astro_cb_slotbot_free_roll_chance") && Math.random() < player.getMetadata("astro_cb_slotbot_free_roll_chance").get(0).asDouble()) {
+                    // Cosmic Trophy custom block in the player's chunk (metadata set by CustomSkullBlocks)
+                    returnTickets(tickets, player);
+                    player.sendMessage("");
+                    player.sendMessage(CC.translate("&6&l* ASTRO TROPHY &7Saved Slotbot Ticket(s) &6&l*"));
+                    player.sendMessage("");
                 }
             }
         } else if (inventory.getTitle().contentEquals(CC.DarkGray + "Astro Roll Bot Loot")) {
