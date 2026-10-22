@@ -9,6 +9,7 @@ import net.astropvp.customblocks.struct.CustomBlock;
 import net.astropvp.customblocks.struct.CustomBlockType;
 import net.astropvp.customblocks.struct.abilities.LevelAble;
 import net.astropvp.customblocks.struct.abilities.SellBot;
+import net.astropvp.customblocks.struct.impl.Pinata;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -33,6 +34,10 @@ public class CustomBlockBreakListener implements Listener {
         //if (event.isCancelled()) return;
         if (CustomBlocksAPI.isCustomBlock(event.getBlock().getLocation())) {
             CustomBlock customBlockData = CustomBlocksAPI.getCustomBlockData(event.getBlock().getLocation());
+            if (customBlockData instanceof Pinata) {
+                ((Pinata) customBlockData).onBreak(event);
+                return;
+            }
             CustomBlockType type = customBlockData.getType();
 
             /*
@@ -66,8 +71,13 @@ public class CustomBlockBreakListener implements Listener {
     @EventHandler
     public void onExplode(EntityExplodeEvent event) {
         List<Block> blockList = event.blockList();
-        for (Block block : blockList) {
+        for (Block block : new java.util.ArrayList<>(blockList)) {
             if (block.getType() != Material.NOTE_BLOCK) continue;
+            if (CustomBlocksAPI.getCustomBlockData(block.getLocation()) instanceof Pinata) {
+                // explosions can't break a Pinata open or reset it
+                event.blockList().remove(block);
+                continue;
+            }
             if (CustomBlocksAPI.isCustomBlock(block.getLocation())) {
                 block.getDrops().clear();
                 CustomBlock customBlockData = CustomBlocksAPI.getCustomBlockData(block.getLocation());

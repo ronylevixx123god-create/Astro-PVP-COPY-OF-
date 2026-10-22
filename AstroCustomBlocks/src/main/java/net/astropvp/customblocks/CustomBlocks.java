@@ -86,10 +86,13 @@ public class CustomBlocks extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new CustomBlockListener(this), this);
         getServer().getPluginManager().registerEvents(new CustomBlockBreakListener(this), this);
         getServer().getPluginManager().registerEvents(new CustomBlockPlaceListener(this), this);
+        getServer().getPluginManager().registerEvents(new net.astropvp.customblocks.listeners.DarkMatterExpListener(), this);
     }
 
     public void registerTasks() {
         Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, new ChunkCustomBlocksTask(), 40L, 20L * 10);
         Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, new TickAbleBlocksRunnable(), 40L, 20L);
+        // stored EXP, grinder keys and Pinata hits are also written every 5 minutes, not only at shutdown
+        Bukkit.getScheduler().runTaskTimer(this, () -> customBlockManager.saveAll(), 20L * 300, 20L * 300);
     }
 }

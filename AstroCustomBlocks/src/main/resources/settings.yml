@@ -3,3 +3,7 @@ godlyKeyChance: 0.5
 expPer: 25
 autoGrinderActivationPrice: 5000000
 maxCustomBlocksPerTypeFactionPerPerson: 9
+# Pinata: hits needed, seconds between two hits (shared by all players), items rolled from the PINATA loot table
+pinataHitsRequired: 8
+pinataHitCooldownSeconds: 28800
+pinataLootRolls: 3
