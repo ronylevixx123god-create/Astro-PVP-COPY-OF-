@@ -129,6 +129,9 @@ public class CosmicCrateLootSelector
     }
     
     public void conclude() {
+        if (this.phase == CosmicCratePhase.DONE) {
+            return;
+        }
         this.rewards.add(this.metaItem);
         if (this.rewards.size() > 0) {
             for (ItemStack i : this.rewards) {
@@ -168,7 +171,7 @@ public class CosmicCrateLootSelector
         this.endAllAnimations();
         this.phase = CosmicCratePhase.DONE;
         this.player.removeMetadata("ccrate_loot_selector", (Plugin)CosmicCrate.get());
-        if (this.crateVersion.getCrateData() != null) {
+        if (this.crateVersion.getCrateData() != null && CosmicCrate.get().isEnabled()) {   // no fireworks while shutting down
             this.crateVersion.getCrateData().playConclusion(this.player);
         }
     }

@@ -66,6 +66,20 @@ public class InventoryListener implements Listener
         }
     }
     
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPreviewClick(final InventoryClickEvent e) {
+        if (e.getInventory().getHolder() instanceof PlayerListener.PreviewHolder) {
+            e.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onCosmicCrateDrag(final org.bukkit.event.inventory.InventoryDragEvent e) {
+        if (e.getInventory().getTitle().startsWith("Astro Crate: ") || e.getInventory().getHolder() instanceof PlayerListener.PreviewHolder) {
+            e.setCancelled(true);
+        }
+    }
+
     @EventHandler
     public void onCosmicCrateRedeemInventoryClose(final InventoryCloseEvent e) {
         if (e.getInventory().getTitle().startsWith("Astro Crate: ") && e.getPlayer().hasMetadata("ccrate_loot_selector")) {

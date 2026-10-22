@@ -33,12 +33,14 @@ public class SOTW extends CosmicCrateData {
         double chance = Math.random();
         Map<String, MysteryChest> chests = CosmicMysteryChest.get().getChestManager().getMysteryChestMap();
 
+        // the bonus items in the lore; each is given when this server can build it
         if (chance <= 0.05D) {
-            new CustomItemBuilder("apollo_rank");
+            ItemStack rank = new CustomItemBuilder("apollo_rank").build();
+            if (rank != null) return rank;
         }
 
-        if (chance <= 0.5D) {
-            chests.get("PremadeOmni").createClaimableItem(false);
+        if (chance <= 0.5D && chests.get("PremadeOmni") != null) {
+            return chests.get("PremadeOmni").createClaimableItem(false);
         }
 
         return ItemUtils.setAmount(CosmicSlotBotAPI.createSlotBotItem(), 8 + (new Random()).nextInt(16));
@@ -92,6 +94,16 @@ public class SOTW extends CosmicCrateData {
 
 
         return items;
+    }
+
+    @Override
+    public List<String> getMissingRewardSources() {
+        Map<String, MysteryChest> chests = CosmicMysteryChest.get().getChestManager().getMysteryChestMap();
+        List<String> missing = new ArrayList<>();
+        for (String name : new String[]{"Spawner", "AdminWeapon", "AstroNote", "HeroicProtVI", "OPCache", "SkinBundle", "Backpack", "OmniCrystal"}) {
+            if (!chests.containsKey(name)) missing.add(name);
+        }
+        return missing;
     }
 
     @Override

@@ -37,6 +37,11 @@ public abstract class CosmicCrateData
     public abstract short getColorPane();
     
     public abstract List<Color> getConclusionFireworkColors();
+
+    /** reward sources (mystery chests etc.) this server doesn't have; the crate can't be opened without them */
+    public List<String> getMissingRewardSources() {
+        return java.util.Collections.emptyList();
+    }
     
     public void playConclusion(final Player player) {
         final Location l = player.getEyeLocation();

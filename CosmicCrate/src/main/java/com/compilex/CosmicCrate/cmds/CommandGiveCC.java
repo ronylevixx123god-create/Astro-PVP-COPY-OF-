@@ -26,7 +26,11 @@ public class CommandGiveCC implements CommandExecutor
         }
         final String version = args[0];
         final String playerName = args[1];
-        final ItemStack i = CCAPI.getCosmicCrate(Version.valueOf(version.toUpperCase()), playerName);
+        final Version v = CommandCosmicCrate.version(sender, version);
+        if (v == null) {
+            return true;
+        }
+        final ItemStack i = CCAPI.getCosmicCrate(v, playerName);
         if (i == null || Bukkit.getPlayer(playerName) == null) {
             return true;
         }

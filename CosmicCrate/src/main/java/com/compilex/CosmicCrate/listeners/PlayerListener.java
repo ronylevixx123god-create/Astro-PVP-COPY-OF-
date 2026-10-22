@@ -44,6 +44,14 @@ import org.bukkit.event.Listener;
 
 public class PlayerListener implements Listener
 {
+    /** marks the admin loot preview, so its items can't be taken */
+    public static class PreviewHolder implements InventoryHolder {
+        @Override
+        public Inventory getInventory() {
+            return null;
+        }
+    }
+
     private boolean isEmptyBesidesCCs(final Inventory inventory, final int allowed) {
         int found = 0;
         for (int i = 0; i < inventory.getSize(); ++i) {
@@ -84,8 +92,14 @@ public class PlayerListener implements Listener
             e.setCancelled(true);
             e.setUseInteractedBlock(Event.Result.DENY);
             e.setUseItemInHand(Event.Result.DENY);
+            final java.util.List<String> missing = v.getCrateData() == null ? java.util.Collections.emptyList() : v.getCrateData().getMissingRewardSources();
+            if (!missing.isEmpty()) {
+                e.getPlayer().sendMessage(ChatColor.RED + ChatColor.BOLD.toString() + "(!) " + ChatColor.RED + "This Astro Crate's rewards are not set up on this server yet.");
+                Bukkit.getLogger().info("[CosmicCrate] " + v.name() + " crate can't open: missing mystery chests " + missing);
+                return;
+            }
             if (e.getPlayer().isOp() && (e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK)) {
-                final Inventory previewInventory = Bukkit.createInventory((InventoryHolder)null, 45, v.name());
+                final Inventory previewInventory = Bukkit.createInventory(new PreviewHolder(), 45, v.name());   // view-only (see InventoryListener)
                 for (final ItemStack is : v.getCrateData().getCrateLoot(e.getPlayer())) {
                     previewInventory.addItem(is);
                 }

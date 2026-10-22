@@ -40,8 +40,10 @@ public class CrateStorageMenu extends CosmicGUI
                     return;
                 }
                 else {
-
-                        if (this.player.getInventory().firstEmpty() != -1) {
+                        if (CCAPI.hasClaimedCosmicCrate(this.player, version)) {
+                            this.player.sendMessage(ChatColor.RED.toString() + ChatColor.BOLD.toString() + "(!) " + ChatColor.RED + "You already claimed the " + ChatColor.UNDERLINE.toString() + ChatColor.BOLD.toString() + version.name() + ChatColor.RED + " Astro Crate!");
+                        }
+                        else if (this.player.getInventory().firstEmpty() != -1) {
                             CCAPI.claimCosmicCrate(this.player, version);
                         }
                         else {
