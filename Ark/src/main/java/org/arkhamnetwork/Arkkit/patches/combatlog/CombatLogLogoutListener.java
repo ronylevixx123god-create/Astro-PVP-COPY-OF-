@@ -29,6 +29,7 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class CombatLogLogoutListener
@@ -51,6 +52,21 @@ public class CombatLogLogoutListener
         this.cl = cl;
         this.cl.registerTask(this.logoutMonitor.runTaskTimer(Arkkit.get(), 5L, 5L), CombatLogLogoutListener.class);
         spawnNPC = cl.getBukkitPlugin().getConfig().getBoolean("settings.combat_log.spawnNPC");
+    }
+
+    // vanilla only remembers a player's killer for 5 seconds after the hit; the combat tag lasts longer, so a player who
+    // logs out later in combat died with no killer and their loot dropped on the ground instead of going to the killer
+    private static void creditLastAttacker(Player p) {
+        if (!p.hasMetadata("lastPlayerDamagerUUID") || !p.hasMetadata("lastPlayerDamagerTime")) return;
+        if (System.currentTimeMillis() - p.getMetadata("lastPlayerDamagerTime").get(0).asLong() > CombatLog.getCombatTagDuration(p)) return;
+        Object id = p.getMetadata("lastPlayerDamagerUUID").get(0).value();
+        Player attacker = id instanceof UUID ? Bukkit.getPlayer((UUID) id) : null;
+        if (attacker == null || attacker.equals(p) || !attacker.isOnline()) return;
+        net.minecraft.server.v1_8_R3.EntityPlayer handle = ((org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer) p).getHandle();
+        if (handle.killer == null) {
+            handle.killer = ((org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer) attacker).getHandle();
+            Bukkit.getLogger().info("[Arkkit (CombatLog)] Crediting " + attacker.getName() + " with the combat log kill of " + p.getName());
+        }
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -139,6 +155,7 @@ public class CombatLogLogoutListener
                 Bukkit.getLogger().info("[Arkkit (CombatLog)] Spawned combatNPC for player " + p.getName() + " at " + p.getLocation().getBlockX() + "," + p.getLocation().getBlockY() + "," + p.getLocation().getBlockZ() + " with HP: " + p.getHealth() + " / Inventory: " + combatNPCs_loot.get(playerUUID));
             } else {
                 Bukkit.getLogger().info("[Arkkit (CombatLog)] Killing " + e.getPlayer().getName() + " due to logging out while still in cl_combat!");
+                creditLastAttacker(e.getPlayer());
                 e.getPlayer().setHealth(0.0);
                 for (Entity ent : e.getPlayer().getNearbyEntities(64.0, 64.0, 64.0)) {
                     if (!(ent instanceof Player)) continue;
