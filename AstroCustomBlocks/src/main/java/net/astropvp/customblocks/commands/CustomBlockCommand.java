@@ -11,7 +11,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 @Command("customblocks")
-@Alias({"cblocks", "customblock"})
+@Alias({"cblocks", "customblock", "blockcustoms"})
 public class CustomBlockCommand extends CommandBase {
 
     @Default
