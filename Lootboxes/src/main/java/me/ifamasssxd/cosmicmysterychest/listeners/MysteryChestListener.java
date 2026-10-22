@@ -58,6 +58,7 @@ import org.bukkit.inventory.PlayerInventory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MysteryChestListener
         implements Listener {
@@ -149,14 +150,25 @@ public class MysteryChestListener
 
                     if (event.getPlayer().isSneaking()){
                         int counter = 0;
+                        int kept = 0;
                         while (counter != event.getItem().getAmount()) {
                             new MysteryChestGUI(player, chest, 0L).skipGUI(CosmicMysteryChest.get());
+                            if (candleKeepsLootbox(player, chest)) kept++;
                             counter++;
                         }
-                        player.setItemInHand(null);
+                        if (kept > 0) {
+                            ItemStack i = event.getItem().clone();
+                            i.setAmount(kept);
+                            player.setItemInHand(i);
+                        } else {
+                            player.setItemInHand(null);
+                        }
                     } else {
+                        boolean keep = candleKeepsLootbox(player, chest);
                         int amt = event.getItem().getAmount();
-                        if (amt == 1) {
+                        if (keep) {
+                            // the Halloween Candle saved this lootbox
+                        } else if (amt == 1) {
                             player.setItemInHand(null);
                         } else if (amt > 1) {
                             ItemStack i = event.getItem();
@@ -179,6 +191,24 @@ public class MysteryChestListener
     @EventHandler(priority = EventPriority.HIGHEST)
     public void joinEvent(PlayerJoinEvent e) {
         CosmicMysteryChest.get().getShardAnimations().anotoggle(e.getPlayer());
+    }
+
+    /**
+     * Halloween Candle custom block in the player's chunk (metadata set by CustomSkullBlocks): with its chance, either the
+     * lootbox isn't used up (returns true) or the player gets one extra of its guaranteed items.
+     */
+    private boolean candleKeepsLootbox(Player player, MysteryChest chest) {
+        if (!player.hasMetadata("astro_cb_lootbox_bonus_chance")) return false;
+        if (Math.random() >= player.getMetadata("astro_cb_lootbox_bonus_chance").get(0).asDouble()) return false;
+        List<ItemStack> garunteed = chest.getGarunteedItems();
+        if (!garunteed.isEmpty() && Math.random() < 0.5) {
+            ItemStack bonus = garunteed.get((int) (Math.random() * garunteed.size())).clone();
+            com.cosmicpvp.cosmicutils.utils.PlayerUtil.giveOrDropProtectedItem(player, bonus, -1);
+            player.sendMessage(CC.translate("&6&l* HALLOWEEN CANDLE &7Extra guaranteed item: &f" + com.cosmicpvp.cosmicutils.utils.ItemUtils.getDisplayName(bonus) + " &6&l*"));
+            return false;
+        }
+        player.sendMessage(CC.translate("&6&l* HALLOWEEN CANDLE &7Your lootbox was not used up &6&l*"));
+        return true;
     }
 
     public int getEmptySlots(Player p) {
