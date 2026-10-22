@@ -78,7 +78,7 @@ implements CommandExecutor {
                     sender.sendMessage(CC.RedB + "(!) " + CC.Red + "You must wait " + CC.RedU + timeTillCanRun + CC.Red + " before disguising again!");
                     return true;
                 }
-                new AvailableDisguiseMenu(player, CosmicDisguises.get().getDisguiseManager().getAvailableDisguises(player, false)).openGUI(CosmicDisguises.get());
+                new AvailableDisguiseMenu(player, CosmicDisguises.get().getDisguiseManager().getAvailableDisguises(player, true)).openGUI(CosmicDisguises.get());   // current permissions, not the ones cached at join
             }
             return true;
         }
