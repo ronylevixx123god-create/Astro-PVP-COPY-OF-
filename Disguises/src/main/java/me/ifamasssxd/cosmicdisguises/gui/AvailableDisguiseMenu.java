@@ -61,6 +61,13 @@ extends CosmicGUI {
         return Math.max(36, (shown + 8) / 9 * 9);
     }
 
+    // spawn egg shown for a disguise: there are no wither or dragon eggs, and a zombie villager is a zombie entity in 1.8,
+    // so it gets the villager egg to tell it apart from Zombie
+    private static EntityType iconType(DisguiseType type, EntityType entityType) {
+        if (type == DisguiseType.ZOMBIE_VILLAGER) return EntityType.VILLAGER;
+        return entityType == EntityType.WITHER ? EntityType.ENDERMAN : (entityType == EntityType.ENDER_DRAGON ? EntityType.BAT : entityType);
+    }
+
     public void redraw() {
         int index = 0;
         Disguise active = DisguiseAPI.getDisguise(this.player);
@@ -72,7 +79,7 @@ extends CosmicGUI {
             boolean unlocked = this.disguiseTypes.contains(type);
             ArrayList lore = Lists.newArrayList("", equipped ? CC.GreenB + "CURRENTLY ACTIVE" : (!unlocked ? CC.RedB + "LOCKED" : CC.GreenB + "UNLOCKED"), "", !unlocked ? CC.Gray + "Unlock disguises at " + CC.GrayU + "buy.astropvp.net" + CC.Gray + "!" : CC.Gray + "Click to " + (equipped ? "de-" : "") + "activate this disguise!");
             String eggName = StringUtils.capitaliseAllWords(type.name().replace("_", " ").toLowerCase());
-            this.setItem(index++, new InventoryItem(new ItemBuilder(new ItemStack(Material.MONSTER_EGG, 1, (entityType == EntityType.WITHER ? EntityType.ENDERMAN : (entityType == EntityType.ENDER_DRAGON ? EntityType.BAT : entityType)).getTypeId())).name((equipped ? CC.GreenB : CC.RedB) + eggName).lore(lore).build()).click(() -> {
+            this.setItem(index++, new InventoryItem(new ItemBuilder(new ItemStack(Material.MONSTER_EGG, 1, AvailableDisguiseMenu.iconType(type, entityType).getTypeId())).name((equipped ? CC.GreenB : CC.RedB) + eggName).lore(lore).build()).click(() -> {
                 if (this.lastChange != 0L && System.currentTimeMillis() - this.lastChange <= 1000L) {
                     this.player.sendMessage(CC.Red + "Please wait at least 1 second in between disguise changes!");
                 } else if (!unlocked) {
@@ -88,13 +95,13 @@ extends CosmicGUI {
                             this.player.sendMessage(CC.RedB + "(!) " + CC.Red + "Disguise De-activated!");
                         } else {
                             Bukkit.getScheduler().scheduleSyncDelayedTask(CosmicDisguises.get(), () -> {
-                                if (type == DisguiseType.ENDER_DRAGON || type == DisguiseType.ZOMBIE_VILLAGER || type == DisguiseType.WITHER || type == DisguiseType.GIANT || type == DisguiseType.WITHER_SKELETON) {
+                                if (type == DisguiseType.ENDER_DRAGON || type == DisguiseType.GIANT || type == DisguiseType.WITHER_SKELETON) {
                                     this.player.sendMessage(CC.Red + "This disguise is disabled.");
                                     return;
                                 }
                                 DisguiseAPI.disguiseToAll(this.player, new MobDisguise(type));
                             });
-                            if (type == DisguiseType.ENDER_DRAGON || type == DisguiseType.ZOMBIE_VILLAGER || type == DisguiseType.WITHER || type == DisguiseType.GIANT || type == DisguiseType.WITHER_SKELETON) {
+                            if (type == DisguiseType.ENDER_DRAGON || type == DisguiseType.GIANT || type == DisguiseType.WITHER_SKELETON) {
                                 return;
                             }
                             this.player.sendMessage(CC.GreenB + "(!) " + CC.Green + "You have activated the " + CC.GreenU + StringUtils.capitaliseAllWords(type.name().toLowerCase().replace("_", " ")) + CC.Green + " disguise!");
