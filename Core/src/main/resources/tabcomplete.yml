@@ -1,0 +1,170 @@
+# Command tab completion for players who aren't OP (OPs always get every command).
+# A command is suggested when the player can use it:
+#  - it declares a permission in its plugin.yml and the player has it,
+#  - it is an Essentials command and the player has essentials.<command>,
+#  - it is a mattstudios command (/staff, /freeze, /customblocks, ...) and the player has its @Permission, or it has none,
+#  - it is listed below under "public", or under "permissions" with a permission the player has.
+# Everything else, and every plugin:command name, is not suggested. Typed commands are not affected: each command still
+# checks its own permission. Commands go by their main name; aliases follow it. The file is read when the server
+# starts.
+
+# player commands with no permission check of their own (checked by running each one as a default-rank player)
+public:
+  - ah
+  - alchemist
+  - answer
+  - apply
+  - armorsets
+  - bah
+  - bahloot
+  - banknote
+  - bossrewards
+  - cagefight
+  - challenge
+  - chestlogs
+  - christmas
+  - claim
+  - coinflip
+  - collect
+  - combineexp
+  - cosmiccrate
+  - cosmicshop
+  - credits
+  - discord
+  - disguises
+  - duel
+  - dungeon
+  - dungeonmaster
+  - enchanter
+  - event
+  - events
+  - factions
+  - factionstop
+  - fbanner
+  - filterloot
+  - frecall
+  - fsetbanner
+  - ftloot
+  - giftcards
+  - giveaway
+  - gkit
+  - grinding
+  - helpenchants
+  - icf
+  - if
+  - itemcoinflip
+  - itemflip
+  - itemskin
+  - jackpot
+  - koth
+  - lastmanstanding
+  - lbfilter
+  - lbtoggle
+  - logout
+  - lootfilter
+  - lootft
+  - mcmmoxp
+  - merchant
+  - meteor
+  - mkit
+  - mysterychest
+  - namevault
+  - nextgiveall
+  - objective
+  - parkour
+  - pet
+  - phoenix
+  - pots
+  - pv
+  - pvdel
+  - pvsearch
+  - raid-claim
+  - raidshop
+  - redeem
+  - removeblocks
+  - removecollector
+  - roll
+  - roster
+  - ruins
+  - sandbot
+  - showcase
+  - slot
+  - spawnershop
+  - spectate
+  - splitspawners
+  - stackspawners
+  - stats
+  - stronghold
+  - sumo
+  - team
+  - tinkerer
+  - titan
+  - title
+  - togglebossmessages
+  - toggleciconfirm
+  - toggledeathmessages
+  - togglefactionland
+  - togglefilter
+  - togglekilltitle
+  - toggleparticles
+  - togglepay
+  - togglepotsdrop
+  - toggles
+  - togglesb
+  - trade
+  - trailer
+  - trash
+  - vkit
+  - voicechat
+  - weaponbonus
+  - wiki
+  - wildpvp
+  - withdrawmcmmo
+  - withdrawsouls
+  - xpbottle
+  - xporb
+  - xpshop
+
+# commands that check one permission inside their code
+permissions:
+  addskin: addskin.cmd
+  adminfactionstop: ftop.recalculate
+  arkconfig: arkkit.command.admin
+  arkdebug: arkkit.command.admin
+  arkhamreload: arkkit.command.admin
+  arklist: arkkit.command.admin
+  arkreboot: arkkit.command.admin
+  arkregister: arkkit.command.admin
+  arkunregister: arkkit.command.admin
+  armorcolor: astrocore.apollo
+  chatcolor: astrocore.nebula
+  debugarmorsets: astrocore.staff
+  dungeongive: cosmicdungeons.dungeongive
+  giveall: astro.giveall
+  giveskin: skin.give
+  pvconvert: playervaults.convert
+  pvsign: playervaults.signs.set
+  randomtp: essentials.tp
+  revive: prorevive.revive
+  stack: astrocore.stack
+  throwable: astrocore.admin
+
+# never suggested to players who aren't OP: the server software and plugin list, and LibsDisguises' own commands, which
+# check their real permissions inside (players use /disguises; /d, /dis and /disguise lead there)
+hidden:
+  - "?"
+  - about
+  - disguiseclone
+  - disguiseentity
+  - disguisehelp
+  - disguiseplayer
+  - disguiseradius
+  - icanhasbukkit
+  - libsdisguises
+  - pl
+  - plugins
+  - undisguiseentity
+  - undisguiseplayer
+  - undisguiseradius
+  - ver
+  - version
