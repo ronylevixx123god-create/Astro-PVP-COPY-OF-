@@ -45,6 +45,9 @@ public class CustomConfig {
 
     public static Map<String, Integer> load() {
         Map<String, Integer> kothWins = new HashMap<>();
+        if (customFile.getConfigurationSection("kothWins") == null) {
+            return kothWins;   // no wins yet (the file starts empty)
+        }
         try {
             for (String key : customFile.getConfigurationSection("kothWins.").getKeys(false)) {
                 if (key == null) continue;
