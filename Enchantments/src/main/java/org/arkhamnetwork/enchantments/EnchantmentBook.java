@@ -628,6 +628,13 @@ public class EnchantmentBook {
         if (s == null) {
             return lore_l;
         }
+        // a description written as separate lines ("\n" in the config) is shown exactly as written, with & colour codes
+        if (s.contains("\n")) {
+            for (final String line : s.split("\n")) {
+                lore_l.add(CC.translate(line));
+            }
+            return lore_l;
+        }
         if (s.length() <= 38) {
             lore_l.add(ChatColor.YELLOW + s);
             return lore_l;
