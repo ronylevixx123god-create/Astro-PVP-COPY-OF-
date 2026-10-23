@@ -1,0 +1,5 @@
+# Automatic events: Parkour and Sumo take turns. A turn is skipped while another event is running or when fewer
+# players are online than the event's min-players (events/parkour.yml, events/sumo.yml). /aevent start and stop still work.
+auto-events:
+  enabled: true
+  interval-seconds: 7200

@@ -41,7 +41,8 @@ public class ConfigManager {
         PARKOUR("events/parkour.yml"),
         SUMO("events/sumo.yml"),
         SPLEEF("events/spleef.yml"),
-        LANGUAGE("language.yml")
+        LANGUAGE("language.yml"),
+        CONFIG("config.yml")
         ;
 
         private final String fileName;

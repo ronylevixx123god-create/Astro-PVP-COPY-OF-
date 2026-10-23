@@ -1,5 +1,6 @@
 minigame:
   countdown-message: '&8(&4!&8) &7Sumo event starts in &4{time}'
+  join-message: '&8(&4!&8) &7Type &4/sumo join &7to join the event!'
   win-message: '&8(&4!&8) &4{player}&4 has won the sumo event'
   min-players: 2
   max-players: 16

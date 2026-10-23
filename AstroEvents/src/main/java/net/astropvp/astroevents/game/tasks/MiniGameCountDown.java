@@ -2,6 +2,7 @@ package net.astropvp.astroevents.game.tasks;
 
 import net.astropvp.astroevents.game.MiniGame;
 import net.astropvp.astroevents.game.MiniGameState;
+import net.astropvp.astroevents.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -33,6 +34,10 @@ public class MiniGameCountDown extends BukkitRunnable {
 
         if (countdown == this.miniGame.getCountdownTime() || countdown == 120 || countdown == 60 || countdown == 45 || countdown == 30 || countdown == 15 || countdown == 10 || countdown == 5 || countdown == 3 || countdown == 2 || countdown == 1)
             Bukkit.broadcastMessage(this.miniGame.getCountdownMessage().replace("{time}", countdown + "s"));
+        // with the first countdown line: how to join
+        if (countdown == this.miniGame.getCountdownTime())
+            Bukkit.broadcastMessage(Utils.color(this.miniGame.getConfiguration().getString("join-message",
+                    "&8(&4!&8) &7Type &4/" + this.miniGame.getMiniGameType().name().toLowerCase() + " join &7to join the event!")));
 
         if (countdown == 1) {
             if (this.miniGame.getParticipants().size() >= this.miniGame.getMinPlayers()) {
