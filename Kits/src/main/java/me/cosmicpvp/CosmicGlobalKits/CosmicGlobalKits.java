@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import me.cosmicpvp.CosmicGlobalKits.commands.CommandFallenHero;
 import me.cosmicpvp.CosmicGlobalKits.commands.CommandGKit;
+import me.cosmicpvp.CosmicGlobalKits.commands.CommandMKit;
 import me.cosmicpvp.CosmicGlobalKits.database.Database;
 import me.cosmicpvp.CosmicGlobalKits.database.SQLManager;
 import me.cosmicpvp.CosmicGlobalKits.database.SQLQueryCustomThread;
@@ -28,6 +29,7 @@ public class CosmicGlobalKits extends JavaPlugin {
     @Getter private static CosmicGlobalKits plugin = null;
 
     @Getter @Setter public static String sql_table = "globalkits_userdata";
+    @Getter @Setter public static String mastery_table = "masterykit_userdata";
     @Getter @Setter private SQLQueryThread sql_worker;
     @Getter @Setter public static boolean kitGemsEnabled = true;
     @Getter @Setter private String serverName;
@@ -53,6 +55,7 @@ public class CosmicGlobalKits extends JavaPlugin {
         SQLManager.initializeSQL(this);
         SQLManager.sql_query.add("CREATE TABLE IF NOT EXISTS " + sql_table + "(player_uuid VARCHAR(64), player_name VARCHAR(16), global_kit TEXT, last_use LONG)");
         SQLManager.sql_query.add("CREATE TABLE IF NOT EXISTS globalkit_player_tiers(player_uuid VARCHAR(64), player_name VARCHAR(16), global_kit varchar(64), tier int, server_name varchar(32))");
+        SQLManager.sql_query.add("CREATE TABLE IF NOT EXISTS masterykit_userdata(uuid VARCHAR(64), masteryKit VARCHAR(64), last_use bigint, tier int, PRIMARY KEY (uuid, masteryKit))");
         this.sql_worker = new SQLQueryThread();
         this.sql_worker.start();
             CosmicSkyCustomItems.get().getItemManager().registerCustomItem(new WildcardGkit());
@@ -86,6 +89,7 @@ public class CosmicGlobalKits extends JavaPlugin {
 
     private void registerCommands() {
         this.getCommand("gkit").setExecutor(new CommandGKit());
+        this.getCommand("mkit").setExecutor(new CommandMKit());
         this.getCommand("fallenhero").setExecutor(new CommandFallenHero());
 
     }
@@ -94,6 +98,7 @@ public class CosmicGlobalKits extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new InventoryListener(), this);
         this.getServer().getPluginManager().registerEvents(new LoginListener(), this);
         this.getServer().getPluginManager().registerEvents(new FallenHeroListener(), this);
+        this.getServer().getPluginManager().registerEvents(new MasteryKitListener(), this);
             this.getServer().getPluginManager().registerEvents(new PermissionListener(), this);
     }
 

@@ -48,6 +48,7 @@ import com.rit.sucy.CustomEnchantment;
 import com.rit.sucy.EnchantmentAPI;
 import net.astropvp.core.AstroCore;
 import me.cosmicpvp.CosmicGlobalKits.libs.GlobalKits;
+import me.cosmicpvp.CosmicGlobalKits.libs.MasteryKits;
 import me.cosmicpvp.CosmicGlobalKits.struct.GlobalKit;
 import me.cosmicpvp.CosmicGlobalKits.struct.GlobalKitData;
 import me.cosmicpvp.CosmicGlobalKits.struct.GlobalKitUser;
@@ -77,6 +78,20 @@ import java.util.Map;
 import java.util.Random;
 
 public class CosmicGlobalKitsAPI {
+    public static ItemStack createMasteryKitItem(MasteryKits kits, boolean addID) {
+        ArrayList<String> lore = Lists.newArrayList("", CC.RedB + "NOTE: " + CC.Gray + "Once unlocked, you will lose", CC.Gray + "access to the required Global Kits", CC.Gray + "in exchange for access to this Mastery Kit!", "", CC.GoldB + "/gkit Requirements:");
+        for (GlobalKits required : kits.getKitsRequired()) {
+            lore.add(CC.GoldB + " * " + CC.Gold + required.getItemName() + CC.GoldB + " Tier III");
+        }
+        lore.add("");
+        lore.add(CC.Gray + "Right-click to unlock this Mastery Kit!");
+        ItemStack item = new NBTWrapper(new ItemBuilder(Material.INK_SACK, CC.LightPurpleB + "Mastery Kit " + CC.LightPurple + "(" + kits.getName() + CC.LightPurple + ")", new String[0]).lore((List)lore).data((short)DyeColor.CYAN.getDyeData()).build()).setString("cosmicType", "MASTERY_KIT").setNBTBase("conaxData", (NBTBase)new NBTTagCompoundBuilder().setString("kit", kits.name()).get()).build();
+        if (addID && ArkPlugins.ITEM_ID.getArkPlugin().isRunning()) {
+            item = ItemID.assignItemID(null, (ItemStack)item);
+        }
+        return item;
+    }
+
 
 
 

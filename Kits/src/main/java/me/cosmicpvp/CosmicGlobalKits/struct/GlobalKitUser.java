@@ -17,12 +17,14 @@ import java.util.function.Consumer;
 import me.cosmicpvp.CosmicGlobalKits.CosmicGlobalKits;
 import me.cosmicpvp.CosmicGlobalKits.database.SQLConnection;
 import me.cosmicpvp.CosmicGlobalKits.libs.GlobalKits;
+import me.cosmicpvp.CosmicGlobalKits.libs.MasteryKits;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 public class GlobalKitUser {
     private UUID uuid;
     private Map<GlobalKits, GlobalKitData> globalKits = new HashMap<GlobalKits, GlobalKitData>();
+    private Map<MasteryKits, GlobalKitData> masteryKits = new HashMap<MasteryKits, GlobalKitData>();
     private boolean loadingData = true;
 
     public GlobalKitUser(UUID uuid) {
@@ -74,6 +76,26 @@ public class GlobalKitUser {
                 catch (Exception err) {}
             }
             statement.close();
+            statement = SQLConnection.getConnection().prepareStatement("SELECT last_use, masteryKit, tier FROM masterykit_userdata WHERE uuid = ?;");
+            statement.setString(1, uuidString);
+            rs = statement.executeQuery();
+            while (rs.next()) {
+                try {
+                    long lastUsed = rs.getLong("last_use");
+                    String masteryKit = rs.getString("masteryKit");
+                    int tier = rs.getInt("tier");
+                    MasteryKits kits = MasteryKits.getFromName(masteryKit);
+                    if (kits == null) {
+                        Bukkit.getLogger().info("Unable to load Mastery Kit: " + masteryKit + "!");
+                        continue;
+                    }
+                    this.masteryKits.put(kits, new GlobalKitData(lastUsed, tier));
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            statement.close();
         }
         catch (SQLException e1) {
             e1.printStackTrace();
@@ -109,6 +131,10 @@ public class GlobalKitUser {
 
     public void setGlobalKits(Map<GlobalKits, GlobalKitData> globalKits) {
         this.globalKits = globalKits;
+    }
+
+    public Map<MasteryKits, GlobalKitData> getMasteryKits() {
+        return this.masteryKits;
     }
 
 }

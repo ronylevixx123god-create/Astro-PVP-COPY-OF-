@@ -14,10 +14,12 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
@@ -179,5 +181,49 @@ public class KitPermissionGranterTest {
         assertEquals(GrantResult.FAILED, KitPermissionGranter.toResult(null, DataMutateResult.FAIL));
         assertEquals(GrantResult.FAILED, KitPermissionGranter.toResult(null, null));
         assertEquals(GrantResult.FAILED, KitPermissionGranter.toResult(new RuntimeException(), DataMutateResult.SUCCESS));
+    }
+
+    private static final List<String> GKITS = Arrays.asList("cosmickits.kit.spooky", "cosmickits.kit.butcher");
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void exchangeAddsTheMkitAndRemovesTheGkitsInOneSave() {
+        granter().exchange(uuid, GKITS, PERM, "", results::add);
+        verify(builder).withContext(DefaultContextKeys.SERVER_KEY, "astro");
+        verify(data).add(node);
+        verify(data, times(2)).clear(any(Predicate.class));
+        verify(users, times(1)).modifyUser(eq(uuid), any(Consumer.class));
+        assertTrue(results.isEmpty());
+        saveFuture.complete(null);
+        runMainThread();
+        assertEquals(GrantResult.GRANTED, results.get(0));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void exchangeKeepsTheGkitsWhenTheMkitWasAlreadyThere() {
+        when(data.add(node)).thenReturn(DataMutateResult.FAIL_ALREADY_HAS);
+        granter().exchange(uuid, GKITS, PERM, "", results::add);
+        verify(data, never()).clear(any(Predicate.class));
+        saveFuture.complete(null);
+        runMainThread();
+        assertEquals(GrantResult.ALREADY_GRANTED, results.get(0));
+    }
+
+    @Test
+    public void exchangeStorageFailureIsReportedAsFailed() {
+        granter().exchange(uuid, GKITS, PERM, "", results::add);
+        saveFuture.completeExceptionally(new RuntimeException("storage write failed"));
+        runMainThread();
+        assertEquals(GrantResult.FAILED, results.get(0));
+    }
+
+    @Test
+    public void exchangeWithoutAServerScopeNeverTouchesStorage() {
+        when(api.getServerName()).thenReturn("global");
+        granter().exchange(uuid, GKITS, PERM, "", results::add);
+        verify(api, never()).getUserManager();
+        runMainThread();
+        assertEquals(GrantResult.FAILED, results.get(0));
     }
 }

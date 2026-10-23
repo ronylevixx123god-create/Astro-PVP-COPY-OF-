@@ -9,6 +9,7 @@ import net.luckperms.api.node.types.PermissionNode;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -78,6 +79,56 @@ public final class KitPermissionGranter {
             GrantResult result = toResult(error, mutateResult.get());
             if (result == GrantResult.FAILED) {
                 this.logger.severe("[GlobalKits] Failed to grant " + permission + " (" + scope + ") to " + uuid
+                        + ": " + (error != null ? error : mutateResult.get()));
+            }
+            this.mainThread.execute(() -> onMainThread.accept(result));
+        });
+    }
+
+    /**
+     * The Mastery Kit unlock: adds {@code permission} (scoped like {@link #grant}) and, only when that node was newly
+     * added, removes the user's own {@code revoke} nodes in every context, in one LuckPerms save. This replaces Astro's
+     * "pex user ... remove" / "pex user ... add" pair. Permissions a player gets from a group are not touched.
+     */
+    public void exchange(UUID uuid, List<String> revoke, String permission, String configuredServerContext, Consumer<GrantResult> onMainThread) {
+        final LuckPerms api;
+        final ServerScope scope;
+        try {
+            api = this.luckPerms.get();
+            scope = ServerScope.resolve(configuredServerContext, api.getServerName());
+        } catch (IllegalStateException | LinkageError e) {
+            this.logger.severe("[GlobalKits] Cannot grant " + permission + " to " + uuid + ": " + e.getMessage());
+            this.mainThread.execute(() -> onMainThread.accept(GrantResult.FAILED));
+            return;
+        }
+
+        PermissionNode.Builder builder = api.getNodeBuilderRegistry().forPermission().permission(permission).value(true);
+        if (!scope.isGlobal()) {
+            builder.withContext(DefaultContextKeys.SERVER_KEY, scope.getServer());
+        }
+        final Node node = builder.build();
+
+        final AtomicReference<DataMutateResult> mutateResult = new AtomicReference<>();
+        CompletableFuture<Void> saved;
+        try {
+            saved = api.getUserManager().modifyUser(uuid, user -> {
+                DataMutateResult added = user.data().add(node);
+                mutateResult.set(added);
+                if (added == DataMutateResult.SUCCESS) {
+                    for (String key : revoke) {
+                        user.data().clear(n -> n.getKey().equalsIgnoreCase(key));
+                    }
+                }
+            });
+        } catch (RuntimeException e) {
+            saved = new CompletableFuture<>();
+            saved.completeExceptionally(e);
+        }
+
+        saved.whenComplete((ignored, error) -> {
+            GrantResult result = toResult(error, mutateResult.get());
+            if (result == GrantResult.FAILED) {
+                this.logger.severe("[GlobalKits] Failed to exchange " + revoke + " for " + permission + " (" + scope + ") for " + uuid
                         + ": " + (error != null ? error : mutateResult.get()));
             }
             this.mainThread.execute(() -> onMainThread.accept(result));
