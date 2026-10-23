@@ -25,6 +25,7 @@ import me.kingsavaqe.astrotournaments.AstroTournamentsPlugin;
 import me.kingsavaqe.astrotournaments.managers.TournamentManager;
 import me.kingsavaqe.astrotournaments.objects.TournamentMatch;
 import me.neznamy.tab.api.TabAPI;
+import me.neznamy.tab.api.event.plugin.TabLoadEvent;
 import net.crankedpvp.shards.MobcoinAPI;
 import net.md_5.bungee.api.ProxyServer;
 import org.bukkit.Bukkit;
@@ -49,15 +50,31 @@ public class AstroScoreboardPlugin extends JavaPlugin {
 
     public void onEnable() {
         astroScoreboardPlugin = this;
+        registerPlaceholders();
+        // "/tab reload" drops every placeholder other plugins registered through TAB's API; register them again
+        TabAPI.getInstance().getEventBus().register(TabLoadEvent.class, event -> registerPlaceholders());
+        //registerBungeeScoreboardPlaceholders();
+        //registerListener(new ListenerSB());
+    }
+
+
+    /** "&8[&a<title>&8]" for the equipped /title, "" without one (AstroCore's PlayerTitleAPI; not on this module's compile path) */
+    private static String getEquippedTitleTag(java.util.UUID uuid) {
+        try {
+            Object title = Class.forName("net.astropvp.core.titles.PlayerTitleAPI").getMethod("getEquippedTitle", java.util.UUID.class).invoke(null, uuid);
+            return title == null || "none".equalsIgnoreCase(title.toString()) ? "" : "&8[&a" + title + "&8]";
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            return "";
+        }
+    }
+
+    private void registerPlaceholders() {
         registerDefaultAndFactionScoreboard();
         registerStrongHoldScoreboard();
         registerDuelScoreboard();
         //registerSpaceScoreboard();
         registerTournamentScoreboard();
-        //registerBungeeScoreboardPlaceholders();
-        //registerListener(new ListenerSB());
     }
-
 
     @Override
     public void onDisable() {
@@ -99,6 +116,8 @@ public class AstroScoreboardPlugin extends JavaPlugin {
     public void registerDefaultAndFactionScoreboard() {
         // nametag faction suffix (TAB tagsuffix): relation colour + faction tag, empty without a faction - Astro's own
         // AstroScoreboardAPI.getDefaultSuffix, as used for nametags before the move to TAB (viewer first, target second)
+        // nametag title (TAB tagsuffix): the /title the player equipped, in Astro's chat format " &8[&a<title>&8]" (ChatListener.getTag)
+        TabAPI.getInstance().getPlaceholderManager().registerPlayerPlaceholder("%astro_title%", 500, player -> getEquippedTitleTag(player.getUniqueId()));
         TabAPI.getInstance().getPlaceholderManager().registerRelationalPlaceholder("%rel_astro_faction%", 500, (viewer, target) -> AstroScoreboardAPI.getDefaultSuffix((Player) target.getPlayer(), (Player) viewer.getPlayer()));
         TabAPI.getInstance().getPlaceholderManager().registerPlayerPlaceholder("%has-faction%", getMS(1), player -> !FactionUtils.getFPlayer((Player) player.getPlayer()).getFaction().isWilderness());
         TabAPI.getInstance().getPlaceholderManager().registerPlayerPlaceholder("%kills%", getMS(5), player -> FactionUtils.getFPlayer((Player) player.getPlayer()).getKills());
