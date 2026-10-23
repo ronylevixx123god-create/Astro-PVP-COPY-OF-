@@ -12,6 +12,7 @@
     <modules>
         <module>StorageUtil</module>
         <module>Utils</module>
+        <module>EvolutionKits</module>
         <module>Ark</module>
         <module>AuctionHouse</module>
         <module>SpaceChests</module>

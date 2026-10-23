@@ -15,6 +15,3 @@ commands:
   mkit:
     description: Mastery kit command.
     aliases: [mkits]
-  vkit:
-    description: Evolution kit command.
-    aliases: [evkit]
