@@ -44,7 +44,8 @@ import java.util.UUID;
  * <p>
  * Now: when a player hits the wearer with a melee attack, the attacker can get Slowness I (Frozen I/II) or Slowness II
  * (Frozen III) for the same time as before (level + 0..level-1 seconds). The chance per hit starts at 2/3/4% and grows
- * by 1% with every further hit from the same attacker, up to 3x the start chance; it goes back to the start after a
+ * by 1% with every further hit from the same attacker, up to 3x the start chance but never above 9% (I 6%, II 9%,
+ * III 9%); it goes back to the start after a
  * proc (also a proc blocked by a skin) or after 5 seconds without a hit from that attacker. Build-ups are kept per
  * wearer and attacker. Only the wearer's highest Frozen piece counts, and only one roll is made per hit. Mobs are
  * ignored.
@@ -53,6 +54,7 @@ public class Frozen
 extends CustomEnchantment {
     private static final long RESET_MS = 5000L;
     private static final double STEP = 0.01;
+    private static final double MAX_CHANCE = 0.09;
     /** wearer + attacker -> build-up */
     private static final Map<String, BuildUp> BUILD_UPS = new HashMap<String, BuildUp>();
     /** the last hit already handled; the API calls this once for every armor piece that has Frozen */
@@ -79,7 +81,12 @@ extends CustomEnchantment {
     public static double currentChance(LivingEntity wearer, LivingEntity attacker, int level) {
         BuildUp b = BUILD_UPS.get(key(wearer, attacker));
         int hits = b == null || System.currentTimeMillis() - b.lastHit > RESET_MS ? 0 : b.hits;
-        return Math.min(baseChance(level) + STEP * hits, 3 * baseChance(level));
+        return Math.min(baseChance(level) + STEP * hits, maxChance(level));
+    }
+
+    /** highest chance the build-up reaches: 3x the start chance, at most 9% (I 6%, II 9%, III 9%) */
+    public static double maxChance(int level) {
+        return Math.min(3 * baseChance(level), MAX_CHANCE);
     }
 
     /** the highest Frozen level on the wearer's armor (at least the level of the piece the API is calling for) */
