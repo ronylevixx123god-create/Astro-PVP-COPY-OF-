@@ -36,7 +36,19 @@ implements CommandExecutor {
         if (!sender.isOp()) {
             return true;
         }
+        // Astro's command read args[0] straight away and threw on a bare /akoth; list the subcommands instead
+        if (args.length == 0) {
+            sender.sendMessage(CC.Red + "/akoth start | forcecap [player] | loot | logwin | setspawn | setkothcenter");
+            return true;
+        }
         String param1 = args[0];
+        // loot, logwin, setspawn and setkothcenter use the sender's own location / inventory
+        if (!(sender instanceof Player) && (param1.equalsIgnoreCase("loot") || param1.equalsIgnoreCase("logwin")
+                || param1.equalsIgnoreCase("setspawn") || param1.equalsIgnoreCase("setkothcenter")
+                || param1.equalsIgnoreCase("forcecap") && args.length < 2)) {
+            sender.sendMessage(CC.Red + "Only a player can use /akoth " + param1.toLowerCase() + (param1.equalsIgnoreCase("forcecap") ? " without a player name." : "."));
+            return true;
+        }
         if (param1.equalsIgnoreCase("start")) {
             CosmicKOTHAPI.resetKOTH();
             sender.sendMessage("(A-KOTH) KOTH has been reset.");
@@ -61,6 +73,10 @@ implements CommandExecutor {
                 sender.sendMessage("(A-KOTH) Lootbag added.");
             }
         } else if (param1.equalsIgnoreCase("logwin")) {
+            if (CosmicKOTHPlugin.get_().getKoth() == null) {
+                sender.sendMessage(CC.Red + "No KOTH currently running!");
+                return true;
+            }
             CosmicKOTHPlugin.get_().getKoth().logWinner((Player)sender);
             sender.sendMessage((Object)ChatColor.RED + "Forced log win in .log!");
         }

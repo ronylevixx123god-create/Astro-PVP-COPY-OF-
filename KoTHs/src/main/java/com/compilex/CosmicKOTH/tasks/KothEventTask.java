@@ -173,6 +173,10 @@ public class KothEventTask
         FPlayer fplayer;
         this.capped = true;
         running = false;
+        // /akoth forcecap captures for a player who was not capping: the broadcast below named the winner "???"
+        if (this.playerCapping == null) {
+            this.playerCapped = player;
+        }
         Bukkit.broadcastMessage("");
         Bukkit.broadcastMessage(StringUtils.getCenteredMessage(CC.translate("&6&lAstro&f&lPvP &8| &6&lDesert K.O.T.H")));
         Bukkit.broadcastMessage(StringUtils.getCenteredMessage(CC.translate("&fThe &6Koth&f has been Captured!")));
@@ -240,6 +244,8 @@ public class KothEventTask
         String factionId = FactionUtils.getFactionId(p);
         int wins;
         if (factionId == null) return;
+        // a player without a faction counted as a win for Wilderness in /koth top
+        if (!FPlayers.getInstance().getByPlayer(p).getFaction().isNormal()) return;
         wins = CosmicKOTHPlugin.get_().getKothWins().getOrDefault(factionId, 0);
         CosmicKOTHPlugin.get_().getKothWins().put(factionId, wins + 1);
 
