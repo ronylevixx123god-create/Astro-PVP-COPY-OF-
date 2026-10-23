@@ -3,3 +3,5 @@ main: me.astropvp.factionlogs.FactionLogs
 version: 1.0
 depend:
   - AstroKillCounters
+softdepend:
+  - Factions
