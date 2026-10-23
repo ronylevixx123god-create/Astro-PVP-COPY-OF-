@@ -18,6 +18,7 @@ package net.astropvp.core.killtracker.commands;
 
 import net.astropvp.core.killtracker.KillTrackerAPI;
 import net.astropvp.core.AstroCore;
+import com.cosmicpvp.cosmicutils.utils.MoneyParser;
 import org.apache.commons.lang3.StringUtils;
 import org.arkhamnetwork.Arkkit.patches.ItemID;
 import org.arkhamnetwork.Arkkit.plugins.ArkPlugins;
@@ -42,16 +43,21 @@ public class CommandWithdrawSouls
         }
         Player p = (Player) sender;
         if (args.length == 1) {
-            if (!StringUtils.isNumeric((CharSequence) args[0])) {
-                p.sendMessage((Object) ChatColor.RED + "Please enter a valid number!");
-                return true;
-            }
-            try {
-                amount = Integer.parseInt(args[0]);
-            } catch (NumberFormatException err) {
+            // whole numbers with an optional k/m/b shorthand in any case (20k, 1.5K, 1m); souls aren't money, so no $
+            Long parsed = args[0].startsWith("$") ? null : MoneyParser.parseWhole(args[0]);
+            if (parsed == null && StringUtils.isNumeric((CharSequence) args[0])) {
                 p.sendMessage((Object) ChatColor.RED + "Please enter a valid amount.");
                 return true;
             }
+            if (parsed == null) {
+                p.sendMessage((Object) ChatColor.RED + "Please enter a valid number!");
+                return true;
+            }
+            if (parsed > Integer.MAX_VALUE) {
+                p.sendMessage((Object) ChatColor.RED + "Please enter a valid amount.");
+                return true;
+            }
+            amount = parsed.intValue();
             if (amount <= 0) {
                 p.sendMessage((Object) ChatColor.RED + "Please enter a valid amount.");
                 return true;
