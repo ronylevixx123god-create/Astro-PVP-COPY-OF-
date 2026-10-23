@@ -33,12 +33,17 @@ public class WildPvP {
    private Location joinLocation;
    private boolean grace = true;
    private boolean ended = false;
-   /** Natural non-solid blocks the cage may replace; solid terrain, player-built blocks and liquids are left alone. */
+   /** Non-solid blocks the cage may replace (air, plants, snow layers, liquids), so the walls have no gaps; solid
+    *  terrain and player-built blocks stay and are part of the wall. */
    private static final Set<Material> CAGE_REPLACEABLE = EnumSet.of(Material.AIR, Material.LONG_GRASS, Material.DOUBLE_PLANT,
          Material.YELLOW_FLOWER, Material.RED_ROSE, Material.DEAD_BUSH, Material.SNOW, Material.VINE,
-         Material.BROWN_MUSHROOM, Material.RED_MUSHROOM);
-   /** Every block the cage turned into iron bars, so exactly those go back to air. */
-   private final List<Location> cageBlocks = new ArrayList<>();
+         Material.BROWN_MUSHROOM, Material.RED_MUSHROOM, Material.WATER, Material.STATIONARY_WATER, Material.LAVA,
+         Material.STATIONARY_LAVA, Material.SUGAR_CANE_BLOCK, Material.WEB, Material.FIRE);
+   /** Light gray stained glass (data 8): the gray glass Astro's own cage code used (AstroCagePvP showBorder). */
+   public static final Material CAGE_MATERIAL = Material.STAINED_GLASS;
+   public static final byte CAGE_DATA = 8;
+   /** Every block the cage replaced with its previous state, so cleanup puts exactly that block back. */
+   private final List<org.bukkit.block.BlockState> cageBlocks = new ArrayList<>();
 
    public WildPvP(AstroCagePvP instance, Player creator, Location location) {
       this.instance = instance;
@@ -246,7 +251,9 @@ public class WildPvP {
 
     */
 
-   /** Iron bars on the four edges of the match chunk (the chunk the world border shows), bottom to top of the world. */
+   /** Light gray glass on the four edges of the match chunk, from y=1 to the top of the world: the cage is the 16x16
+    *  chunk and the usable inside is the 14x14 blocks between the walls. */
+   @SuppressWarnings("deprecation")
    public void buildCage() {
       Chunk chunk = this.getChunk();
       int maxY = chunk.getWorld().getMaxHeight() - 1;
@@ -256,22 +263,63 @@ public class WildPvP {
             for (int y = 1; y <= maxY; ++y) {
                org.bukkit.block.Block block = chunk.getBlock(x, y, z);
                if (!CAGE_REPLACEABLE.contains(block.getType())) continue;
-               block.setType(Material.IRON_FENCE);
-               this.cageBlocks.add(block.getLocation());
+               this.cageBlocks.add(block.getState());
+               // no physics: neighbouring water must not flow into, or pop, anything while the cage goes up
+               block.setTypeIdAndData(CAGE_MATERIAL.getId(), CAGE_DATA, false);
             }
          }
       }
    }
 
-   /** Turns exactly the blocks the cage placed back into air. */
+   /** Puts back exactly the blocks the cage replaced (type and data), only where the cage glass is still there. */
+   @SuppressWarnings("deprecation")
    public void removeCage() {
-      for (Location location : this.cageBlocks) {
-         org.bukkit.block.Block block = location.getBlock();
-         if (block.getType() == Material.IRON_FENCE) {
-            block.setType(Material.AIR);
+      for (int i = this.cageBlocks.size() - 1; i >= 0; --i) {
+         org.bukkit.block.BlockState previous = this.cageBlocks.get(i);
+         org.bukkit.block.Block block = previous.getBlock();
+         if (block.getType() == CAGE_MATERIAL && block.getData() == CAGE_DATA) {
+            previous.update(true, false);
          }
       }
       this.cageBlocks.clear();
+   }
+
+   public boolean isInsideChunk(Location location) {
+      Chunk chunk = this.getChunk();
+      return location.getWorld().equals(chunk.getWorld()) && location.getBlockX() >> 4 == chunk.getX() && location.getBlockZ() >> 4 == chunk.getZ();
+   }
+
+   private static boolean passable(org.bukkit.block.Block block) {
+      return !block.getType().isSolid() && block.getType() != Material.LAVA && block.getType() != Material.STATIONARY_LAVA;
+   }
+
+   /**
+    * A safe spot inside the walls near the given location: x/z kept 1.3 blocks clear of the chunk edges (the wall
+    * columns), and a y with two free blocks for the body that is not above the cage walls, so the player can't be
+    * put inside a wall, inside the ground or on top of the cage.
+    */
+   public Location safeInside(Location near) {
+      Chunk chunk = this.getChunk();
+      double minX = (chunk.getX() << 4) + 1.3D, maxX = (chunk.getX() << 4) + 14.7D;
+      double minZ = (chunk.getZ() << 4) + 1.3D, maxZ = (chunk.getZ() << 4) + 14.7D;
+      Location location = near.clone();
+      location.setWorld(chunk.getWorld());
+      location.setX(Math.max(minX, Math.min(maxX, location.getX())));
+      location.setZ(Math.max(minZ, Math.min(maxZ, location.getZ())));
+      int top = chunk.getWorld().getMaxHeight() - 2;
+      int startY = Math.max(1, Math.min(top, location.getBlockY()));
+      for (int offset = 0; offset <= top; ++offset) {
+         for (int y : new int[]{startY - offset, startY + offset}) {
+            if (y < 1 || y > top) continue;
+            Location candidate = location.clone();
+            candidate.setY(y);
+            if (passable(candidate.getBlock()) && passable(candidate.clone().add(0.0D, 1.0D, 0.0D).getBlock())) {
+               return candidate;
+            }
+         }
+      }
+      location.setY(location.getWorld().getHighestBlockYAt(location));
+      return location;
    }
 
    public void teleport(Player player) {

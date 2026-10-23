@@ -20,6 +20,12 @@ public class Move implements Listener {
       this.instance = instance;
    }
 
+   /**
+    * Astro's boundary behaviour: a participant who leaves the match chunk (by walking, falling, flying over the top of
+    * the walls, or any other way) is moved 2 blocks back the way they came. That spot is clamped inside the walls and
+    * checked for two free blocks, so nobody is put in a wall, in the ground or on top of the cage, and a second move
+    * never repeats the teleport. Ended matches are skipped so the match-end, death and disconnect teleports work.
+    */
    @EventHandler
    public void onPlayerMoveOutsideChunk(PlayerMoveEvent event) {
       Player player = event.getPlayer();
@@ -29,16 +35,19 @@ public class Move implements Listener {
       if (wildPvPManager.hasWildPvP(player)) {
          if (player.isOp()) return;
          WildPvP wildPvP = wildPvPManager.getWildPvP(player);
-         if (fromLocation.getChunk().getX() == wildPvP.getChunk().getX() && fromLocation.getChunk().getZ() == wildPvP.getChunk().getZ() && (toLocation.getChunk().getX() != wildPvP.getChunk().getX() || toLocation.getChunk().getZ() != wildPvP.getChunk().getZ())) {
-            Location location = player.getLocation().clone().add(fromLocation.toVector().subtract(toLocation.toVector()).normalize().multiply(2.0D));
-            if (location.getBlock().getType().isSolid()) {
-               location.setY(location.getWorld().getHighestBlockYAt(location));
-            }
-
-            player.teleport(location, TeleportCause.UNKNOWN);
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', this.instance.getConfig().getString("Listeners.Move.Chunk.Participant.Message")));
-            player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 1.0F, 5.0F);
+         if (wildPvP.hasEnded() || wildPvP.isInsideChunk(toLocation)) return;
+         Location back = fromLocation.clone();
+         org.bukkit.util.Vector away = fromLocation.toVector().subtract(toLocation.toVector()).setY(0);
+         if (away.lengthSquared() > 1.0E-6D) {
+            back.add(away.normalize().multiply(2.0D));
          }
+         Location location = wildPvP.safeInside(back);
+         location.setYaw(toLocation.getYaw());
+         location.setPitch(toLocation.getPitch());
+         event.setTo(location);
+         player.setFallDistance(0.0F);
+         player.sendMessage(ChatColor.translateAlternateColorCodes('&', this.instance.getConfig().getString("Listeners.Move.Chunk.Participant.Message")));
+         player.playSound(player.getLocation(), Sound.FIREWORK_LAUNCH, 1.0F, 5.0F);
       }
    }
 

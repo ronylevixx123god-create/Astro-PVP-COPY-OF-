@@ -43,10 +43,11 @@ public class Interact implements Listener {
         }
     }
 
+    // participants, and anyone else standing in a match chunk, can't throw ender pearls
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPearl(PlayerInteractEvent event) {
         Player player = event.getPlayer();
-        if (this.instance.getWildPvPManager().hasWildPvP(player)) {
+        if (this.instance.getWildPvPManager().hasWildPvP(player) || this.instance.getWildPvPManager().hasWildPvP(player.getLocation().getChunk())) {
             if (player.getItemInHand() != null) {
                 if (player.getItemInHand().getType() == Material.ENDER_PEARL) {
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', this.instance.getConfig().getString("Listeners.Teleport.Match.Participant.Message")));

@@ -18,6 +18,22 @@ public class Teleport implements Listener {
       this.instance = instance;
    }
 
+   /** An ender pearl may never carry anyone into or out of a match chunk (no op or staff exception, unlike commands). */
+   @EventHandler(priority = org.bukkit.event.EventPriority.LOWEST)
+   public void onPearlAcrossCage(PlayerTeleportEvent event) {
+      if (event.getCause() != TeleportCause.ENDER_PEARL) return;
+      WildPvPManager wildPvPManager = this.instance.getWildPvPManager();
+      boolean fromCage = wildPvPManager.hasWildPvP(event.getFrom().getChunk());
+      boolean toCage = wildPvPManager.hasWildPvP(event.getTo().getChunk());
+      boolean sameChunk = event.getFrom().getChunk().getX() == event.getTo().getChunk().getX() && event.getFrom().getChunk().getZ() == event.getTo().getChunk().getZ();
+      if ((fromCage || toCage) && !sameChunk || wildPvPManager.hasWildPvP(event.getPlayer())) {
+         event.setCancelled(true);
+         Player player = event.getPlayer();
+         player.sendMessage(ChatColor.translateAlternateColorCodes('&', this.instance.getConfig().getString(wildPvPManager.hasWildPvP(player) ? "Listeners.Teleport.Match.Participant.Message" : "Listeners.Teleport.Match.Match.Message")));
+         player.playSound(player.getLocation(), Sound.VILLAGER_NO, 1.0F, 1.0F);
+      }
+   }
+
    @EventHandler
    public void onPlayerTeleportParticipant(PlayerTeleportEvent event) {
       if (!event.isCancelled()) {

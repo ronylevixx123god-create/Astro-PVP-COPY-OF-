@@ -36,6 +36,11 @@ public class WildPvPManager {
       }
 
       wildPvP.buildCage();
+      // a host standing on the chunk edge would now be inside the glass: move them just inside the walls
+      int localX = player.getLocation().getBlockX() & 15, localZ = player.getLocation().getBlockZ() & 15;
+      if (localX == 0 || localX == 15 || localZ == 0 || localZ == 15) {
+         player.teleport(wildPvP.safeInside(player.getLocation()), org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.UNKNOWN);
+      }
       this.wildPvPs.add(wildPvP);
       return wildPvP;
    }
