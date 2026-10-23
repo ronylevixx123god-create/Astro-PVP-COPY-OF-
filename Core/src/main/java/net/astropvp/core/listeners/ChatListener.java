@@ -44,7 +44,6 @@ public class ChatListener implements Listener {
     private final Pattern webpattern = Pattern.compile("[-a-zA-Z0-9@:%_\\+.~#?&//=]{2,256}\\.[a-z]{2,4}\\b(\\/[-a-zA-Z0-9@:%_\\+.~#?&//=]*)?");
     private final List<String> badWords = Arrays.asList("nigger", "jew", "kys", "demonicpvp", "jurassicpvp", "cursedpvp", "exoduspvp", "faggot", "ddos", "doss", "niggar", "hitler", "frans", "jozef", "gronckel", "straat", "lennik", "bryan", "jeetun", "savina", "dox", "doxed", "swat", "swatted", "kys", "gourley", "3dsam", "gmail", "hotmail", "rewind");
     private final ShieldFeature shieldFeature;
-    private double chatCooldown;
 
     public ChatListener(AstroCore plugin) {
         this.shieldFeature = FactionsKore.get().getFeature(ShieldFeature.class);
@@ -57,6 +56,35 @@ public class ChatListener implements Listener {
         }
     }
 
+
+    /** Seconds between public chat messages for this player's rank (OPs have none). */
+    static double chatCooldownSeconds(Player player) {
+        if (player.hasPermission("astrocore.nebula")) {
+            return 0;
+        } else if (player.hasPermission("astrocore.apollo")) {
+            return 2;
+        } else {
+            return 4;
+        }
+    }
+
+    // The rank cooldown runs before Arkkit's chat filter (LOW): a message it blocks must not count as sent there, or
+    // repeating it once the cooldown is over was refused as a "duplicate message". Same checks as before, earlier.
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void chatCooldown(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
+        if (player.isOp()) return;
+        FPlayer fPlayer = FPlayers.getInstance().getByPlayer(player);
+        if (fPlayer == null || fPlayer.getChatMode() != ChatMode.PUBLIC) return;
+        if (AstroCore.getInstance().getStaffChatManager().getInStaffChat().contains(player)) return;
+
+        if (AstroCore.getInstance().getCooldownUtils().isOnCooldown(player, "chatCooldown")) {
+            long msLeft = AstroCore.getInstance().getCooldownUtils().getRemainingMillis(player, "chatCooldown");
+            player.sendMessage(CC.translate("&c&l(!)&c You cannot send messages for another " + msLeft + "ms."));
+            player.sendMessage(CC.translate("&cTo reduce this cooldown, purchase a higher rank at &7buy.astropvp.net&c!"));
+            event.setCancelled(true);
+        }
+    }
 
     // Chat Filter
     @EventHandler(priority = EventPriority.HIGH)
@@ -80,20 +108,8 @@ public class ChatListener implements Listener {
             return;
         }
 
-        if (player.hasPermission("astrocore.nebula")) {
-            chatCooldown = 0;
-        } else if (player.hasPermission("astrocore.apollo")) {
-            chatCooldown = 2;
-        } else {
-            chatCooldown = 4;
-        }
-
-        if (AstroCore.getInstance().getCooldownUtils().isOnCooldown(player, "chatCooldown")) {
-            long msLeft = AstroCore.getInstance().getCooldownUtils().getRemainingMillis(player, "chatCooldown");
-            player.sendMessage(CC.translate("&c&l(!)&c You cannot send messages for another " + msLeft + "ms."));
-            player.sendMessage(CC.translate("&cTo reduce this cooldown, purchase a higher rank at &7buy.astropvp.net&c!"));
-            return;
-        }
+        // checked in chatCooldown() before the chat filter; kept per message (chat events run on several threads)
+        double chatCooldown = chatCooldownSeconds(player);
 
 
         Faction faction = fPlayer.getFaction();
