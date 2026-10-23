@@ -128,6 +128,7 @@ Copy these jars from the repo into `plugins/` (paths are relative to the repo ro
 | Commons (2021-12-01) | `Ruins/lib/Commons.jar` | **required:** AstroRuins, NebulaShop. Use this copy (newer superset of `NebulaShop/lib/Commons.jar`). |
 | BuycraftX 12.0.7 | `CCVerify/libs/BuycraftX.jar` | **required:** CCVerify (and so AstroRuins) |
 | AstroKillCounters | `KillCountersPatch/AstroKillCounters-1.0.jar` (`Ruins/lib/AstroKillCounters-1.0 (6).jar` with the empty-hand kill fix, see its README) | **required:** AstroTournaments, FactionLogs (option A) |
+| CosmicFactionBoosters | `FactionBoostersPatch/CosmicFactionBoosters.jar` (Astro's original with a load order and a Factions-interface fix, see its README) | optional: `/givefacbooster` EXP and mcMMO faction boosters (FactionsKore's `/booster` has no mcMMO type) |
 | HolographicDisplays | `AstroCollect/lib/HolographicDisplays (2).jar` | **required:** AstroCollectors, AstroEvents |
 | NBTAPI 2.7.1 | `AstroCustomBlocks/lib/item-nbt-api-plugin-2.7.1.jar` | **required:** AstroArmorSets, AstroHypeBoxes |
 | TAB 3.1.2 | `AstroScoreboard/lib/TAB.v3.1.2.jar` | **required:** AstroScoreboard (built against TAB 3's `me.neznamy.tab.api.TabAPI`; the TAB 2.8.10 jar in the same folder doesn't have it) |
