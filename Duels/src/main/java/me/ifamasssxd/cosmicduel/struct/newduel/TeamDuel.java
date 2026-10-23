@@ -123,6 +123,9 @@ public class TeamDuel extends NewDuel {
 
     /** 0 = challenging team (A), 1 = challenged team (B), -1 = not in this duel. */
     public int getSide(UUID uuid) {
+        // NewDuel's constructor calls addPlayer before this class's fields are initialised
+        if (this.sideA == null || this.sideB == null)
+            return -1;
         return this.sideA.contains(uuid) ? 0 : (this.sideB.contains(uuid) ? 1 : -1);
     }
 
@@ -895,6 +898,11 @@ public class TeamDuel extends NewDuel {
         for (List<ItemStack> itemStackList : this.stakes.values()) {
             rewards.addAll(itemStackList);
         }
+        // nothing was staked: new ItemStack[-1] below threw, so the duel never ended and spectators were never sent back
+        if (rewards.isEmpty()) {
+            this.stakes.clear();
+            return;
+        }
         CollectCategory category = new CollectCategory(CollectType.DUEL, rewards.toArray(new ItemStack[rewards.size() - 1]), CC.GoldB + "Duel Collect", System.currentTimeMillis());
         CollectPlugin.getInstance().getCollectManager().getOrCreate(winner.getUniqueId().toString()).add(category);
         winner.sendMessage("");
@@ -907,7 +915,7 @@ public class TeamDuel extends NewDuel {
     public void returnStakes() {
         for (Map.Entry<UUID, List<ItemStack>> item : this.stakes.entrySet()) {
             Player p = Bukkit.getPlayer(item.getKey());
-            if (p != null) {
+            if (p != null && !item.getValue().isEmpty()) {
                 CollectCategory category = new CollectCategory(CollectType.DUEL, item.getValue().toArray(new ItemStack[item.getValue().size() - 1]), CC.GoldB + "Duel Collect", System.currentTimeMillis());
                 CollectPlugin.getInstance().getCollectManager().getOrCreate(p.getUniqueId().toString()).add(category);
                 p.sendMessage("");
