@@ -2,6 +2,8 @@ name: CCVerify
 author: Bryside
 version: 1.0
 main: com.astropvp.cc.CCVerify
+softdepend:
+  - LuckPerms
 depend:
   - ProtocolLib
   - BuycraftX
