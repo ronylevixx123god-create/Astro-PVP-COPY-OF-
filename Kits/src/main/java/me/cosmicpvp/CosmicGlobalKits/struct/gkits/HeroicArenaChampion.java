@@ -15,9 +15,10 @@
  */
 package me.cosmicpvp.CosmicGlobalKits.struct.gkits;
 
-import com.compilex.CosmicArmorSets.CosmicArmorSetsAPI;
-import com.compilex.CosmicArmorSets.enums.ArmorSet;
-import com.compilex.CosmicArmorSets.enums.HeroicArmorType;
+import net.astropvp.armorsets.AstroArmorSetsAPI;
+import net.astropvp.armorsets.struct.ArmorSetType;
+import net.astropvp.armorsets.struct.ArmorSetWeapon;
+import net.astropvp.armorsets.struct.heroicArmor.HeroicArmor;
 import com.google.common.collect.Lists;
 import com.rit.sucy.EnchantmentAPI;
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ extends GlobalKit {
         boolean phantomSycthe;
         ArrayList<ItemStack> rewards = Lists.newArrayList();
         ItemStack helmet = ItemUtils.buildItem(Material.DIAMOND_HELMET, (short)0, ChatColor.GOLD.toString() + ChatColor.BOLD.toString() + "Crown of the Colosseum Champion", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "A golden crown embedded with bloodstones,", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "beware the monstrosity whom dawns this sigil.");
-        helmet = CosmicArmorSetsAPI.convertItemToHeroic((ItemStack)helmet, (HeroicArmorType)HeroicArmorType.HELMET, (boolean)true);
+        helmet = AstroArmorSetsAPI.convertArmorToHeroic((ItemStack)helmet, HeroicArmor.HELMET);
         HeroicArenaChampion.addRandomEnchantLevel(helmet, "Guardians");
         if (Math.random() <= 0.1 + 0.1 * (double)kitLevel) {
             HeroicArenaChampion.addEnchant(helmet, "Overload", HeroicArenaChampion.getMaxEnchantLevel("Overload"));
@@ -68,7 +69,7 @@ extends GlobalKit {
             armor.addEnchantment(Enchantment.PROTECTION_PROJECTILE, 4);
         }
         boolean bl = phantomSycthe = Math.random() <= 0.03 + 0.03 * (double)kitLevel;
-        ItemStack sword = phantomSycthe ? CosmicArmorSetsAPI.getWeaponFromArmorSet((ArmorSet)ArmorSet.PHANTOM) : ItemUtils.buildItem(Material.DIAMOND_SWORD, (short)0, ChatColor.GOLD.toString() + ChatColor.BOLD.toString() + "Bloodstone Rapier of Kronos", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "A blade with such a dark lineage", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "its very existence has been condemned", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "by the Council of Cosmonauts.");
+        ItemStack sword = phantomSycthe ? ((ArmorSetWeapon) ArmorSetType.PHANTOM.getArmorSet()).getWeapons().get(0) : ItemUtils.buildItem(Material.DIAMOND_SWORD, (short)0, ChatColor.GOLD.toString() + ChatColor.BOLD.toString() + "Bloodstone Rapier of Kronos", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "A blade with such a dark lineage", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "its very existence has been condemned", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "by the Council of Cosmonauts.");
         sword.addEnchantment(Enchantment.DAMAGE_ALL, 5);
         sword.addEnchantment(Enchantment.FIRE_ASPECT, 2);
         sword.addEnchantment(Enchantment.DURABILITY, 2);

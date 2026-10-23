@@ -18,7 +18,10 @@ import com.rit.sucy.EnchantmentAPI;
 import java.util.List;
 import java.util.Random;
 import me.cosmicpvp.CosmicGlobalKits.libs.GlobalKits;
+import net.astropvp.armorsets.AstroArmorSetsAPI;
+import net.astropvp.armorsets.struct.heroicArmor.HeroicArmor;
 import org.bukkit.Bukkit;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -56,6 +59,16 @@ public abstract class GlobalKit {
             return item;
         }
         return enchantment.addToItem(item, level);
+    }
+
+    /** CosmicArmorSetsAPI.createHeroicPeice(type): a plain heroic piece (Unbreaking III, boots also Protection IV), made by AstroArmorSets. */
+    public static ItemStack createHeroicPiece(HeroicArmor type) {
+        ItemStack item = AstroArmorSetsAPI.convertArmorToHeroic(new ItemStack(type.getType()), type);
+        if (type == HeroicArmor.BOOTS) {
+            item.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
+        }
+        item.addUnsafeEnchantment(Enchantment.DURABILITY, 3);
+        return item;
     }
 
     public static int getMaxEnchantLevel(String enchant) {

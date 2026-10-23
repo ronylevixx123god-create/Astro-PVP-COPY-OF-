@@ -18,8 +18,11 @@
  */
 package me.cosmicpvp.CosmicGlobalKits.struct.gkits;
 
-import com.compilex.CosmicArmorSets.CosmicArmorSetsAPI;
-import com.compilex.CosmicArmorSets.enums.ArmorSet;
+import com.compilex.CosmicDungeons.DungeonsAPI;
+import com.compilex.CosmicDungeons.dungeons.libs.Dungeon;
+import net.astropvp.armorsets.struct.ArmorSetType;
+import net.astropvp.core.AstroCore;
+import net.astropvp.core.killtracker.KillTrackerAPI;
 import com.google.common.collect.Lists;
 import me.cosmicpvp.CosmicGlobalKits.libs.GlobalKits;
 import me.cosmicpvp.CosmicGlobalKits.struct.GlobalKit;
@@ -99,16 +102,25 @@ extends GlobalKit {
         }
         rewards.add(sword);
         if (Math.random() < 0.005) {
-            rewards.add(CosmicArmorSetsAPI.getArmorSet((ArmorSet)ArmorSet.PHANTOM)[random.nextInt(4)]);
+            rewards.add(ArmorSetType.PHANTOM.getItems().get(random.nextInt(4)));
         }
+        // (else 16-32x Halloween Candy: Arkkit's Halloween items are not on this server)
         if (Math.random() < 0.02) {
             rewards.add(com.cosmicpvp.CosmicSpaceChests.utils.ItemUtils.getTitleVoucher((String)"GrimReaper"));
         }
+        rewards.add(KillTrackerAPI.createSoulShard(100 + random.nextInt(401)));
+        // Holy White Scroll and Soul Pearl moved from CosmicDungeons into AstroCore on this server
         if (Math.random() <= 0.001) {
+            rewards.add(AstroCore.getHolyWhiteScroll());
         }
         if (Math.random() <= 0.001) {
+            rewards.add(AstroCore.getSoulPearl());
         }
         if (Math.random() <= 0.001) {
+            Dungeon dungeon = DungeonsAPI.get().getDungeon(0);
+            if (dungeon != null) {
+                rewards.add(dungeon.getDungeonPortal());
+            }
         }
         return rewards;
     }

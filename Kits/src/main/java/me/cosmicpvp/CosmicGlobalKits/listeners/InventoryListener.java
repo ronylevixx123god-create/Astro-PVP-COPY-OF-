@@ -38,6 +38,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -108,10 +109,19 @@ implements Listener {
             pl = (Player)e.getWhoClicked();
             e.setCancelled(true);
             e.setResult(Event.Result.DENY);
-            pl.sendMessage(ChatColor.RED.toString() + (Object)ChatColor.BOLD + "(!) " + (Object)ChatColor.RED + "You cannot withdraw me.astropvp.cratekeys.items from a kit preview.");
+            pl.sendMessage(ChatColor.RED.toString() + (Object)ChatColor.BOLD + "(!) " + (Object)ChatColor.RED + "You cannot withdraw items from a kit preview.");
             pl.sendMessage((Object)ChatColor.GRAY + "Unlock access by defeating a Fallen Hero purchased at:");
             pl.sendMessage((Object)ChatColor.GRAY + "" + (Object)ChatColor.UNDERLINE + CosmicGlobalKits.getPlugin().getConfig().getString("store_url"));
             pl.closeInventory();
+        }
+    }
+
+    // items dragged onto the kit menu or a preview were deleted with it
+    @EventHandler
+    public void onKitMenuDrag(InventoryDragEvent e) {
+        String name = e.getInventory().getName();
+        if (name.equals("Astro Kits") || name.equals("Astro Kit Preview")) {
+            e.setCancelled(true);
         }
     }
 

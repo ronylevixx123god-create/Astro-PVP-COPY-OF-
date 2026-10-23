@@ -15,8 +15,8 @@
  */
 package me.cosmicpvp.CosmicGlobalKits.struct.gkits;
 
-import com.compilex.CosmicArmorSets.enums.ArmorSet;
-import com.compilex.CosmicArmorSets.enums.WeaponedArmorSet;
+import com.compilex.CosmicCustomCreepers.enums.CreeperTypes;
+import org.arkhamnetwork.CosmicCustomTNT.enums.TNTTypes;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,26 +101,45 @@ extends GlobalKit {
         for (int x = kitLevel + 1; x > 0; --x) {
             int x1 = random.nextInt(3);
             int x2 = random.nextInt(3);
-
-            int vanillaTntStacks = 1 + new Random().nextInt(3 + kitLevel);
-            while (vanillaTntStacks-- > 0) {
-                rewards.add(new ItemStack(Material.TNT, 64));
+            if (x1 == 0) {
+                rewards.add(ItemUtils.setAmount(TNTTypes.getTNTItem(TNTTypes.Lucky), 16 + new Random().nextInt(16)));
             }
-            for (int i = 0; i < 4; ++i) {
-                ItemStack customCreeper = null;
-
-                if (customCreeper != null) {
-                    customCreeper.setAmount(1 + kitLevel);
-                }
-                rewards.add(customCreeper);
+            if (x1 == 1) {
+                rewards.add(ItemUtils.setAmount(TNTTypes.getTNTItem(TNTTypes.Huge), 16 + new Random().nextInt(16)));
             }
-            rewards.add(new ItemStack(Material.MONSTER_EGG, 3 + new Random().nextInt(kitLevel * 2 + 1), (short) 50));
-            rewards.add(new ItemStack(Material.SPONGE, 5 + kitLevel * 2));
-            rewards.add(new ItemStack(Material.DISPENSER, 16 + kitLevel * 16));
-            if (Math.random() < (double) kitLevel * 0.2) {
-                rewards.add(((WeaponedArmorSet) ArmorSet.RANGER.getArmorSetInfo()).getWeapon(false));
+            if (x1 == 2) {
+                rewards.add(ItemUtils.setAmount(TNTTypes.getTNTItem(TNTTypes.Lethal), 16 + new Random().nextInt(16)));
             }
+            if (x2 == 0) {
+                rewards.add(ItemUtils.setAmount(TNTTypes.getTNTItem(TNTTypes.Lucky), 16 + new Random().nextInt(16)));
+            }
+            if (x2 == 1) {
+                rewards.add(ItemUtils.setAmount(TNTTypes.getTNTItem(TNTTypes.Huge), 16 + new Random().nextInt(16)));
+            }
+            if (x2 != 2) continue;
+            rewards.add(ItemUtils.setAmount(TNTTypes.getTNTItem(TNTTypes.Lethal), 16 + new Random().nextInt(16)));
         }
+        int vanillaTntStacks = 1 + new Random().nextInt(3 + kitLevel);
+        while (vanillaTntStacks-- > 0) {
+            rewards.add(new ItemStack(Material.TNT, 64));
+        }
+        for (int i = 0; i < 4; ++i) {
+            int x = new Random().nextInt(3);
+            ItemStack customCreeper = null;
+            if (x == 0) {
+                customCreeper = CreeperTypes.getCCItem(CreeperTypes.Lucky);
+            } else if (x == 2) {
+                customCreeper = CreeperTypes.getCCItem(CreeperTypes.Huge);
+            }
+            // (x == 1: Tactical Creeper, which this server does not have: its creepers are Huge, Raid and Lucky)
+            if (customCreeper == null) continue;
+            customCreeper.setAmount(1 + kitLevel);
+            rewards.add(customCreeper);
+        }
+        rewards.add(new ItemStack(Material.MONSTER_EGG, 3 + new Random().nextInt(kitLevel * 2 + 1), (short) 50));
+        rewards.add(new ItemStack(Material.SPONGE, 5 + kitLevel * 2));
+        rewards.add(new ItemStack(Material.DISPENSER, 16 + kitLevel * 16));
+        // (Ranger Bow at kitLevel * 20%: AstroArmorSets' Ranger set has no weapon)
         return rewards;
 
     }

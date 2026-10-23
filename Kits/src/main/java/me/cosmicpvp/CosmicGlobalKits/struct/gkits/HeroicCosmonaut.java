@@ -14,8 +14,7 @@
  */
 package me.cosmicpvp.CosmicGlobalKits.struct.gkits;
 
-import com.compilex.CosmicArmorSets.CosmicArmorSetsAPI;
-import com.compilex.CosmicArmorSets.enums.HeroicArmorType;
+import net.astropvp.armorsets.struct.heroicArmor.HeroicArmor;
 import com.google.common.collect.Lists;
 import com.rit.sucy.CustomEnchantment;
 import com.rit.sucy.EnchantmentAPI;
@@ -35,8 +34,8 @@ extends GlobalKit {
     public List<ItemStack> getKitItems(Player player, GlobalKits kits, int kitLevel) {
         ArrayList<ItemStack> rewards = Lists.newArrayList();
         ArrayList<CustomEnchantment> enchants = new ArrayList<CustomEnchantment>();
-        ItemStack helmet = this.setItemNameAndLore(CosmicArmorSetsAPI.createHeroicPeice((HeroicArmorType)HeroicArmorType.CHESTPLATE), ChatColor.GOLD.toString() + ChatColor.BOLD.toString() + (player != null ? player.getName() : "???") + "'s Cosmonaut Spacesuit", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "Forged of the finest materials in all", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "the galaxy. A timeless, unique piece.");
-        ItemStack legs = this.setItemNameAndLore(CosmicArmorSetsAPI.createHeroicPeice((HeroicArmorType)HeroicArmorType.LEGGINGS), ChatColor.GOLD.toString() + ChatColor.BOLD.toString() + (player != null ? player.getName() : "???") + "'s Cosmonaut Pantaloons", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "Created out of the richest materials", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "in all the galaxy. So fabulous.");
+        ItemStack helmet = this.setItemNameAndLore(HeroicCosmonaut.createHeroicPiece(HeroicArmor.CHESTPLATE), ChatColor.GOLD.toString() + ChatColor.BOLD.toString() + (player != null ? player.getName() : "???") + "'s Cosmonaut Spacesuit", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "Forged of the finest materials in all", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "the galaxy. A timeless, unique piece.");
+        ItemStack legs = this.setItemNameAndLore(HeroicCosmonaut.createHeroicPiece(HeroicArmor.LEGGINGS), ChatColor.GOLD.toString() + ChatColor.BOLD.toString() + (player != null ? player.getName() : "???") + "'s Cosmonaut Pantaloons", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "Created out of the richest materials", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "in all the galaxy. So fabulous.");
         enchants.add(EnchantmentAPI.getEnchantment((String)"Immortal"));
         enchants.add(EnchantmentAPI.getEnchantment((String)"Enlighted"));
         enchants.add(EnchantmentAPI.getEnchantment((String)"Obsidianshield"));
