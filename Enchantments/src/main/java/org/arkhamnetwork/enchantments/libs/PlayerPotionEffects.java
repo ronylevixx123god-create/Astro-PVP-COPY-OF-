@@ -1,5 +1,7 @@
 package org.arkhamnetwork.enchantments.libs;
 
+import org.arkhamnetwork.enchantments.listeners.FactionsKorePotionCompat;
+
 import com.compilex.CosmicDungeons.DungeonsAPI;
 import com.compilex.CosmicDungeons.dungeons.libs.DungeonPlayer;
 import com.rit.sucy.CustomEnchantment;
@@ -214,7 +216,7 @@ public class PlayerPotionEffects {
                 if (!p.hasPotionEffect(ape.getEffectType())) {
                     if (AstroItemSkinsAPI.hasSkinEquipped(p, SkinType.CHRISTMAS_BOOTS_SLIPPERS) && ape.getEffectType().getName().equals("SLOW"))
                         continue;
-                    p.addPotionEffect(new PotionEffect(ape.getEffectType(), 2147483647, ape.getPotionLevel(), true));
+                    FactionsKorePotionCompat.applyEnchantEffect(p, new PotionEffect(ape.getEffectType(), 2147483647, ape.getPotionLevel(), true));
                     if (!alertChanges)
                         continue;
                     p.sendMessage(ChatColor.GREEN.toString() + ChatColor.BOLD + "[+] " + ChatColor.GREEN + "" + ((SpecificCustomEnchantment)data.getKey()).getEnchantment().name() + " " + RomanNumber.toRoman(((SpecificCustomEnchantment)data.getKey()).getEnchantmentLevel()) + ":" + ChatColor.GRAY + " applying " + ape.getEffectType().getName() + " " + RomanNumber.toRoman(ape.getPotionLevel() + 1));
@@ -225,7 +227,7 @@ public class PlayerPotionEffects {
                             AstroItemSkinsAPI.hasSkinEquipped(p, SkinType.CHRISTMAS_BOOTS_SLIPPERS) && ape.getEffectType().getName().equals("SLOW")))
                         continue;
                     p.removePotionEffect(ape.getEffectType());
-                    p.addPotionEffect(new PotionEffect(ape.getEffectType(), 2147483647, ape.getPotionLevel(), true));
+                    FactionsKorePotionCompat.applyEnchantEffect(p, new PotionEffect(ape.getEffectType(), 2147483647, ape.getPotionLevel(), true));
                     if (!alertChanges)
                         continue;
                     if (((SpecificCustomEnchantment)data.getKey()).getEnchantment().name().equals("Gears") && ((SpecificCustomEnchantment)data.getKey()).getEnchantmentLevel() == 4)

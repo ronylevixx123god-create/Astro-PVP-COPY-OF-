@@ -171,6 +171,8 @@ public class Enchantments extends EnchantPlugin {
     private void registerTasks() {
         getServer().getScheduler().runTaskTimer(this, new SoulModeTask(), 5L, 5L);
         getServer().getScheduler().runTaskTimer(this, new PlayerPotionEffectPersistTask(), 20L, 20L);
+        // after every plugin has enabled, so FactionsKore's event class can be found
+        getServer().getScheduler().runTask(this, FactionsKorePotionCompat::hook);
     }
 
     private void registerCommands() {
