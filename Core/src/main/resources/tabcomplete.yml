@@ -149,12 +149,22 @@ permissions:
   stack: astrocore.stack
   throwable: astrocore.admin
 
-# never suggested to players who aren't OP (they show the server software and plugin list)
+# never suggested to players who aren't OP: the server software and plugin list, and LibsDisguises' own commands, which
+# check their real permissions inside (players use /disguises; /d, /dis and /disguise lead there)
 hidden:
   - "?"
   - about
+  - disguiseclone
+  - disguiseentity
+  - disguisehelp
+  - disguiseplayer
+  - disguiseradius
   - icanhasbukkit
+  - libsdisguises
   - pl
   - plugins
+  - undisguiseentity
+  - undisguiseplayer
+  - undisguiseradius
   - ver
   - version
