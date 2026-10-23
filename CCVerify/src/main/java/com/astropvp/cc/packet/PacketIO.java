@@ -189,8 +189,13 @@ public class PacketIO {
                 break;
             }
         }*/
-        if (!player.hasPermission("astrocore.apollo")) return;
-        this.headers.put(player.getName(), Collections.singletonList(CC.translate(LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId()).getCachedData().getMetaData().getPrefix())));
+        // the line above the name: the rank's "header" meta (LuckPerms), else - as Astro did - the prefix for apollo+
+        net.luckperms.api.model.user.User user = LuckPermsProvider.get().getUserManager().getUser(player.getUniqueId());
+        String header = user == null ? null : user.getCachedData().getMetaData().getMetaValue("header");
+        if (header == null && user != null && player.hasPermission("astrocore.apollo")) header = user.getCachedData().getMetaData().getPrefix();
+        if (header != null) this.headers.put(player.getName(), Collections.singletonList(CC.translate(header)));
+        else this.headers.remove(player.getName());
+        // always send: a player without a header still needs everyone else's (Astro returned early here)
         PacketOutPlayerHeaders playerHeaders = new PacketOutPlayerHeaders(this.headers, false);
         for (CosmicPlayer cp : CosmicPlayers.get().getAll())
             queuePacket(cp.getPlayer(), playerHeaders);

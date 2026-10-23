@@ -34,6 +34,11 @@ public class CCVerify extends JavaPlugin implements Listener {
         PacketCommons.bootstrap();
 
         PacketIO.create();
+        // a rank change updates the header straight away instead of after the next login
+        net.luckperms.api.LuckPermsProvider.get().getEventBus().subscribe(this, net.luckperms.api.event.user.UserDataRecalculateEvent.class, event -> {
+            org.bukkit.entity.Player player = getServer().getPlayer(event.getUser().getUniqueId());
+            if (player != null) getServer().getScheduler().runTask(this, () -> { if (player.isOnline()) PacketIO.get().addPlayerToHeader(player); });
+        });
 
         VoiceTask.start();
 
