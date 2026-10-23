@@ -26,31 +26,39 @@ public class Lifesteal extends CustomEnchantment {
             health = (int)user.getMaxHealth();
         }
         if (random <= chance) {
-            if (target instanceof Player && MaskType.hasEquipped((Player) target, "NECROMANCER")) {
+            if (isLifestealBlocked(target)) {
                 return;
             }
-            if (target instanceof Player && AstroItemSkinsAPI.hasSkinEquipped((Player) target, SkinType.SUMMER_2021_BELT)) {
-                return;
-            }
-
-
-            if ((target instanceof Player && AstroItemSkinsAPI.hasSkinEquipped((Player) target, SkinType.SPRING_BREAK_2022_MUTATED_BELT))) {
-                return;
-            }
-
-            if (target instanceof Player && AstroItemSkinsAPI.hasSkinEquipped((Player) target, SkinType.JULY4TH_2022_HELMET)) {
-                return;
-            }
-
-            if (target instanceof Player && AstroItemSkinsAPI.hasSkinEquipped((Player) target, SkinType.VALENTINES_2022_MUTATED_BACKPACK)) {
-                return;
-            }
-
-            if (target instanceof Player && (AstroItemSkinsAPI.hasSkinEquipped((Player) target, SkinType.EASTER_2022_BELT) || AstroItemSkinsAPI.hasSkinEquipped((Player) target, SkinType.EASTER_2022_MUTATED_BELT)))
-                return;
-
             GeneralUtil.setPlayerHealth(user, health);
 
         }
+    }
+
+    // Necromancer mask and the item skins that block lifesteal; shared with Demonic Lifesteal so both use the same counters
+    public static boolean isLifestealBlocked(final LivingEntity target) {
+        if (target instanceof Player && MaskType.hasEquipped((Player) target, "NECROMANCER")) {
+            return true;
+        }
+        if (target instanceof Player && AstroItemSkinsAPI.hasSkinEquipped((Player) target, SkinType.SUMMER_2021_BELT)) {
+            return true;
+        }
+
+
+        if ((target instanceof Player && AstroItemSkinsAPI.hasSkinEquipped((Player) target, SkinType.SPRING_BREAK_2022_MUTATED_BELT))) {
+            return true;
+        }
+
+        if (target instanceof Player && AstroItemSkinsAPI.hasSkinEquipped((Player) target, SkinType.JULY4TH_2022_HELMET)) {
+            return true;
+        }
+
+        if (target instanceof Player && AstroItemSkinsAPI.hasSkinEquipped((Player) target, SkinType.VALENTINES_2022_MUTATED_BACKPACK)) {
+            return true;
+        }
+
+        if (target instanceof Player && (AstroItemSkinsAPI.hasSkinEquipped((Player) target, SkinType.EASTER_2022_BELT) || AstroItemSkinsAPI.hasSkinEquipped((Player) target, SkinType.EASTER_2022_MUTATED_BELT)))
+            return true;
+
+        return false;
     }
 }
