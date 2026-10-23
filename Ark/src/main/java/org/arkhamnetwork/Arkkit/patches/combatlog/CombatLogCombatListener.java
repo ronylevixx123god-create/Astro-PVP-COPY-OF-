@@ -32,11 +32,10 @@ import org.bukkit.potion.PotionEffectType;
 
 public class CombatLogCombatListener
         implements Listener {
+    // time left on the combat tag: settings.combat_log.combat_duration with the Joker Mask changes, as the tag itself
+    // (this used a fixed 10 seconds, so the in-combat command block and /ct showed the wrong time)
     public static int getTimeLeftMSInCombat(Player pl) {
-        if (pl.hasMetadata("cl_combat") && pl.getMetadata("cl_combat").get(0) != null && System.currentTimeMillis() - pl.getMetadata("cl_combat").get(0).asLong() <= 10000L) {
-            return (int) (10000L - (System.currentTimeMillis() - pl.getMetadata("cl_combat").get(0).asLong()));
-        }
-        return 0;
+        return (int) CombatLog.getTimeLeftInCombat(pl);
     }
 
 

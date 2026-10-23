@@ -793,7 +793,7 @@ settings:
   combat_log:
     block_enderpearls: false
     block_heal: false
-    combat_duration: 8000
+    combat_duration: 12000
     spawnNPC: true
 
   voting:
