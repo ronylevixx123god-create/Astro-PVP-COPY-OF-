@@ -76,7 +76,7 @@ public class Enchantments extends EnchantPlugin {
                 new AntiGravity(), new Immortal(), new Armored(), new Nutrition(), new SelfDestruct(), new SpiritLink(), new Berserk(), new Bleed(), new Blessed(), new Confusion(), new Decapitation(),
                 new Ravenous(), new Reforged(), new Cleave(), new Commander(), new Valor(), new Inquisitive(), new Cactus(), new RocketEscape(), new Guardians(), new Teleportation(),
                 new Lifebloom(), new PlagueCarrier(), new Obliterate(), new EnderWalker(), new Paralyze(), new Drunk(), new Insomnia(), new SkillSwipe(), new Silence(), new Angelic(),
-                new Voodoo(), new Tray(), new Stormcaller(), new Execute(), new Demonforged(), new AutoSmelt(), new Experience(), new Detonate(), new ObsidianDestroyer(), new Oxygenate(),
+                new Voodoo(), new Tray(), new Stormcaller(), new Execute(), new AgainstTheOdds(), new Demonforged(), new AutoSmelt(), new Experience(), new Detonate(), new ObsidianDestroyer(), new Oxygenate(),
                 new Telepathy(), new Lucky(), new Leadership(), new SmokeBomb(), new Rage(), new ArrowLifesteal(), new Clarity(), new Spirits(), new UndeadRuse(), new Trickster(),
                 new BloodLust(), new Devour(), new Protection(), new Destruction(), new Hellfire(), new Ragdoll(), new Sniper(), new Snare(), new CombatMedic(), new Overwhelm(), new HeroicAntiGank(), new DivineLight(), this.naturesWrathEnchant = new NatureWrath(), new DivineImmolation(),
                 new Rogue(), new HeroicInversion(), new HeroicInsomnia(), new HeroicValor(), new HeroicAegis(), new HeroicEnrage(), new HeroicCorrupt(), new HeroicSolitude(), new HeroicDevour(), new HeroicHex(),
