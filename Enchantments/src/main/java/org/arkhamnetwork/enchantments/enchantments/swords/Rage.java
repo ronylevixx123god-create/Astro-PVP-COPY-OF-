@@ -1,5 +1,6 @@
 package org.arkhamnetwork.enchantments.enchantments.swords;
 
+import org.arkhamnetwork.enchantments.enchantments.armor.Soulguard;
 import com.cosmicpvp.cosmicutils.utils.CC;
 import com.cosmicpvp.cosmicutils.utils.GeneralUtil;
 import com.cosmicpvp.cosmicutils.utils.WorldUtil;
@@ -131,6 +132,11 @@ public class Rage extends CustomEnchantment {
                 this.sendRageActionBar((Player)user, (Player)target, rageStacksCache);
                 this.playRageEffect(target.getLocation());
                 if(rageDamage < 1) rageDamage = 1;
+                // Soulguard on the target shrinks only the Rage bonus (the part above 1x); stacks are left alone
+                if (rageDamage > 1) {
+                    double soulguard = Soulguard.rageReduction(target);
+                    if (soulguard > 0) rageDamage = 1 + (rageDamage - 1) * (1 - soulguard);
+                }
                 event.setDamage(event.getDamage() * rageDamage);
             }
 

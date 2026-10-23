@@ -1,5 +1,6 @@
 package org.arkhamnetwork.enchantments.enchantments.swords;
 
+import org.arkhamnetwork.enchantments.enchantments.armor.Soulguard;
 import com.cosmicpvp.cosmicutils.nms.MinecraftServerUtils;
 import com.cosmicpvp.cosmicutils.utils.CC;
 import com.cosmicpvp.cosmicutils.utils.WorldGuardUtils;
@@ -201,7 +202,9 @@ public class DivineImmolation extends CustomEnchantment {
                     final LivingEntity le = (LivingEntity) ent;
                     final Player attacker = (Player) player;
 
-                    le.damage(damage);
+                    // Soulguard: reduce the splash damage here, at its only source (no general damage listener)
+                    double soulguard = Soulguard.divineReduction(le);
+                    le.damage(damage * (1 - soulguard));
 
                     if (AstroItemSkinsAPI.hasSkinEquipped(pEnt, SkinType.THANKSGIVING_SWORD_HARVESTER) && Math.random() < 0.5) {
                         pEnt.sendMessage(CC.translate("&e&l** SOUL HARVESTER [&7Blocked Divine Immolation&e&l] **"));

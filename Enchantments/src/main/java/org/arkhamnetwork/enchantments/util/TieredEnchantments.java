@@ -80,6 +80,7 @@ public enum TieredEnchantments {
     extremeinsanity(7),
     naturewrath(6),
     divineimmolation(6),
+    soulguard(6),
     immortal(6),
     teleblock(6),
     paradox(6),
