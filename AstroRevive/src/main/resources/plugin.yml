@@ -6,3 +6,10 @@ commands:
    revive:
       description: revive
       usage: /<command>
+permissions:
+   prorevive.revive:
+      description: /revive <player> - view, revive and archive death inventories
+      default: op
+   prorevive.archive:
+      description: /revive box - every death record incl. archived ones, inspect and revive
+      default: op
