@@ -1,5 +1,6 @@
 package net.crankedpvp.staff.managers;
 
+import net.crankedpvp.staff.listeners.FrozenChatListener;
 import com.cosmicpvp.cosmicutils.utils.CC;
 import lombok.Getter;
 import net.astropvp.core.AstroCore;
@@ -22,6 +23,10 @@ public class FreezeManager {
     @Getter
     private Map<UUID, Location> frozenPlayers = new HashMap<>();
 
+    // frozen player -> the staff member who froze them (Frozen Chat only talks to players you froze)
+    @Getter
+    private Map<UUID, UUID> frozenBy = new HashMap<>();
+
     public boolean isFrozen(Player player) {
         return this.frozenPlayers.containsKey(player.getUniqueId());
     }
@@ -30,10 +35,13 @@ public class FreezeManager {
     public boolean toggleFreeze(Player player, Player toFreeze) {
         if(this.frozenPlayers.containsKey(toFreeze.getUniqueId())) {
             this.frozenPlayers.remove(toFreeze.getUniqueId());
+            this.frozenBy.remove(toFreeze.getUniqueId());
+            FrozenChatListener.closeForTarget(toFreeze.getUniqueId());
             Bukkit.getOnlinePlayers().stream().filter(loopPlayer -> loopPlayer.hasPermission("staff.freeze")).forEach(loopPlayer -> loopPlayer.sendMessage(CC.translate("&b&lFreeze &8➥ &7The player &f" + toFreeze.getName() + " &7has been unfrozen by &f" + player.getName())));
             return false;
         }
         this.frozenPlayers.put(toFreeze.getUniqueId(), toFreeze.getLocation().clone());
+        this.frozenBy.put(toFreeze.getUniqueId(), player.getUniqueId());
         Bukkit.getOnlinePlayers().stream().filter(loopPlayer -> loopPlayer.hasPermission("staff.freeze")).forEach(loopPlayer -> loopPlayer.sendMessage(CC.translate("&b&lFreeze &8➥ &7The player &f" + toFreeze.getName() + " &7has been frozen by &f" + player.getName())));
         TitleUtils.sendTitle(toFreeze, CC.translate("&c&lFROZEN"), CC.translate("&7DO NOT LOG OUT"), 1, 10, 1);
         toFreeze.sendMessage(CC.translate("&b&lFreeze &8➥ &7You have been &c&lFROZEN&7. Join discord.gg/b58nePVn immediately."));

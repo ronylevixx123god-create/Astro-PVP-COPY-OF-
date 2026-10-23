@@ -1,5 +1,6 @@
 package net.crankedpvp.staff.struct;
 
+import net.crankedpvp.staff.listeners.FrozenChatListener;
 import com.cosmicpvp.cosmicutils.utils.CC;
 import de.tr7zw.nbtapi.NBTItem;
 import net.astropvp.core.AstroCore;
@@ -33,12 +34,14 @@ public class StaffMode {
         this.addRandomPlayerSelector();
         this.addVanish();
         this.addFreezeTool();
+        this.addFrozenChat();
     }
 
     public void removePlayerFromStaffMode() {
         this.player.sendMessage(CC.translate(AstroCore.prefix + "&eYou have left staff mode"));
         this.player.playSound(this.player.getLocation(), Sound.BAT_TAKEOFF, 2.0F, 2.0F);
         this.staffManager.removePlayerFromStaffMode(this.player);
+        FrozenChatListener.close(this.player.getUniqueId());
         this.player.setGameMode(GameMode.SURVIVAL);
         this.reinstateInventory();
     }
@@ -81,6 +84,12 @@ public class StaffMode {
         NBTItem nbtItem = new NBTItem(itemBuilder.colorize().build());
         nbtItem.setString("staffModeItem", "freezeTool");
         return nbtItem.getItem();
+    }
+
+    // next to the freeze tool, same permission
+    private void addFrozenChat() {
+        if(!this.player.hasPermission("staff.freeze")) return;
+        this.player.getInventory().setItem(7, FrozenChatListener.getFrozenChatTool());
     }
 
     private void completelyClearPlayersInventory() {
