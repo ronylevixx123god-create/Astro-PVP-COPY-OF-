@@ -77,6 +77,7 @@ import net.crankedpvp.staff.commands.FreezeCommand;
 import net.crankedpvp.staff.commands.GhostMuteCommand;
 import net.crankedpvp.staff.commands.StaffChatCommand;
 import net.crankedpvp.staff.commands.StaffModeCommand;
+import net.crankedpvp.staff.commands.StaffListCommand;
 import net.crankedpvp.staff.listeners.*;
 import net.crankedpvp.staff.managers.FreezeManager;
 import net.crankedpvp.staff.managers.GhostMuteManager;
@@ -250,6 +251,7 @@ public class AstroCore extends JavaPlugin {
 
         me.mattstudios.mf.base.CommandManager commandManager = new me.mattstudios.mf.base.CommandManager(this);
         commandManager.register(new StaffModeCommand(this));
+        commandManager.register(new StaffListCommand(this));
         commandManager.register(new FreezeCommand(this));
         commandManager.register(new GhostMuteCommand(this));
         commandManager.register(new StaffChatCommand(this));
