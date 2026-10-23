@@ -1,0 +1,10 @@
+version: 1.0
+main: me.ifamasssxd.cosmicevolutionkits.CosmicEvolutionKits
+name: CosmicEvolutionKits
+depend: [CosmicPvPUtils, CosmicSkyCustomItems]
+# load after the plugins whose items the kits build (Astro: softdepend LilyPad-Connect, its old proxy)
+softdepend: [AstroCore, Arkkit, Enchantments, EnchantmentAPI, CosmicSpaceChests, Factions, CosmicConquests, CosmicCustomTNT, mcMMO, LuckPerms]
+commands:
+  vkit:
+    description: Evolution kit command.
+    aliases: [evkit]
