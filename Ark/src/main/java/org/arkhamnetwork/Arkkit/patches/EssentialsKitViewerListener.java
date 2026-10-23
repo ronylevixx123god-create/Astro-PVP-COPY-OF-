@@ -36,6 +36,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.inventory.Inventory;
@@ -89,7 +90,8 @@ final class EssentialsKitViewerListener
         if (e.getInventory().getTitle().equals(EssentialsKitViewer.kit_inventory_name)) {
             e.setCancelled(true);
             e.setResult(Event.Result.DENY);
-            if (e.getCurrentItem() != null) {
+            // only the menu's own slots redeem: a named item in the player's inventory used to run "/kit <first word>"
+            if (e.getCurrentItem() != null && e.getRawSlot() < e.getInventory().getSize()) {
                 String warp = this.getWarpName(e.getCurrentItem());
                 if (warp == null) {
                     return;
@@ -101,6 +103,15 @@ final class EssentialsKitViewerListener
                 //pl.chat("/kit " + warp);
                 pl.playSound(pl.getLocation(), Sound.CLICK, 1.0f, 0.75f);
             }
+        }
+    }
+
+    // items dragged onto the menus were kept by the (shared) selector or deleted with the kit menu
+    @EventHandler
+    public void onInventoryDrag(InventoryDragEvent e) {
+        String title = e.getInventory().getTitle();
+        if (title.equals("Choose a kit category...") || title.equals(EssentialsKitViewer.kit_inventory_name)) {
+            e.setCancelled(true);
         }
     }
 
@@ -141,7 +152,9 @@ final class EssentialsKitViewerListener
             String kit_name = data.getKey();
             double delay_ms = 0.0;
             try {
-                delay_ms = EssentialsKitViewer.getEssentials().getKits().getKit(kit_name).containsKey("delay") ? ((Number) EssentialsKitViewer.getEssentials().getKits().getKit(kit_name).get("delay")).doubleValue() : 0.0;
+                Map<String, Object> kit = EssentialsKitViewer.getEssentials().getKits().getKit(kit_name);
+                // a listed kit missing from kits.yml has no delay (claiming it says "That kit does not exist.")
+                delay_ms = kit != null && kit.containsKey("delay") ? ((Number) kit.get("delay")).doubleValue() : 0.0;
                 delay_ms *= 1000.0;
             } catch (Exception err) {
                 err.printStackTrace();
