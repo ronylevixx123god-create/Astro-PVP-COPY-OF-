@@ -57,14 +57,17 @@ public class ChatListener implements Listener {
     }
 
 
-    /** Seconds between public chat messages for this player's rank (OPs have none). */
+    /**
+     * Seconds between public chat messages for this player's rank (OPs have none): Astro's compiled AstroCore jars
+     * (June 2022 - January 2023) used 0 / 1 / 2; the source had been raised to 0 / 2 / 4 in September 2023.
+     */
     static double chatCooldownSeconds(Player player) {
         if (player.hasPermission("astrocore.nebula")) {
             return 0;
         } else if (player.hasPermission("astrocore.apollo")) {
-            return 2;
+            return 1;
         } else {
-            return 4;
+            return 2;
         }
     }
 
