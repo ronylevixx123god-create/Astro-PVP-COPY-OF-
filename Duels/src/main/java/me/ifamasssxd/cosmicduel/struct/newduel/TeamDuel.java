@@ -97,10 +97,80 @@ public class TeamDuel extends NewDuel {
 
     public void setTeamA(TeamData teamA) {
         this.teamA = teamA;
+        snapshotRoster(this.sideA, teamA);
     }
 
     public void setTeamB(TeamData teamB) {
         this.teamB = teamB;
+        snapshotRoster(this.sideB, teamB);
+    }
+
+    // The duel keeps its own copy of both rosters (leader first) taken when the teams are set, so it never depends on
+    // /team data that could change, and offline players still have a name.
+    private void snapshotRoster(List<UUID> side, TeamData data) {
+        side.clear();
+        if (data != null) {
+            side.addAll(data.getAllMembers());
+            for (UUID uuid : side)
+                this.rosterNames.put(uuid, Bukkit.getOfflinePlayer(uuid).getName());
+        }
+        this.teams.clear();
+        if (this.teamA != null)
+            this.teams.add(this.teamA);
+        if (this.teamB != null)
+            this.teams.add(this.teamB);
+    }
+
+    /** 0 = challenging team (A), 1 = challenged team (B), -1 = not in this duel. */
+    public int getSide(UUID uuid) {
+        return this.sideA.contains(uuid) ? 0 : (this.sideB.contains(uuid) ? 1 : -1);
+    }
+
+    public boolean onSameSide(Player a, Player b) {
+        int side = getSide(a.getUniqueId());
+        return side >= 0 && side == getSide(b.getUniqueId());
+    }
+
+    public List<UUID> getSideMembers(int side) {
+        return side == 0 ? this.sideA : this.sideB;
+    }
+
+    public TeamData getSideTeam(int side) {
+        return side == 0 ? this.teamA : this.teamB;
+    }
+
+    public String getSideLeaderName(int side) {
+        List<UUID> members = getSideMembers(side);
+        return members.isEmpty() ? "?" : this.rosterNames.get(members.get(0));
+    }
+
+    public String getRoster(int side) {
+        List<String> names = Lists.newArrayList();
+        for (UUID uuid : getSideMembers(side))
+            names.add(this.rosterNames.get(uuid));
+        return String.join(", ", names);
+    }
+
+    private List<Player> getOnlineParticipants() {
+        List<Player> online = Lists.newArrayList();
+        for (int side = 0; side < 2; side++) {
+            for (UUID uuid : getSideMembers(side)) {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player != null)
+                    online.add(player);
+            }
+        }
+        return online;
+    }
+
+    // the side's leader if online, otherwise any online member
+    private Player getSideRepresentative(int side) {
+        for (UUID uuid : getSideMembers(side)) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null)
+                return player;
+        }
+        return null;
     }
 
     public TeamDuel(Player initiator, List<String> pendingInvites) {
@@ -108,8 +178,10 @@ public class TeamDuel extends NewDuel {
         this.ending = false;
         this.format = new DecimalFormat("#.#");
         this.duelID = id++;
-        setTeamA(CosmicDuel.get().getTeamDataManager().tryFindTeam(initiator.getUniqueId()));
+        this.teams = Lists.newArrayList();
         this.contentsToDrop = Maps.newHashMap();
+        setTeamA(CosmicDuel.get().getTeamDataManager().tryFindTeam(initiator.getUniqueId()));
+        initiator.setMetadata("in_team_duel", new FixedMetadataValue(CosmicDuel.get(), this.duelID + ":0"));
     }
 
     public TeamDuel(Player initiator, List<String> pendingInvites, boolean ranked) {
@@ -117,19 +189,22 @@ public class TeamDuel extends NewDuel {
         this.ending = false;
         this.format = new DecimalFormat("#.#");
         this.duelID = id++;
-        this.teams.add(CosmicDuel.get().getTeamDataManager().tryFindTeam(initiator.getUniqueId()));
+        this.teams = Lists.newArrayList();
+        this.contentsToDrop = Maps.newHashMap();
+        setTeamA(CosmicDuel.get().getTeamDataManager().tryFindTeam(initiator.getUniqueId()));
     }
 
     public String getName() {
-        return "Team v Team";
+        return "2v2 Team";
     }
 
     public DuelType getDuelType() {
         return DuelType.TEAM_VS_TEAM;
     }
 
+    // 2 + 2 once the challenged team is known (the original returned getPlayers().size(), so it always looked ready)
     public int getPlayersToStart() {
-        return getPlayers().size();
+        return this.teamB == null ? getPlayers().size() : this.sideA.size() + this.sideB.size();
     }
 
     public List<TeamData> getTeams() {
@@ -137,27 +212,34 @@ public class TeamDuel extends NewDuel {
     }
 
     public TeamData getOppositeTeam(TeamData data) {
-        return (this.teams.get(0) == data) ? this.teams.get(1) : this.teams.get(0);
+        return (this.teamA == data) ? this.teamB : this.teamA;
     }
 
     public TeamData getOppositeTeam(Player player) {
-        return getOppositeTeam(CosmicDuel.get().getTeamDataManager().tryFindTeam(player.getUniqueId()));
+        return getSide(player.getUniqueId()) == 0 ? this.teamB : this.teamA;
     }
 
     public void addPlayer(Player player, boolean checkStart) {
+        if (player == null || this.players.contains(player))
+            return;
         this.players.add(player);
         player.setMetadata("in_duel", new FixedMetadataValue(CosmicDuel.get(), ""));
-        if (CosmicDuel.get().getTeamDataManager().tryFindTeam(player.getUniqueId()) != null) {
-            TeamData data = CosmicDuel.get().getTeamDataManager().tryFindTeam(player.getUniqueId());
-            player.setMetadata("in_team_duel", new FixedMetadataValue(CosmicDuel.get(), data.getLeaderUUID()));
-        }
-        if (checkStart && this.players.size() == getPlayersToStart()) {
+        int side = getSide(player.getUniqueId());
+        if (side >= 0)
+            player.setMetadata("in_team_duel", new FixedMetadataValue(CosmicDuel.get(), this.duelID + ":" + side));
+        if (checkStart)
+            checkReady();
+    }
+
+    // all four players are in: open the leaders' stake menus (everyone else watches them)
+    public void checkReady() {
+        if (this.teamB != null && this.players.size() >= getPlayersToStart() && getCreateState() != DuelCreateState.STAKES) {
             setCreateState(DuelCreateState.STAKES);
             this.stakeInventory = new NewStakeInventory(this, getTeamA(), getTeamB(), Bukkit.getPlayer(getTeamA().getLeaderUUID()), Bukkit.getPlayer(getTeamB().getLeaderUUID()));
             for (Player p : getPlayers()) {
                 p.setMetadata("close_exempt", new FixedMetadataValue(CosmicDuel.get(), ""));
                 p.closeInventory();
-                if (CosmicDuel.get().getTeamDataManager().tryFindTeam(p.getUniqueId()) == this.stakeInventory.teamA) {
+                if (getSide(p.getUniqueId()) == 0) {
                     p.openInventory(this.stakeInventory.getTeamALeaderInventory());
                     continue;
                 }
@@ -184,27 +266,22 @@ public class TeamDuel extends NewDuel {
         removeVanish(player);
     }
 
+    // arena spawns are listed alternating sides: 0 = team A, 1 = team B, 2 = team A, 3 = team B; an arena with only two
+    // spawns puts both teammates on their side's spawn like the original
     public void teleportToSpawnLocation(TeamData a, TeamData b) {
-        Location locationA = checkIfTeamSpawnLoaded(this.arena.getTeamASpawnLocation());
-        Location locationB = checkIfTeamSpawnLoaded(this.arena.getTeamBSpawnLocation());
-        List<Player> teamA = Lists.newArrayList();
-        teamA.add(Bukkit.getPlayer(a.getLeaderUUID()));
-        a.getTeamates().stream().forEach(teamate -> teamA.add(Bukkit.getPlayer(teamate)));
-        List<Player> teamB = Lists.newArrayList();
-        teamB.add(Bukkit.getPlayer(b.getLeaderUUID()));
-        b.getTeamates().stream().forEach(teamate -> teamB.add(Bukkit.getPlayer(teamate)));
-        teamA.stream().forEach(team -> {
-            if (team.hasMetadata("in_team_duel") && team.hasMetadata("in_duel")) {
-                forceTeleport(team, locationA);
-                System.out.println("[CosmicDuels] Teleporting " + team.getName() + " to " + locationA);
+        List<Location> spawns = this.arena.getSpawnLocations();
+        for (int side = 0; side < 2; side++) {
+            int index = 0;
+            for (UUID uuid : getSideMembers(side)) {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player == null || !this.players.contains(player))
+                    continue;
+                int spawnIndex = side + 2 * index++;
+                Location location = checkIfTeamSpawnLoaded(spawns.size() > spawnIndex ? spawns.get(spawnIndex) : spawns.get(side));
+                forceTeleport(player, location);
+                System.out.println("[CosmicDuels] Teleporting " + player.getName() + " to " + location);
             }
-        });
-        teamB.stream().forEach(team -> {
-            if (team.hasMetadata("in_team_duel") && team.hasMetadata("in_duel")) {
-                forceTeleport(team, locationB);
-                System.out.println("[CosmicDuels] Teleporting " + team.getName() + " to " + locationB);
-            }
-        });
+        }
     }
 
     public void onStart() {
@@ -217,14 +294,8 @@ public class TeamDuel extends NewDuel {
         for (int i = 0; i < this.players.size(); i++) {
             if (getDuelType() == DuelType.TEAM_VS_TEAM) {
                 Player player = this.players.get(i);
-                TeamData data = CosmicDuel.get().getTeamDataManager().tryFindTeam(player.getUniqueId());
-                TeamData enemyData = null;
-                if (data == this.teamA) {
-                    enemyData = this.teamB;
-                } else {
-                    enemyData = this.teamA;
-                }
-                player.sendMessage(CC.translate("&e&l(!) &eYour duel against " + Bukkit.getPlayer(enemyData.getLeaderUUID()).getName() + "'s Team will begin shortly..."));
+                int enemySide = getSide(player.getUniqueId()) == 0 ? 1 : 0;
+                player.sendMessage(CC.translate("&e&l(!) &eYour 2v2 duel against " + getSideLeaderName(enemySide) + "'s Team &7(" + getRoster(enemySide) + ")&e will begin shortly..."));
             }
         }
         final NewDuel duel = this;
@@ -252,21 +323,15 @@ public class TeamDuel extends NewDuel {
     }
 
     private List<Player> returnTeamPlayers(Player winner, Player loser) {
-        List<Player> players = Lists.newArrayList();
-        players.add(winner);
-        players.add(loser);
-        TeamData winnerData = CosmicDuel.get().getTeamDataManager().tryFindTeam(winner.getUniqueId());
-        winnerData.getTeamates().stream().forEach(teamate -> players.add(Bukkit.getPlayer(teamate)));
-        TeamData loserData = CosmicDuel.get().getTeamDataManager().tryFindTeam(loser.getUniqueId());
-        loserData.getTeamates().stream().forEach(teamate -> players.add(Bukkit.getPlayer(teamate)));
-        return players;
+        return getOnlineParticipants();
     }
 
     private List<String> getWinnerTeamNames(Player winner) {
         List<String> winners = Lists.newArrayList();
-        winners.add(winner.getName());
-        TeamData winnerData = CosmicDuel.get().getTeamDataManager().tryFindTeam(winner.getUniqueId());
-        winnerData.getTeamates().stream().forEach(teamate -> winners.add(Bukkit.getPlayer(teamate).getName()));
+        int side = winner == null ? -1 : getSide(winner.getUniqueId());
+        if (side >= 0)
+            for (UUID uuid : getSideMembers(side))
+                winners.add(this.rosterNames.get(uuid));
         return winners;
     }
 
@@ -301,48 +366,69 @@ public class TeamDuel extends NewDuel {
     public void onDuelEnd(EndReason endReason, Player loser) {
         this.ending = true;
         resetEnvoys();
-        CosmicDuel.logMessage("Ending team duel for reason: " + endReason.name() + " loser: " + ((loser != null) ? (Bukkit.getPlayer(CosmicDuel.get().getTeamDataManager().tryFindTeam(loser.getUniqueId()).getLeaderUUID()) + "'s Team") : "none"));
-        if (endReason == EndReason.WIN) {
-            if (this.players.size() >= 1) {
-                Player winner = Bukkit.getPlayer(CosmicDuel.get().getTeamDataManager().tryFindTeam(this.players.get(0).getUniqueId()).getLeaderUUID());
-                if (loser != null)
-                    loser = Bukkit.getPlayer(CosmicDuel.get().getTeamDataManager().tryFindTeam(loser.getUniqueId()).getLeaderUUID());
-                String winningMsg = CC.translate("&e&l(!) &a&n" + winner.getName() + "'s&e team has defeated &c" + loser.getName() + "'s&e team!");
-                for (Player player : returnTeamPlayers(winner, loser)) {
-                    if (!getEndingInventoryCache().containsValue(player)) {
-                        UUID uuid = CosmicDuel.get().getDuelHistoryManager().storeInventorySnapshot(player);
-                        getEndingInventoryCache().put(player.getName(), uuid);
-                    }
+        int loserSide = loser == null ? -1 : getSide(loser.getUniqueId());
+        if (loserSide < 0 && !this.players.isEmpty())
+            loserSide = getSide(this.players.get(0).getUniqueId()) == 0 ? 1 : 0;
+        int winnerSide = loserSide == 0 ? 1 : 0;
+        CosmicDuel.logMessage("Ending team duel for reason: " + endReason.name() + " loser: " + (loserSide >= 0 ? getSideLeaderName(loserSide) + "'s Team" : "none"));
+        if (endReason == EndReason.WIN && loserSide >= 0) {
+            Player winner = getSideRepresentative(winnerSide);
+            Player loserLeader = getSideRepresentative(loserSide);
+            String winnerName = getSideLeaderName(winnerSide);
+            String loserName = getSideLeaderName(loserSide);
+            String winningMsg = CC.translate("&e&l(!) &a&n" + winnerName + "'s&e team has defeated &c" + loserName + "'s&e team!");
+            List<Player> participants = getOnlineParticipants();
+            for (Player player : participants) {
+                if (!getEndingInventoryCache().containsKey(player.getName())) {
+                    UUID uuid = CosmicDuel.get().getDuelHistoryManager().storeInventorySnapshot(player);
+                    getEndingInventoryCache().put(player.getName(), uuid);
                 }
-                JSONMessage jsonMessage = new JSONMessage(ChatColor.YELLOW + ChatColor.BOLD.toString() + "Inventories: ");
-                int index = 0;
-                for (Map.Entry<String, UUID> invs : getEndingInventoryCache().entrySet()) {
-                    boolean includeComma = true;
-                    if (index++ == getEndingInventoryCache().size() - 1)
-                        includeComma = false;
-                    jsonMessage.addRunCommand(invs.getKey() + (includeComma ? ", " : ""), getWinnerTeamNames(winner).contains(invs.getKey()) ? ChatColor.GREEN : ChatColor.RED, "/viewdeathinventory " + getEndingInventoryCache().get(invs.getKey()).toString(), ChatColor.GRAY + "Click to view duel inventory.");
+            }
+            List<String> winnerNames = Lists.newArrayList();
+            for (UUID uuid : getSideMembers(winnerSide))
+                winnerNames.add(this.rosterNames.get(uuid));
+            JSONMessage jsonMessage = new JSONMessage(ChatColor.YELLOW + ChatColor.BOLD.toString() + "Inventories: ");
+            int index = 0;
+            for (Map.Entry<String, UUID> invs : getEndingInventoryCache().entrySet()) {
+                boolean includeComma = true;
+                if (index++ == getEndingInventoryCache().size() - 1)
+                    includeComma = false;
+                jsonMessage.addRunCommand(invs.getKey() + (includeComma ? ", " : ""), winnerNames.contains(invs.getKey()) ? ChatColor.GREEN : ChatColor.RED, "/viewdeathinventory " + invs.getValue().toString(), ChatColor.GRAY + "Click to view duel inventory.");
+            }
+            for (Player player : Lists.newArrayList(this.players)) {
+                if (getSide(player.getUniqueId()) == winnerSide)
+                    removePlayer(player, Reason.WIN, false);
+            }
+            List<Player> audience = Lists.newArrayList(participants);
+            for (Player spectator : this.spectators) {
+                if (!audience.contains(spectator))
+                    audience.add(spectator);
+            }
+            for (Player player : audience) {
+                player.sendMessage("");
+                player.sendMessage(winningMsg);
+                jsonMessage.sendToPlayer(player);
+                player.sendMessage("");
+            }
+            Title titleWinner = new Title(CC.translate("&a&lWinner"), CC.translate("&7") + winnerName + "'s Team", 10, 40, 10);
+            Title titleLoser = new Title(CC.translate("&c&lYou Lost"), CC.translate("&7Winner: ") + winnerName + "'s Team", 10, 40, 10);
+            for (Player player : participants) {
+                if (getSide(player.getUniqueId()) == winnerSide) {
+                    player.playSound(player.getLocation(), Sound.LEVEL_UP, 1.0F, 1.4F);
+                    RandomFireworks.getManager().launchRandomFirework(player.getLocation());
+                    player.sendTitle(titleWinner);
+                } else {
+                    player.sendTitle(titleLoser);
                 }
-                removePlayer(winner, Reason.WIN, false);
-                sendEndDuelMessage("", winner, loser, true);
-                sendEndDuelMessage(winningMsg, winner, loser, true);
-                sendEndDuelJsonMessage(jsonMessage, winner, loser, true);
-                sendEndDuelMessage("", winner, loser, true);
-                winner.playSound(winner.getLocation(), Sound.LEVEL_UP, 1.0F, 1.4F);
-                RandomFireworks.getManager().launchRandomFirework(winner.getLocation());
-                for (UUID uuid : CosmicDuel.get().getTeamDataManager().tryFindTeam(winner.getUniqueId()).getTeamates()) {
-                    removePlayer(Bukkit.getPlayer(uuid), Reason.WIN, false);
-                    Bukkit.getPlayer(uuid).playSound(Bukkit.getPlayer(uuid).getLocation(), Sound.LEVEL_UP, 1.0F, 1.4F);
-                    RandomFireworks.getManager().launchRandomFirework(Bukkit.getPlayer(uuid).getLocation());
-                }
+            }
+            if (winner != null) {
                 awardStakes(winner);
-                if (this.settings.hasSetting(Setting.DEATH_CERT))
-                    giveWinnerPage(winner, loser);
+                if (this.settings.hasSetting(Setting.DEATH_CERT) && loserLeader != null)
+                    giveWinnerPage(winner, loserLeader);
                 if (this.settings.hasSetting(Setting.DROPITEMS) && this.kit == Kit.BYOB) {
-                    CosmicDuel.logMessage("Dropping all of " + loser.getName() + "'s team items to " + winner.getName());
-                    TeamData loserData = CosmicDuel.get().getTeamDataManager().tryFindTeam(loser.getUniqueId());
-                    List<ItemStack> items = getContentsToDrop(loserData);
-                    if (items != null) {
-                        //CollectionBin.addItems(winner, items);
+                    CosmicDuel.logMessage("Dropping all of " + loserName + "'s team items to " + winner.getName());
+                    List<ItemStack> items = getContentsToDrop(getSideTeam(loserSide));
+                    if (items != null && !items.isEmpty()) {
                         CollectCategory category = new CollectCategory(CollectType.DUEL, items.toArray(new ItemStack[items.size() - 1]), CC.GoldB + "Duel Collect", System.currentTimeMillis());
                         CollectPlugin.getInstance().getCollectManager().getOrCreate(winner.getUniqueId().toString()).add(category);
                         winner.sendMessage("");
@@ -350,12 +436,8 @@ public class TeamDuel extends NewDuel {
                         winner.sendMessage("");
                     }
                 }
-
-                Title titleWinner = new Title(CC.translate("&a&lWinner"), CC.translate("&7") + winner.getName(), 10, 40, 10);
-                winner.sendTitle(titleWinner);
-                Title titleLoser = new Title(CC.translate("&c&lYou Lost"), CC.translate("&7Winner: ") + winner.getName(), 10, 40, 10);
-                winner.sendTitle(titleWinner);
-                loser.sendTitle(titleLoser);
+            } else {
+                returnStakes();
             }
         } else if (endReason == EndReason.RELOAD || endReason == EndReason.NO_WINNER) {
             onEnd(false);
@@ -422,19 +504,21 @@ public class TeamDuel extends NewDuel {
     private ItemStack getWinnerPage(Player winner, Player loser, Date date, SimpleDateFormat format, SimpleDateFormat timeFormat) {
         ItemStack item = new ItemStack(Material.PAPER);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(CC.translate("&f&l" + loser.getName() + " Team's Death Certificate"));
+        meta.setDisplayName(CC.translate("&f&l" + getSideLeaderName(getSide(loser.getUniqueId())) + " Team's Death Certificate"));
         List<String> lore = Lists.newArrayList();
-        lore.add(CC.translate("&f" + loser.getName() + "'s team &7was defeated in a &fTeam v Team"));
+        lore.add(CC.translate("&f" + getSideLeaderName(getSide(loser.getUniqueId())) + "'s team &7was defeated in a &f2v2 Team"));
         lore.add(CC.translate("&7duel on &f" + format.format(date) + " &7at &f" + timeFormat.format(date)));
-        lore.add(CC.translate("&7in the " + getArena().getName() + " Arena &7by &f" + winner.getName() + "'s team&7."));
+        lore.add(CC.translate("&7in the " + getArena().getName() + " Arena &7by &f" + getSideLeaderName(getSide(winner.getUniqueId())) + "'s team&7."));
         lore.add(CC.translate(""));
-        TeamData winnerTeam = CosmicDuel.get().getTeamDataManager().tryFindTeam(winner.getUniqueId());
-        TeamData loserTeam = CosmicDuel.get().getTeamDataManager().tryFindTeam(loser.getUniqueId());
-        lore.add(CC.translate("&a&l" + winner.getName() + "'s Team"));
-        winnerTeam.getTeamates().stream().forEach(teamate -> lore.add(CC.translate("&f&l* &a" + Bukkit.getPlayer(teamate).getName())));
+        int winnerSide = getSide(winner.getUniqueId());
+        int loserSide = getSide(loser.getUniqueId());
+        lore.add(CC.translate("&a&l" + getSideLeaderName(winnerSide) + "'s Team"));
+        for (UUID uuid : getSideMembers(winnerSide))
+            lore.add(CC.translate("&f&l* &a" + this.rosterNames.get(uuid)));
         lore.add(CC.translate(""));
-        lore.add(CC.translate("&c&l" + loser.getName() + "'s Team"));
-        loserTeam.getTeamates().stream().forEach(teamate -> lore.add(CC.translate("&f&l* &c" + Bukkit.getPlayer(teamate).getName())));
+        lore.add(CC.translate("&c&l" + getSideLeaderName(loserSide) + "'s Team"));
+        for (UUID uuid : getSideMembers(loserSide))
+            lore.add(CC.translate("&f&l* &c" + this.rosterNames.get(uuid)));
         meta.setLore(lore);
         item.setItemMeta(meta);
         return item;
@@ -496,11 +580,12 @@ public class TeamDuel extends NewDuel {
             DuelAPI.cancelDuel(this, CancelReason.DUEL_END);
     }
 
+    // players of this player's side who are still fighting
     public int getTeamCount(Player player) {
-        TeamData teamData = CosmicDuel.get().getTeamDataManager().tryFindTeam(player.getUniqueId());
+        int side = getSide(player.getUniqueId());
         int teamCount = 0;
         for (Player duelPlayer : this.players) {
-            if (CosmicDuel.get().getTeamDataManager().tryFindTeam(duelPlayer.getUniqueId()) == teamData)
+            if (getSide(duelPlayer.getUniqueId()) == side)
                 teamCount++;
         }
         return teamCount;
@@ -532,7 +617,7 @@ public class TeamDuel extends NewDuel {
         if (reason == Reason.WIN || reason == Reason.RELOAD || reason == Reason.NO_WINNER)
             return;
         if (this.settings.hasSetting(Setting.DROPITEMS) && this.kit == Kit.BYOB) {
-            TeamData data = CosmicDuel.get().getTeamDataManager().tryFindTeam(player.getUniqueId());
+            TeamData data = getSideTeam(getSide(player.getUniqueId()));
             List<ItemStack> items = Lists.newArrayList();
             for (ItemStack armor : player.getInventory().getArmorContents()) {
                 if (armor != null)
@@ -660,20 +745,15 @@ public class TeamDuel extends NewDuel {
     }
 
     public Player getOppositePlayer(Player p) {
-        for (TeamData data : this.teams) {
-            if (data.getTeamates().contains(p.getUniqueId()))
-                continue;
-            Player opposite = Bukkit.getPlayer(data.getLeaderUUID());
-            if (!opposite.isOnline() || !this.players.contains(opposite)) {
-                for (Player player : this.players) {
-                    if (data.getTeamates().contains(player.getUniqueId()))
-                        return player;
-                }
-                return null;
-            }
-            return opposite;
+        int side = getSide(p.getUniqueId());
+        if (side < 0)
+            return null;
+        for (Player player : this.players) {
+            if (getSide(player.getUniqueId()) == (side == 0 ? 1 : 0))
+                return player;
         }
-        return null;
+        Player representative = getSideRepresentative(side == 0 ? 1 : 0);
+        return representative;
     }
 
     public void applySettings(Player p) {
@@ -864,4 +944,10 @@ public class TeamDuel extends NewDuel {
     private TeamData teamA;
 
     private TeamData teamB;
+
+    private final List<UUID> sideA = Lists.newArrayList();
+
+    private final List<UUID> sideB = Lists.newArrayList();
+
+    private final Map<UUID, String> rosterNames = Maps.newHashMap();
 }

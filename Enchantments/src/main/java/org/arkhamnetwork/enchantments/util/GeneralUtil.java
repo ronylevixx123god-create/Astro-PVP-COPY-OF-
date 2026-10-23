@@ -142,9 +142,22 @@ public class GeneralUtil {
         return false;
     }
 
+    // teammates in the same CosmicDuel 2v2 team duel (CosmicDuel sets in_team_duel to "<duel id>:<side>") are allies, so
+    // enchant splash damage skips them and ally effects reach them; outside team duels nothing changes
+    public static boolean isTeamDuelPartner(final Player p1, final Player p2) {
+        if (!p1.hasMetadata("in_team_duel") || !p2.hasMetadata("in_team_duel")) {
+            return false;
+        }
+        final String side1 = p1.getMetadata("in_team_duel").get(0).asString();
+        return side1 != null && side1.contains(":") && side1.equals(p2.getMetadata("in_team_duel").get(0).asString());
+    }
+
     public static boolean isAlly(final Player p1, final Player p2) {
         if (p1 == null || p2 == null) {
             return false;
+        }
+        if (isTeamDuelPartner(p1, p2)) {
+            return true;
         }
         if (p1.hasMetadata("in_duel") || p2.hasMetadata("in_duel")) {
             return false;
@@ -163,6 +176,9 @@ public class GeneralUtil {
     public static boolean isAtleastTruce(final Player p1, final Player p2) {
         if (p1 == null || p2 == null) {
             return false;
+        }
+        if (isTeamDuelPartner(p1, p2)) {
+            return true;
         }
         if (p1.hasMetadata("in_duel") || p2.hasMetadata("in_duel")) {
             return false;

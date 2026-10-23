@@ -20,6 +20,8 @@
  */
 package me.ifamasssxd.cosmicduel.struct;
 
+import me.ifamasssxd.cosmicduel.struct.newduel.TeamDuel;
+
 import com.cosmicpvp.cosmicutils.utils.CC;
 import com.google.common.collect.Lists;
 import me.ifamasssxd.cosmicduel.CosmicDuel;
@@ -153,10 +155,18 @@ public class Settings {
                 if (Settings.this.getDuel().getCreateState().equals((Object)DuelCreateState.SETTINGS)) {
                     Settings.this.getDuel().setCreateState(DuelCreateState.ARENA);
                 }
-                ClassInventory custom = new ClassInventory("Select an Arena", PlayerUtils.getRoundedSize((int)Arena.arenas.stream().filter(a -> !a.isRankedArena()).count()) / 9);
+                // a 2v2 needs an arena with four spawns (two per team)
+                boolean teamDuel = Settings.this.getDuel() instanceof TeamDuel;
+                java.util.function.Predicate<Arena> selectable = a -> !a.isRankedArena() && (!teamDuel || a.getSpawnLocations().size() >= 4);
+                if (teamDuel && Arena.arenas.stream().noneMatch(selectable)) {
+                    p.closeInventory();
+                    p.sendMessage(ChatColor.RED + ChatColor.BOLD.toString() + "(!) " + ChatColor.RED + "No arena is set up for 2v2 duels yet (an arena needs 4 spawns).");
+                    return;
+                }
+                ClassInventory custom = new ClassInventory("Select an Arena", PlayerUtils.getRoundedSize((int)Arena.arenas.stream().filter(selectable).count()) / 9);
                 int index = 0;
                 for (Arena arena : Arena.arenas) {
-                    if (arena.isRankedArena()) continue;
+                    if (!selectable.test(arena)) continue;
                     custom.insertItem(index++, Settings.this.getArenaInventoryItem(p, arena));
                 }
                 p.setMetadata("close_exempt", (MetadataValue)new FixedMetadataValue((Plugin)CosmicDuel.get(), (Object)""));

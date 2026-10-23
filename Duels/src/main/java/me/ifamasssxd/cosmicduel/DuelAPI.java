@@ -14,6 +14,7 @@ import me.ifamasssxd.cosmicduel.struct.newduel.TeamDuel;
 import me.ifamasssxd.cosmicduel.utils.ItemBuilder;
 import me.ifamasssxd.cosmicduel.utils.JSONMessage;
 import me.ifamasssxd.cosmicduel.utils.PlayerUtils;
+import me.ifamasssxd.cosmicduel.struct.TeamData;
 import org.arkhamnetwork.Arkkit.commands.CommandArkReboot;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -42,6 +43,8 @@ public class DuelAPI {
         inviter.sendMessage(ChatColor.YELLOW + ChatColor.BOLD.toString() + "(!) " + ChatColor.YELLOW + "Your Duel request has been sent.");
         inviter.playSound(inviter.getLocation(), Sound.LEVEL_UP, 1.0F, 1.4F);
         invited.sendMessage(ChatColor.YELLOW + ChatColor.BOLD.toString() + "(!) " + ChatColor.YELLOW + inviter.getName() + " has invited you to a " + ChatColor.RED + ChatColor.UNDERLINE.toString() + duel.getName() + ChatColor.YELLOW + " Duel " + CC.translate("&ein the &c" + duel.getArena().getName() + " &eArena."));
+        if (duel instanceof TeamDuel)
+            sendTeamChallengeInfo((TeamDuel) duel, inviter, invited);
         invited.sendMessage("     " + ChatColor.GRAY + "Click one of the following options below.");
         JSONMessage accept = new JSONMessage(ChatColor.YELLOW + "                ");
         accept.addRunCommand(ChatColor.GREEN + ChatColor.BOLD.toString() + "ACCEPT", ChatColor.YELLOW, "/duel accept " + inviter.getName(), ChatColor.GREEN + "/duel accept " + inviter.getName());
@@ -49,6 +52,26 @@ public class DuelAPI {
         accept.addRunCommand(ChatColor.RED + ChatColor.BOLD.toString() + "DECLINE", ChatColor.YELLOW, "/duel decline " + inviter.getName(), ChatColor.RED + "/duel decline " + inviter.getName());
         accept.sendToPlayer(invited);
         invite_timer.add(new DuelInvite(30, inviter.getName(), invited.getName(), false));
+    }
+
+    // 2v2: both rosters for everyone involved; only the challenged leader gets the ACCEPT / DECLINE buttons
+    private static void sendTeamChallengeInfo(TeamDuel duel, Player inviter, Player invited) {
+        TeamData invitedTeam = CosmicDuel.get().getTeamDataManager().tryFindTeam(invited.getUniqueId());
+        List<UUID> audience = Lists.newArrayList(duel.getSideMembers(0));
+        if (invitedTeam != null)
+            audience.addAll(invitedTeam.getAllMembers());
+        String rosterB = invitedTeam == null ? invited.getName() : String.join(", ", invitedTeam.getAllMembers().stream().map(uuid -> Bukkit.getOfflinePlayer(uuid).getName()).collect(java.util.stream.Collectors.toList()));
+        for (UUID uuid : audience) {
+            Player member = Bukkit.getPlayer(uuid);
+            if (member == null)
+                continue;
+            member.sendMessage(CC.translate("&e&l2v2 Team Duel &7(" + duel.getArena().getName() + " &7Arena)"));
+            member.sendMessage(CC.translate(" &a&l* &a" + inviter.getName() + "'s Team: &f" + duel.getRoster(0)));
+            member.sendMessage(CC.translate(" &c&l* &c" + invited.getName() + "'s Team: &f" + rosterB));
+            if (!member.equals(invited) && !member.equals(inviter))
+                member.sendMessage(CC.translate("&7Only &f" + invited.getName() + "&7 (team leader) can accept or decline this challenge."));
+        }
+        invited.sendMessage(CC.translate("&7Accepting shows both teams and every duel setting before anything starts."));
     }
 
     public static int getDuelPosition(NewDuel d) {
@@ -92,6 +115,13 @@ public class DuelAPI {
         for (Setting setting : Setting.values())
             lore.add(ChatColor.YELLOW + setting.getName() + ": " + (d.getSettings().hasSetting(setting) ? (ChatColor.GREEN + ChatColor.BOLD.toString() + "ON") : (ChatColor.RED + ChatColor.BOLD.toString() + "OFF")));
         lore.add(CC.Yellow + "Arena: " + CC.Green + ((d.getArena() == null) ? "N/A" : d.getArena().getName()));
+        if (d instanceof TeamDuel) {
+            TeamData ownTeam = CosmicDuel.get().getTeamDataManager().tryFindTeam(p.getUniqueId());
+            lore.add("");
+            lore.add(CC.translate("&a&l" + ((TeamDuel) d).getSideLeaderName(0) + "'s Team: &f" + ((TeamDuel) d).getRoster(0)));
+            if (ownTeam != null)
+                lore.add(CC.translate("&c&l" + p.getName() + "'s Team: &f" + String.join(", ", ownTeam.getAllMembers().stream().map(uuid -> Bukkit.getOfflinePlayer(uuid).getName()).collect(java.util.stream.Collectors.toList()))));
+        }
         lore.add("");
         lore.add(ChatColor.GRAY + "Click to accept access the stakes menu.");
         inv.setItem(inv.getSize() - 5, ItemBuilder.buildItem(Material.STAINED_GLASS_PANE, (short)5, ChatColor.YELLOW + ChatColor.BOLD.toString() + "ACCEPT DUEL", lore));
@@ -161,21 +191,47 @@ public class DuelAPI {
                 return;
             }
             if (d2 instanceof TeamDuel) {
-                if (CosmicDuel.get().getTeamDataManager().tryFindTeam(p.getUniqueId()) != null) {
-                    TeamData teamData = CosmicDuel.get().getTeamDataManager().tryFindTeam(p.getUniqueId());
-                    TeamData teamData2 = CosmicDuel.get().getTeamDataManager().tryFindTeam(Bukkit.getPlayer(inviter).getUniqueId());
-                    ((TeamDuel)d2).setTeamB(teamData);
-                    ((TeamDuel) d2).setTeamA(teamData2);
-                    d2.addPlayer(Bukkit.getPlayer(teamData.getLeaderUUID()), true);
-                    //d2.addPlayer(Bukkit.getPlayer(teamData2.getLeaderUUID()), true);
-                    for (UUID uuid : teamData.getTeamates())
-                        d2.addPlayer(Bukkit.getPlayer(uuid), true);
-                    for (UUID uuid : teamData2.getTeamates())
-                        d2.addPlayer(Bukkit.getPlayer(uuid), true);
-
-                    for (Player player : d2.getPlayers()) {
-                        System.out.println("Duel Team DEBUG: "+ player.getName());                    }
+                TeamDuel teamDuel = (TeamDuel) d2;
+                TeamData teamB = CosmicDuel.get().getTeamDataManager().tryFindTeam(p.getUniqueId());
+                TeamData teamA = teamDuel.getTeamA();
+                if (teamB == null || !teamB.isLeader(p.getUniqueId())) {
+                    p.sendMessage(red + ChatColor.RED + "Only your team leader can accept a 2v2 duel challenge.");
+                    return;
                 }
+                // check all four again: someone may have left, logged off, entered combat or started another duel since the challenge
+                String problem = null;
+                if (teamA == null || teamA.getTotalSize() != 2 || teamB.getTotalSize() != 2) {
+                    problem = "Both teams need exactly 2 players.";
+                } else {
+                    List<UUID> members = Lists.newArrayList(teamA.getAllMembers());
+                    members.addAll(teamB.getAllMembers());
+                    for (UUID uuid : members) {
+                        Player member = Bukkit.getPlayer(uuid);
+                        NewDuel memberDuel = member == null ? null : getDuel(member);
+                        if (member == null)
+                            problem = Bukkit.getOfflinePlayer(uuid).getName() + " is not online.";
+                        else if ((memberDuel != null && memberDuel != teamDuel) || isSpectator(member))
+                            problem = member.getName() + " is busy with another duel.";
+                        else if (PlayerUtils.inCombat(member))
+                            problem = member.getName() + " is in combat.";
+                        if (problem != null)
+                            break;
+                    }
+                }
+                if (problem != null) {
+                    teamDuel.sendMessage(red + ChatColor.RED + "The 2v2 duel was cancelled: " + problem, false);
+                    p.sendMessage(red + ChatColor.RED + "The 2v2 duel was cancelled: " + problem);
+                    invite_timer.remove(getDuelInvite(p, InviteType.INVITED));
+                    cancelDuel(teamDuel, CancelReason.NOT_ENOUGH_PLAYERS);
+                    return;
+                }
+                teamDuel.setTeamA(teamA);
+                teamDuel.setTeamB(teamB);
+                for (int side = 0; side < 2; side++) {
+                    for (UUID uuid : teamDuel.getSideMembers(side))
+                        teamDuel.addPlayer(Bukkit.getPlayer(uuid), false);
+                }
+                teamDuel.checkReady();
             } else {
                 d2.addPlayer(p, true);
             }
@@ -498,6 +554,7 @@ public class DuelAPI {
         for (Player p : duel.getPlayers()) {
             if (p != null) {
                 p.removeMetadata("in_duel", CosmicDuel.get());
+                p.removeMetadata("in_team_duel", CosmicDuel.get());
                 p.closeInventory();
             }
         }

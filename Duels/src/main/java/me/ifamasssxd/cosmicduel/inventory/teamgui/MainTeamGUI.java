@@ -3,6 +3,7 @@ package me.ifamasssxd.cosmicduel.inventory.teamgui;
 import com.cosmicpvp.cosmicutils.utils.CC;
 import com.cosmicpvp.cosmicutils.utils.ItemBuilder;
 import me.ifamasssxd.cosmicduel.CosmicDuel;
+import me.ifamasssxd.cosmicduel.commands.CommandTeam;
 import me.ifamasssxd.cosmicduel.struct.TeamData;
 import me.mattstudios.mfgui.gui.guis.GuiItem;
 import me.mattstudios.mfgui.gui.guis.PaginatedGui;
@@ -57,16 +58,11 @@ public class MainTeamGUI {
                 player.sendMessage(CC.translate("&c&l(!) &cYou are not the leader of this team!"));
                 return;
             }
-            if (data.getTeamates() != null)
-                data.getTeamates().forEach(uuid -> {
-                    Player teammate = Bukkit.getPlayer(uuid);
-                    if (teammate != null && teammate.isOnline()) {
-                        teammate.sendMessage(CC.translate("&c&l(!) &c" + player.getName() + " has disbanded your team!"));
-                        teammate.playSound(teammate.getLocation(), Sound.ORB_PICKUP, 10.0F, 10.0F);
-                    }
-                });
-            player.sendMessage(CC.translate("&c&l(!) &cYou have disbanded your team!"));
-            CosmicDuel.get().getTeamDataManager().removeTeam(data);
+            if (CosmicDuel.get().getTeamDataManager().isTeamBusy(data)) {
+                player.sendMessage(CC.translate("&c&l(!) &cYou cannot change your team while it is in a team duel or has a duel challenge pending."));
+                return;
+            }
+            CommandTeam.disband(player, data);
         }));
         }
 

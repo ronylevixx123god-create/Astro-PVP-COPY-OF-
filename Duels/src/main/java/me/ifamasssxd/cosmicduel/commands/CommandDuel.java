@@ -164,41 +164,38 @@ public class CommandDuel implements CommandExecutor {
                 p.sendMessage(CC.translate("&7Please leave your team to duel them or tell them to create a team!"));
                 return true;
             }
-            if (team != null && Bukkit.getPlayer(oTeam.getLeaderUUID()) != pl5) {
-                p.sendMessage(CC.translate("&c&l(!) &cThat player is not the leader of that team, please duel the leader, please duel &f" + Bukkit.getPlayer(oTeam.getLeaderUUID()).getName() + "&c."));
+            if (team != null && !oTeam.isLeader(pl5.getUniqueId())) {
+                p.sendMessage(CC.translate("&c&l(!) &cThat player is not the leader of that team, please duel the leader &f" + Bukkit.getOfflinePlayer(oTeam.getLeaderUUID()).getName() + "&c."));
                 return true;
             }
-            if (team != null && team.getTotalSize() != oTeam.getTotalSize()) {
-                p.sendMessage(CC.translate("&c&l(!) &cMake sure you have the same amount of players on both teams."));
+            if (team != null && (team.getTotalSize() != 2 || oTeam.getTotalSize() != 2)) {
+                p.sendMessage(CC.translate("&c&l(!) &c2v2 duels need exactly 2 players on each team (a leader and 1 teammate)."));
                 return true;
             }
-            if (team != null && (team.getTotalSize() < 2 || oTeam.getTotalSize() < 2)) {
-                p.sendMessage(CC.translate("&c&l(!) &cBoth teams must have atleast 1 teammate to duel."));
-                return true;
-            }
-
             if (team != null) {
-                for (Player player : getBothTeamPlayers(team, oTeam)) {
-                    if (player == null || !player.isOnline()) {
-                        sender.sendMessage(CC.translate("&cOne of the members of the opponent team isn't online."));
-                        return false;
+                // every one of the 4 players must be online and free to duel, not just the two leaders
+                for (UUID uuid : getBothTeamMembers(team, oTeam)) {
+                    Player member = Bukkit.getPlayer(uuid);
+                    String name = Bukkit.getOfflinePlayer(uuid).getName();
+                    String problem = null;
+                    if (member == null || !member.isOnline())
+                        problem = "is not online";
+                    else if (DuelAPI.getDuel(member) != null || DuelAPI.isInArenaQueue(member))
+                        problem = "is already in a duel";
+                    else if (DuelAPI.isSpectator(member))
+                        problem = "is spectating a duel";
+                    else if (PlayerUtils.inCombat(member))
+                        problem = "is in combat";
+                    else if (CosmicDuel.get().getDuelToggles().hasDuelsToggled(member))
+                        problem = "has duels toggled off";
+                    else if (member.hasMetadata("in_ranked_queue_menu"))
+                        problem = "is in a ranked queue";
+                    else if (!member.equals(p) && !member.equals(pl5) && (DuelAPI.isWaitingOnInvite(member) || DuelAPI.hasPendingInvite(member)))
+                        problem = "has another duel invite pending";
+                    if (problem != null) {
+                        p.sendMessage(CC.translate("&c&l(!) &f" + name + " &c" + problem + ", so the 2v2 duel cannot start."));
+                        return true;
                     }
-                }
-                int team1OnlineCount = 0;
-                for (UUID uuid : team.getTeamates()) {
-                    Player player = Bukkit.getPlayer(uuid);
-                    if (player != null && player.isOnline())
-                        team1OnlineCount++;
-                }
-                int team2OnlineCount = 0;
-                for (UUID uuid : oTeam.getTeamates()) {
-                    Player player = Bukkit.getPlayer(uuid);
-                    if (player != null && player.isOnline())
-                        team2OnlineCount++;
-                }
-                if (team1OnlineCount != team2OnlineCount) {
-                    p.sendMessage(CC.translate("&c&l(!) &cMake sure the same amount of players on both team are online."));
-                    return true;
                 }
             }
             if (team != null && oTeam != null && team != oTeam) {
@@ -278,6 +275,12 @@ public class CommandDuel implements CommandExecutor {
             return true;
         }
         return false;
+    }
+
+    private List<UUID> getBothTeamMembers(TeamData a, TeamData b) {
+        List<UUID> members = Lists.newArrayList(a.getAllMembers());
+        members.addAll(b.getAllMembers());
+        return members;
     }
 
     private List<Player> getBothTeamPlayers(TeamData a, TeamData b) {

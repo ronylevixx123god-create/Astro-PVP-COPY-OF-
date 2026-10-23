@@ -57,6 +57,13 @@ public class TeamData {
         return this.invites;
     }
 
+    public List<UUID> getAllMembers() {
+        List<UUID> members = Lists.newArrayList();
+        members.add(this.leader);
+        members.addAll(this.teamates);
+        return members;
+    }
+
     public int getTotalSize() {
         return getTeamates().size() + 1;
     }

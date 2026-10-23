@@ -10,6 +10,7 @@ import java.util.UUID;
 import me.ifamasssxd.cosmicduel.CosmicDuel;
 import me.ifamasssxd.cosmicduel.DuelAPI;
 import me.ifamasssxd.cosmicduel.struct.enums.CancelReason;
+import me.ifamasssxd.cosmicduel.struct.newduel.TeamDuel;
 import me.ifamasssxd.cosmicduel.utils.JSONMessage;
 import me.ifamasssxd.cosmicduel.utils.TimeUtils;
 import org.bukkit.Bukkit;
@@ -88,7 +89,7 @@ public class TeamDataManager {
     }
 
     public boolean hitTeamInivteLimit(TeamData data) {
-        return (data.getTeamates().size() >= 5);
+        return (data.getTeamates().size() >= 1);
     }
 
     public boolean hasInviteToTeam(Player player, TeamData data) {
@@ -139,21 +140,30 @@ public class TeamDataManager {
     }
 
     public void removeTeam(TeamData data) {
-        try {
-            for (UUID uuid : data.getTeamates()) {
-                Player player = Bukkit.getPlayer(uuid);
-                if (player.getOpenInventory() != null) {
-                    player.sendMessage(CC.Red + "Closing inventory.");
-
-                    player.closeInventory();
-                }
-            }
-            Bukkit.getPlayer(data.getLeaderUUID()).closeInventory();
-        } catch (Exception e) {
-            e.printStackTrace();
-            this.teams.remove(data.getLeaderUUID());
-
+        // the team used to stay registered unless closing an inventory threw, so /team disband, leave and leader did nothing
+        this.teams.remove(data.getLeaderUUID());
+        for (UUID uuid : data.getAllMembers()) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null && player.getOpenInventory() != null)
+                player.closeInventory();
         }
+    }
+
+    // a team that is in a team duel (setting it up, staking, queued or fighting) or has a challenge waiting must not
+    // change its members or leader until that is over
+    public boolean isTeamBusy(TeamData data) {
+        for (UUID uuid : data.getAllMembers()) {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player == null)
+                continue;
+            if (DuelAPI.getDuel(player) instanceof TeamDuel)
+                return true;
+            for (DuelInvite invite : DuelAPI.getAllDuelInvites(player, DuelAPI.InviteType.INVITED)) {
+                if (DuelAPI.getPendingDuel(player, invite.getInviter()) instanceof TeamDuel)
+                    return true;
+            }
+        }
+        return false;
     }
 
     public boolean isLeaderOfTeam(UUID uuid) {
