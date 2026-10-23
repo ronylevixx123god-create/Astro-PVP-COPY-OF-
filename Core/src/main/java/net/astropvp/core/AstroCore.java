@@ -6,14 +6,8 @@ import me.ifamasssxd.cosmicheroicenvoys.listeners.EnvoyListener;
 import me.ifamasssxd.cosmicheroicenvoys.managers.EnvoyManager;
 import co.aikar.commands.CommandManager;
 import co.aikar.commands.PaperCommandManager;
-import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.PacketAdapter;
-import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.reflect.FieldAccessException;
 import com.earth2me.essentials.Essentials;
 import com.earth2me.essentials.I18n;
 import com.earth2me.essentials.api.NoLoanPermittedException;
@@ -102,7 +96,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.*;
-import java.util.logging.Level;
 
 @Getter
 @Setter
@@ -612,28 +605,10 @@ public class AstroCore extends JavaPlugin {
         this.holyWhitescrollItem = new HolyWhitescrollItem();
     }
 
+    // non-OP players used to get no command completion at all; now they get the commands they can use (tabcomplete.yml)
     public void protocolFix() {
         this.protocolManager = ProtocolLibrary.getProtocolManager();
-        this.protocolManager.addPacketListener(new PacketAdapter(this, ListenerPriority.NORMAL, PacketType.Play.Client.TAB_COMPLETE) {
-
-            public void onPacketReceiving(PacketEvent event) {
-                if (event.getPacketType() == PacketType.Play.Client.TAB_COMPLETE) {
-                    if (event.getPlayer().isOp()) return;
-
-                    try {
-                        PacketContainer packet = event.getPacket();
-                        String message = packet.getSpecificModifier(String.class).read(0).toLowerCase();
-                        if (message.startsWith("/?") && !message.contains("  ") || message.startsWith("/") && !message.contains(" ")
-                                || message.startsWith("/help") && !message.contains("  ") || message.startsWith("/ver") && !message.contains("  ")
-                                || message.startsWith("/bukkit") && !message.contains("  ")) {
-                            event.setCancelled(true);
-                        }
-                    } catch (FieldAccessException e) {
-                        AstroCore.this.getLogger().log(Level.SEVERE, "bruh", e);
-                    }
-                }
-            }
-        });
+        new TabCompleteFilter(this).register();
     }
 
     private void registerCommand(Command cmd) {

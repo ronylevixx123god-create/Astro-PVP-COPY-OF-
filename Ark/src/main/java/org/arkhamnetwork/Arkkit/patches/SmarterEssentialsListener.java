@@ -172,11 +172,8 @@ final class SmarterEssentialsListener
     @EventHandler
     public void onPlayerChatTabCompleteEvent(PlayerChatTabCompleteEvent e) {
         if (!e.getPlayer().hasPermission("arkkit.staff.hidden")) {
-            for (String s : e.getTabCompletions()) {
-                if (Bukkit.getPlayer(s) == null || !Bukkit.getPlayer(s).hasPermission("arkkit.staff.hidden"))
-                    continue;
-                e.getTabCompletions().remove(s);
-            }
+            // removing while looping over the list threw ConcurrentModificationException and broke the completion
+            e.getTabCompletions().removeIf(s -> Bukkit.getPlayer(s) != null && Bukkit.getPlayer(s).hasPermission("arkkit.staff.hidden"));
         }
     }
 
