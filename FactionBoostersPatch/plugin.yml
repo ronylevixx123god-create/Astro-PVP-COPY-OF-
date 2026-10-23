@@ -1,0 +1,11 @@
+version: 1.0
+name: CosmicFactionBoosters
+main: me.ifamasssxd.cosmicfactionboosters.CosmicFactionBoosters
+# load after the plugins it hooks: mcMMO is only hooked if it is already enabled, and /booster stays FactionsKore's
+softdepend: [mcMMO, Factions, CosmicPvPUtils, Arkkit, FactionsKore]
+commands:
+  givefacbooster:
+    description: Give boosters
+    aliases: [gfb]
+  booster:
+    aliases: [boosters, boostertimer, boost]
