@@ -17,9 +17,8 @@
  */
 package me.cosmicpvp.CosmicGlobalKits.struct.gkits;
 
-import com.compilex.CosmicArmorSets.CosmicArmorSetsAPI;
-import com.compilex.CosmicArmorSets.enums.HeroicArmorType;
-import com.compilex.CosmicArmorSets.enums.HeroicWeaponType;
+import net.astropvp.armorsets.AstroArmorSetsAPI;
+import net.astropvp.armorsets.struct.heroicArmor.HeroicArmor;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +38,7 @@ extends GlobalKit {
     @Override
     public List<ItemStack> getKitItems(Player player, GlobalKits kits, int kitLevel) {
         ArrayList<ItemStack> rewards = Lists.newArrayList();
-        ItemStack helmet = this.setItemNameAndLore(kitLevel == 3 && Math.random() < 0.33 ? CosmicArmorSetsAPI.createHeroicPeice((HeroicArmorType)HeroicArmorType.HELMET) : new ItemStack(Material.DIAMOND_HELMET), ChatColor.GOLD.toString() + ChatColor.BOLD.toString() + "Crown of Shadows", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "A dark crown, embroidered with absolute", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "black onyx. Icy cold to the touch.");
+        ItemStack helmet = this.setItemNameAndLore(kitLevel == 3 && Math.random() < 0.33 ? HeroicLoki.createHeroicPiece(HeroicArmor.HELMET) : new ItemStack(Material.DIAMOND_HELMET), ChatColor.GOLD.toString() + ChatColor.BOLD.toString() + "Crown of Shadows", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "A dark crown, embroidered with absolute", ChatColor.GOLD.toString() + ChatColor.ITALIC.toString() + "black onyx. Icy cold to the touch.");
         HeroicLoki.addRandomEnchantLevel(helmet, "Ghost");
         if (Math.random() < (double)kitLevel * 0.25) {
             HeroicLoki.addEnchant(helmet, "Overload", HeroicLoki.getMaxEnchantLevel("Overload"));
@@ -86,7 +85,10 @@ extends GlobalKit {
         HeroicLoki.addRandomEnchantLevel(axe, "Hex");
         HeroicLoki.addRandomEnchantLevel(axe, "Corrupt");
         if (Math.random() < (double)kitLevel * 0.33) {
-            axe = CosmicArmorSetsAPI.convertIntoHeroicWeapon((HeroicWeaponType)HeroicWeaponType.AXE, (ItemStack)axe, (boolean)true);
+            axe = AstroArmorSetsAPI.convertWeaponToHeroic(HeroicArmor.AXE, (ItemStack)axe);
+            // CosmicArmorSets' heroic axe conversion also maxed Silence and Lifesteal
+            HeroicLoki.addEnchant(axe, "Silence", HeroicLoki.getMaxEnchantLevel("Silence"));
+            HeroicLoki.addEnchant(axe, "Lifesteal", HeroicLoki.getMaxEnchantLevel("Lifesteal"));
         }
         rewards.add(axe);
         if (Math.random() < 0.02 * (double)Math.max(1, kitLevel)) {

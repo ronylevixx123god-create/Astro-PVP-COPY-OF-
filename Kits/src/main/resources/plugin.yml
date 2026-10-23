@@ -2,7 +2,7 @@ name: CosmicGlobalKits
 main: me.cosmicpvp.CosmicGlobalKits.CosmicGlobalKits
 version: 1.0
 depend: [CosmicSkyCustomItems,CosmicPvPUtils]
-softdepend: [Vault, Essentials, WorldGuard, WorldEdit, CompilexPermissions, LuckPerms]
+softdepend: [Vault, Essentials, WorldGuard, WorldEdit, CompilexPermissions, LuckPerms, AstroCore, AstroArmorSets, CosmicCustomTNT, CosmicDungeons, Enchantments, EnchantmentAPI, CosmicSpaceChests, Arkkit]
 commands:
   gkit:
     description: Global kit menu.
