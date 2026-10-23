@@ -398,6 +398,7 @@ public class ClassicDuel extends NewDuel {
         }
         resetPlayer(player);
         removePotionEffects(player);
+        DuelCleanup.cleanse(player);
         if (!this.ending && createSpectator && !willDuelEnd()) {
             prepareSpectator(player);
         } else {
@@ -493,6 +494,7 @@ public class ClassicDuel extends NewDuel {
             return;
         this.spectators.remove(p);
         resetPlayer(p);
+        DuelCleanup.cleanse(p);
         returnPlayerToStartLocation(p);
         if (p.hasPotionEffect(PotionEffectType.POISON))
             p.removePotionEffect(PotionEffectType.POISON);

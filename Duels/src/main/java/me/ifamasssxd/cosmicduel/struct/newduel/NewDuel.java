@@ -113,6 +113,11 @@ public abstract class NewDuel {
         return hitsMap;
     }
 
+    // true once the duel has stored this player's inventory and location (onStart), so leaving must restore them
+    public boolean isSetUp(Player p) {
+        return this.storedPlayers.containsKey(p.getUniqueId());
+    }
+
     public abstract String getName();
 
     public abstract DuelType getDuelType();

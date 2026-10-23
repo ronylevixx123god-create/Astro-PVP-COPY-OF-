@@ -26,6 +26,7 @@ import me.ifamasssxd.cosmicduel.struct.enums.EndReason;
 import me.ifamasssxd.cosmicduel.struct.newduel.DuelLogFormatter;
 import me.ifamasssxd.cosmicduel.struct.newduel.NewDuel;
 import me.ifamasssxd.cosmicduel.tasks.*;
+import me.ifamasssxd.cosmicduel.utils.DuelCleanup;
 import me.ifamasssxd.cosmicduel.utils.DuelToggles;
 import me.ifamasssxd.cosmicduel.utils.WorldGuardUtils;
 import org.arkhamnetwork.Arkkit.commands.CommandArkReboot;
@@ -172,6 +173,7 @@ extends JavaPlugin {
         this.registerListener(new SettingsListener());
         this.registerListener(new HitsListener());
         registerListener((Listener)new TeamDuelListener());
+        this.registerListener(new DuelCleanup());
     }
 
     private void registerListener(Listener listener) {

@@ -7,6 +7,7 @@ import me.ifamasssxd.cosmicduel.struct.*;
 import me.ifamasssxd.cosmicduel.struct.enums.CancelReason;
 import me.ifamasssxd.cosmicduel.struct.enums.DuelCreateState;
 import me.ifamasssxd.cosmicduel.struct.enums.DuelState;
+import me.ifamasssxd.cosmicduel.struct.enums.Reason;
 import me.ifamasssxd.cosmicduel.struct.enums.Setting;
 import me.ifamasssxd.cosmicduel.struct.newduel.NewDuel;
 import me.ifamasssxd.cosmicduel.struct.newduel.TeamDuel;
@@ -486,6 +487,12 @@ public class DuelAPI {
                 if (nextDuelInQueue != null && cancelReason != CancelReason.RELOAD)
                     startQueuedDuel(nextDuelInQueue, arena);
             }
+        }
+        // a duel can be cancelled after its players were teleported in and their items stored (e.g. the opponent left
+        // during the countdown): give those players their items and location back before forgetting them
+        for (Player p : Lists.newArrayList(duel.getPlayers())) {
+            if (p != null && duel.isSetUp(p))
+                duel.removePlayer(p, Reason.NO_WINNER, false);
         }
         duel.setCancelled(true);
         for (Player p : duel.getPlayers()) {

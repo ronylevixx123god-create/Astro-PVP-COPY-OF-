@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import me.ifamasssxd.cosmicduel.CosmicDuel;
 import me.ifamasssxd.cosmicduel.DuelAPI;
+import me.ifamasssxd.cosmicduel.utils.DuelCleanup;
 import me.ifamasssxd.cosmicduel.listeners.DuelListener;
 import me.ifamasssxd.cosmicduel.listeners.SpectateInventory;
 
@@ -521,6 +522,7 @@ public class TeamDuel extends NewDuel {
         }
         resetPlayer(player);
         removePotionEffects(player);
+        DuelCleanup.cleanse(player);
         if (!this.ending && createSpectator && !willDuelEnd(player)) {
             prepareSpectator(player);
         } else {
@@ -638,6 +640,7 @@ public class TeamDuel extends NewDuel {
             return;
         this.spectators.remove(p);
         resetPlayer(p);
+        DuelCleanup.cleanse(p);
         returnPlayerToStartLocation(p);
         if (p.hasPotionEffect(PotionEffectType.POISON))
             p.removePotionEffect(PotionEffectType.POISON);

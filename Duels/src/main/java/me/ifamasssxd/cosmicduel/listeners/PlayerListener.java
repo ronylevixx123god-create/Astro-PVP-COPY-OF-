@@ -83,7 +83,9 @@ public class PlayerListener
         new DuelPlayer(e.getPlayer().getUniqueId(), e.getPlayer().getName());
     }
 
-    @EventHandler
+    // LOWEST: runs before Arkkit's combat-log check (LOW), so a player who disconnects from a duel is first given their
+    // items and location back and their duel combat tag is cleared, instead of being killed for combat logging
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerQuit(PlayerQuitEvent e) {
         NewDuel duel;
         Player player = e.getPlayer();
@@ -104,6 +106,9 @@ public class PlayerListener
                 return;
             }
             duel.removePlayer(player, Reason.LEFT_DUEL, false);
+            // a duel still being set up (settings, stakes) cannot go on without this player
+            if (!duel.isCancelled() && duel.getCreateState() != DuelCreateState.DONE)
+                DuelAPI.cancelDuel(duel, CancelReason.NOT_ENOUGH_PLAYERS);
         } else {
             DuelInvite duelInvite;
             duel = DuelAPI.getDuelSpectating(player);
