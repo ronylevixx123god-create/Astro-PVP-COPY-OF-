@@ -32,6 +32,7 @@ public class StaffMode {
         this.player.setGameMode(GameMode.CREATIVE);
         this.addRandomPlayerSelector();
         this.addVanish();
+        this.addFreezeTool();
     }
 
     public void removePlayerFromStaffMode() {
@@ -66,6 +67,20 @@ public class StaffMode {
         NBTItem nbtItem = new NBTItem(itemBuilder.colorize().build());
         nbtItem.setString("staffModeItem", "vanish");
         this.player.getInventory().setItem(0, nbtItem.getItem());
+    }
+
+    private void addFreezeTool() {
+        if(!this.player.hasPermission("staff.freeze")) return;
+        this.player.getInventory().setItem(8, getFreezeTool());
+    }
+
+    public static ItemStack getFreezeTool() {
+        ItemBuilder itemBuilder = new ItemBuilder(Material.PACKED_ICE, "&b&lFreeze",
+                "&7Right-Click to freeze or unfreeze",
+                "&7the nearest player within 5 blocks");
+        NBTItem nbtItem = new NBTItem(itemBuilder.colorize().build());
+        nbtItem.setString("staffModeItem", "freezeTool");
+        return nbtItem.getItem();
     }
 
     private void completelyClearPlayersInventory() {
