@@ -41,7 +41,7 @@ public class AstroEvents extends JavaPlugin {
         this.commandManager.enableUnstableAPI("help");
 
         this.miniGameManager = new MiniGameManager(this);
-        //this.miniGameManager.startAutoMiniGameTask();
+        if (this.miniGameManager.isAutoMiniGamesEnabled()) this.miniGameManager.startAutoMiniGameTask();
 
         this.registerCommands();
     }
@@ -49,6 +49,7 @@ public class AstroEvents extends JavaPlugin {
     @Override
     public void onDisable() {
         instance = null;
+        if (this.miniGameManager != null && this.miniGameManager.getAutoMiniGameTask() != null) this.miniGameManager.saveSchedule();
         this.getMiniGameRegister().unregisterAll();
     }
 

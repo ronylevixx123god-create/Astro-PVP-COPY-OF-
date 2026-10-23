@@ -1,5 +1,6 @@
 minigame:
   countdown-message: '&8(&4!&8) &7Parkour event starts in &4{time}'
+  join-message: '&8(&4!&8) &7Type &4/parkour join &7to join the event!'
   checkpoint-reached-message: '&8(&4!&8) &7You have reached checkpoint &a#{number}'
   win-message: '&8(&4!&8) &4{player}&4 has won the parkour event in &4{time}'
   parkour-time-message: '&8(&a!&8) &7Parkour time: &a{time}'
