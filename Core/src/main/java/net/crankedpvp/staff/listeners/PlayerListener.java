@@ -58,6 +58,8 @@ public class PlayerListener implements Listener {
         if(!this.plugin.getStaffManager().isPlayerInStaffMode(player)) return;
         event.getDrops().clear();
         this.plugin.getStaffManager().getStaffModeFromPlayer(player).removePlayerFromStaffMode();
+        // the server empties the inventory after the death event unless it is kept, which wiped the inventory just restored
+        event.setKeepInventory(true);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
