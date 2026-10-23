@@ -24,6 +24,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -36,6 +37,13 @@ public class ReviveCommand
         implements CommandExecutor,
         Listener {
     AstroRevivePlugin inst = null;
+
+    /** /revive <player>: view, revive and archive ("Delete Inventory") a player's death inventories */
+    static final String PERM_REVIVE = "prorevive.revive";
+    /** /revive box: every record incl. archived ones, inspect and revive them (Admin, Manager, Owner) */
+    static final String PERM_ARCHIVE = "prorevive.archive";
+    static final String BOX_TITLE = "Revive Box";
+    static final String RECORD_TITLE = "\u00a7cRevive Box: #";
 
     public ReviveCommand(AstroRevivePlugin inst) {
         this.inst = inst;
@@ -88,11 +96,41 @@ public class ReviveCommand
                 return;
             }
             if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase("§aRevive")) {
+                if (!player.hasPermission(PERM_REVIVE)) {
+                    player.sendMessage("§c[!] You don't has access to that command.");
+                    player.closeInventory();
+                    return;
+                }
                 DeathInventory deathInventory = this.getInventories(target.getUniqueId()).get(currentPage);
+                if (deathInventory.isRevived()) {
+                    player.sendMessage("§c§l(!)§c That inventory has already been revived.");
+                    player.closeInventory();
+                    return;
+                }
                 deathInventory.revive(player);
+                this.inst.saveNow(deathInventory);
                 player.sendMessage("§eThe player §f" + target.getName() + "§e has been revived.");
                 player.closeInventory();
                 sendWebHook(target, player, deathInventory);
+                return;
+            }
+            if (event.getCurrentItem().getItemMeta().getDisplayName().equalsIgnoreCase("§cDelete Inventory")) {
+                if (!player.hasPermission(PERM_REVIVE)) {
+                    player.sendMessage("§c[!] You don't has access to that command.");
+                    player.closeInventory();
+                    return;
+                }
+                // archived, not deleted: it leaves this menu and stays in /revive box (not marked revived)
+                DeathInventory deathInventory = inventories.get(currentPage);
+                deathInventory.setArchived(true);
+                this.inst.saveNow(deathInventory);
+                player.sendMessage("§eThe inventory §f#" + deathInventory.getID() + "§e of §f" + target.getName() + "§e has been archived. §7(/revive box)");
+                ArrayList<DeathInventory> left = this.getInventories(target.getUniqueId());
+                if (left.isEmpty()) {
+                    player.closeInventory();
+                } else {
+                    this.deathInventory(player, target, Math.min(currentPage, left.size() - 1));
+                }
                 return;
             }
         }
@@ -166,9 +204,11 @@ public class ReviveCommand
             return true;
         }
         if (args[0].equalsIgnoreCase("box")) {
-            ArrayList<ItemStack> items = new ArrayList<ItemStack>();
-            this.inst.getDeathInventories().forEach(di -> items.add(Util.createItem("§6§lDeath of§7 " + Bukkit.getOfflinePlayer(di.getPlayer()).getName(), Material.CHEST, "§cID§f #" + di.getID())));
-            new ScrollerInventory(items, "Revive Box", player);
+            if (!sender.hasPermission(PERM_ARCHIVE)) {
+                sender.sendMessage("§c[!] You don't has access to that command.");
+                return true;
+            }
+            this.openBox(player);
             return true;
         }
         if (target == null) {
@@ -214,6 +254,129 @@ public class ReviveCommand
         player.openInventory(inventory);
     }
 
+    public void openBox(Player player) {
+        ArrayList<DeathInventory> all = new ArrayList<DeathInventory>(this.inst.getDeathInventories());
+        all.sort((a, b) -> Long.compare(b.getTime(), a.getTime()));
+        ArrayList<ItemStack> items = new ArrayList<ItemStack>();
+        for (DeathInventory di : all) {
+            items.add(Util.createItem("§6§lDeath of§7 " + Bukkit.getOfflinePlayer(di.getPlayer()).getName(), Material.CHEST,
+                    "§cID§f #" + di.getID(),
+                    "§6Time of death: §f" + this.date(di.getTime()),
+                    "§6Killer:§f " + di.getKiller(),
+                    di.isRevived() ? "§aRevived: ✔" : "§cRevived: ✘",
+                    "§6Archived:§f " + (di.isArchived() ? "Yes" : "No"),
+                    "§7Click to view this inventory."));
+        }
+        new ScrollerInventory(items, BOX_TITLE, player);
+    }
+
+    public DeathInventory getRecord(int id) {
+        for (DeathInventory di : this.inst.getDeathInventories()) {
+            if (di.getID() == id) return di;
+        }
+        return null;
+    }
+
+    /** one record from /revive box, Astro's revive layout; revivable only while not revived yet */
+    public void openRecord(Player player, DeathInventory deathInventory) {
+        String name = Bukkit.getOfflinePlayer(deathInventory.getPlayer()).getName();
+        Inventory inventory = Bukkit.createInventory(null, 54, RECORD_TITLE + deathInventory.getID());
+        ItemStack information = Util.createItem("§6Information", 1, Material.STAINED_GLASS_PANE, "§6Time of death: §f" + this.date(deathInventory.getTime()), "§f (" + TimeUtil.formatTime(System.currentTimeMillis() - deathInventory.getTime()) + " ago )", "§6Total Items: §f" + deathInventory.getTotal(), "§6Player:§f " + name, "§6Killer:§f " + deathInventory.getKiller(), "§6Damage:§f " + deathInventory.getDamage(),
+                deathInventory.isRevived() ? "§aRevived: ✔" : "§cRevived: ✘", "§6Archived:§f " + (deathInventory.isArchived() ? "Yes" : "No"));
+        ItemStack back = Util.createItem("§bBack", 7, Material.CARPET, "§7§m--------------------------------", "§bClick to go back to the revive box.", "§7§m--------------------------------");
+        ItemStack revive = deathInventory.isRevived()
+                ? Util.createItem("§cAlready Revived", 7, Material.STAINED_GLASS_PANE, "§7§m--------------------------------", "§cThis inventory was revived by §f" + deathInventory.getReviver(), "§7§m--------------------------------")
+                : Util.createItem("§aRevive", 5, Material.STAINED_GLASS_PANE, "§7§m--------------------------------", "§aClick here to revive §f" + name, "§7§m--------------------------------");
+        try {
+            for (ItemStack item : Base64Utils.itemStackArrayFromBase64(deathInventory.getArmor())) {
+                if (item == null) continue;
+                inventory.addItem(item);
+            }
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+        try {
+            for (ItemStack item : Base64Utils.itemStackArrayFromBase64(deathInventory.getItems())) {
+                if (item == null) continue;
+                inventory.addItem(item);
+            }
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+        inventory.setItem(45, back);
+        inventory.setItem(49, information);
+        inventory.setItem(50, revive);
+        player.openInventory(inventory);
+    }
+
+    @EventHandler
+    public void onRecordClick(InventoryClickEvent event) {
+        String title = event.getInventory().getTitle();
+        if (!title.startsWith(RECORD_TITLE)) return;
+        event.setCancelled(true);   // preview only: nothing can be taken out or put in
+        Player player = (Player) event.getWhoClicked();
+        if (!player.hasPermission(PERM_ARCHIVE)) {
+            player.sendMessage("§c[!] You don't has access to that command.");
+            player.closeInventory();
+            return;
+        }
+        if (event.getRawSlot() >= event.getInventory().getSize() || event.getCurrentItem() == null || !event.getCurrentItem().hasItemMeta() || !event.getCurrentItem().getItemMeta().hasDisplayName()) return;
+        String clicked = event.getCurrentItem().getItemMeta().getDisplayName();
+        DeathInventory deathInventory = this.getRecord(Integer.parseInt(title.substring(RECORD_TITLE.length())));
+        if (deathInventory == null) {
+            player.closeInventory();
+            return;
+        }
+        if (event.getRawSlot() == 45 && clicked.equals("§bBack")) {
+            this.openBox(player);
+            return;
+        }
+        if (event.getRawSlot() == 50 && clicked.equals("§cAlready Revived")) {
+            player.sendMessage("§c§l(!)§c That inventory has already been revived.");
+            return;
+        }
+        if (event.getRawSlot() == 50 && clicked.equals("§aRevive")) {
+            if (deathInventory.isRevived()) {
+                player.sendMessage("§c§l(!)§c That inventory has already been revived.");
+                player.closeInventory();
+                return;
+            }
+            Player target = Bukkit.getPlayer(deathInventory.getPlayer());
+            if (target == null) {
+                player.sendMessage("§c[!] Player " + Bukkit.getOfflinePlayer(deathInventory.getPlayer()).getName() + " is not online!");
+                return;
+            }
+            deathInventory.revive(player);
+            this.inst.saveNow(deathInventory);
+            player.sendMessage("§eThe player §f" + target.getName() + "§e has been revived.");
+            player.closeInventory();
+            sendWebHook(target, player, deathInventory);
+        }
+    }
+
+    /** the box and the record view are previews: no taking items out, no putting items in, no dragging */
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onBoxClick(InventoryClickEvent event) {
+        if (!event.getInventory().getTitle().equals(BOX_TITLE)) return;
+        event.setCancelled(true);
+        if (event.getRawSlot() >= event.getInventory().getSize() || event.getCurrentItem() == null || event.getCurrentItem().getType() != Material.CHEST || !event.getCurrentItem().hasItemMeta() || !event.getCurrentItem().getItemMeta().hasLore()) return;
+        Player player = (Player) event.getWhoClicked();
+        if (!player.hasPermission(PERM_ARCHIVE)) {
+            player.sendMessage("§c[!] You don't has access to that command.");
+            player.closeInventory();
+            return;
+        }
+        String idLine = event.getCurrentItem().getItemMeta().getLore().get(0);
+        DeathInventory deathInventory = this.getRecord(Integer.parseInt(ChatColor.stripColor(idLine).replace("ID #", "").trim()));
+        if (deathInventory != null) this.openRecord(player, deathInventory);
+    }
+
+    @EventHandler
+    public void onPreviewDrag(InventoryDragEvent event) {
+        String title = event.getInventory().getTitle();
+        if (title.equals(BOX_TITLE) || title.startsWith(RECORD_TITLE) || title.startsWith("§cRevive: ")) event.setCancelled(true);
+    }
+
     public String date(Long dong) {
         SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm");
         Date resultdate = new Date(dong);
@@ -224,7 +387,7 @@ public class ReviveCommand
         ArrayList<DeathInventory> result = new ArrayList<DeathInventory>();
         HashMap<DeathInventory, Long> invs = new HashMap<DeathInventory, Long>();
         for (DeathInventory inv : this.inst.getDeathInventories()) {
-            if (!inv.getPlayer().equals(player) || inv.isRevived()) continue;
+            if (!inv.getPlayer().equals(player) || inv.isRevived() || inv.isArchived()) continue;
             result.add(inv);
         }
         for (DeathInventory di : result) {
@@ -237,7 +400,7 @@ public class ReviveCommand
         return result;
     }
 
-    @EventHandler(ignoreCancelled=true)
+    @EventHandler   // the box cancels every click (preview); page arrows must still work
     public void onClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) {
             return;

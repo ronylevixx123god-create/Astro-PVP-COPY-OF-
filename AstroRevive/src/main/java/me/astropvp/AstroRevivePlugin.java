@@ -30,7 +30,8 @@ public class AstroRevivePlugin extends JavaPlugin {
             current++;
             long deathDate = getConfig().getConfigurationSection(s).getLong("time");
             long maxTime = 172800L;
-            if ((System.currentTimeMillis() - deathDate) / 1000L > maxTime) {
+            // archived records stay until an admin deals with them
+            if (!getConfig().getConfigurationSection(s).getBoolean("archived") && (System.currentTimeMillis() - deathDate) / 1000L > maxTime) {
                 getConfig().set(s, null);
                 continue;
             }
@@ -71,6 +72,13 @@ public class AstroRevivePlugin extends JavaPlugin {
         section.set("damage", inv.getDamage());
         section.set("revived", inv.isRevived());
         section.set("reviver", inv.getReviver());
+        section.set("archived", inv.isArchived());
+    }
+
+    /** write one record to disk now (archiving / reviving must survive a crash, not only a clean shutdown) */
+    public void saveNow(DeathInventory inv) {
+        save(inv);
+        saveConfig();
     }
 
     public void load(String ID) {
@@ -81,6 +89,7 @@ public class AstroRevivePlugin extends JavaPlugin {
         inv.setID(section.getInt("ID"));
         inv.setReviver(section.getString("reviver"));
         inv.setRevived(section.getBoolean("revived"));
+        inv.setArchived(section.getBoolean("archived"));
     }
 
     public ArrayList<DeathInventory> getDeathInventories() {

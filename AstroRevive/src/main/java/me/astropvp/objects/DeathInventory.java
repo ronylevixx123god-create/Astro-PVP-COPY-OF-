@@ -103,6 +103,17 @@ public class DeathInventory implements Serializable {
 
     private boolean revived;
 
+    /** "Delete Inventory" archives a record: hidden from /revive <player>, kept in /revive box. Not the same as revived. */
+    private boolean archived;
+
+    public boolean isArchived() {
+        return this.archived;
+    }
+
+    public void setArchived(boolean archived) {
+        this.archived = archived;
+    }
+
     public String getReviver() {
         return this.reviver;
     }
