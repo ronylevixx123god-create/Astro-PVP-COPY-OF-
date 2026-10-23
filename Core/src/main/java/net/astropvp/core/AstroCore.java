@@ -590,6 +590,7 @@ public class AstroCore extends JavaPlugin {
         pluginManager.registerEvents(new PlayerQuitListener(this), this);
         pluginManager.registerEvents(new FreezeListener(this), this);
         pluginManager.registerEvents(new FreezeToolListener(this), this);
+        pluginManager.registerEvents(new FrozenChatListener(this), this);
         pluginManager.registerEvents(new StaffJoinListener(this), this);
         pluginManager.registerEvents(new RemoveKnockbackEnchantListener(), this);
 
