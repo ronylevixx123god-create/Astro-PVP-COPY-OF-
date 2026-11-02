@@ -1,0 +1,14 @@
+name: AstroKitReset
+version: 1.0
+main: net.astropvp.kitreset.AstroKitReset
+author: AstroPvP
+description: /kitreset - reset kit cooldowns for EssentialsX kits, gkits, mkits and vkits.
+softdepend: [Essentials, CosmicGlobalKits, CosmicEvolutionKits]
+commands:
+  kitreset:
+    description: Reset kit cooldowns (EssentialsX kits, gkits, mkits, vkits).
+    usage: /kitreset <kit|all> <player|all>
+permissions:
+  astrokitreset.use:
+    description: Use /kitreset.
+    default: op
