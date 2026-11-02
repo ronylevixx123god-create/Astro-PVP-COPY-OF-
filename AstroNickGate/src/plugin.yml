@@ -1,0 +1,5 @@
+name: AstroNickGate
+version: '1.0'
+main: net.astropvp.nickgate.AstroNickGate
+author: AstroPvP
+description: Shows "You need the Nebula rank" when a player without essentials.nick uses /nick.
