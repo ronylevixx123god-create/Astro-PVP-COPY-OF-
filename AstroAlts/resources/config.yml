@@ -1,0 +1,24 @@
+# AstroAlts: every server (main + lobbies) records each join's real IP (forwarded by the proxy) in the shared
+# MariaDB, so /alts <player> shows accounts that joined from the same IP anywhere on the network.
+# A shared IP is only a possible link (family, school, VPN...). This plugin never punishes anyone.
+database:
+  host: 127.0.0.1
+  port: 3306
+  name: astropvp
+  user: ''
+  password: ''
+
+# name this server is recorded under ("Online now (<name>)"). Empty = the LuckPerms server name.
+server-name: ''
+
+# how many of the most recent IPs are kept per account
+max-ips-per-account: 10
+
+# a staff alert for the same player is sent at most once in this many minutes (server switches are new joins)
+alert-cooldown-minutes: 10
+
+# how often this server publishes its ban list to the shared DB (seconds)
+ban-sync-seconds: 15
+
+# how often (ticks) every server checks for new staff alerts (20 = 1 second)
+poll-ticks: 40

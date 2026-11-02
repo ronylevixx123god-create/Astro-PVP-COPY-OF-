@@ -1,0 +1,20 @@
+name: AstroAlts
+version: '1.0'
+main: net.astropvp.alts.AstroAlts
+author: AstroPvP
+description: Network-wide /alts (accounts sharing an IP) for staff, with join alerts. Never punishes anyone.
+softdepend: [LuckPerms, AstroMute]
+commands:
+  alts:
+    description: Accounts that joined from the same IP as a player (staff only).
+    usage: /alts <player>
+permissions:
+  astroalts.use:
+    description: Use /alts.
+    default: op
+  astroalts.alerts:
+    description: See "may be an alt of" alerts when players join.
+    default: op
+  astroalts.ip:
+    description: See the IPs with /alts <player> ip.
+    default: false
